@@ -1,13 +1,13 @@
 import { useState } from 'react';
-import { 
-  ChevronLeft, 
-  Building2, 
-  Activity, 
-  Settings2, 
-  LayoutGrid, 
-  ListChecks, 
-  Users, 
-  Timer, 
+import {
+  ChevronLeft,
+  Building2,
+  Activity,
+  Settings2,
+  LayoutGrid,
+  ListChecks,
+  Users,
+  Timer,
   RefreshCw,
   LayoutDashboard,
   Radio,
@@ -25,7 +25,16 @@ import {
   Bell,
   CreditCard,
   Palette,
-  Brush
+  Brush,
+  Database,
+  Search,
+  Globe,
+  CheckCircle2,
+  HeartPulse,
+  Share2,
+  Building,
+  Crown,
+  Laptop
 } from 'lucide-react';
 import { NAV_MODULES } from '@/config/navigation';
 import { NavItem, UserRole } from '@/types/uniafy';
@@ -63,6 +72,15 @@ const iconMap: Record<string, React.ReactNode> = {
   CreditCard: <CreditCard className="w-4 h-4" />,
   Palette: <Palette className="w-4 h-4" />,
   Brush: <Brush className="w-4 h-4" />,
+  Database: <Database className="w-4 h-4" />,
+  Search: <Search className="w-4 h-4" />,
+  Globe: <Globe className="w-4 h-4" />,
+  CheckCircle2: <CheckCircle2 className="w-4 h-4" />,
+  HeartPulse: <HeartPulse className="w-4 h-4" />,
+  Share2: <Share2 className="w-4 h-4" />,
+  Building: <Building className="w-4 h-4" />,
+  Crown: <Crown className="w-4 h-4" />,
+  Laptop: <Laptop className="w-4 h-4" />,
 };
 
 export function ContextSidebar({ activeModule, userRole }: ContextSidebarProps) {
@@ -74,7 +92,7 @@ export function ContextSidebar({ activeModule, userRole }: ContextSidebarProps) 
   const items = currentModule?.items.filter(item => item.roles.includes(userRole)) || [];
 
   return (
-    <aside 
+    <aside
       className={cn(
         "bg-background-secondary border-r border-border-industrial transition-all duration-500 flex flex-col",
         isCollapsed ? "w-[56px]" : "w-[290px]"
