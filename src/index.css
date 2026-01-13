@@ -11,42 +11,42 @@
     /* Uniafy Primary Orange */
     --primary: 24 100% 52%;
     --primary-foreground: 0 0% 0%;
-    
+
     /* Dark Industrial Backgrounds */
-    --background: 0 0% 0%;
-    --foreground: 0 0% 100%;
-    
+    --background: 240 10% 2%;
+    --foreground: 0 0% 98%;
+
     --background-secondary: 0 0% 2%;
     --background-tertiary: 0 0% 6%;
-    
+
     /* Card with glassmorphism */
-    --card: 0 0% 6%;
-    --card-foreground: 0 0% 100%;
-    
-    --popover: 0 0% 6%;
-    --popover-foreground: 0 0% 100%;
-    
+    --card: 240 10% 4%;
+    --card-foreground: 0 0% 98%;
+
+    --popover: 240 10% 4%;
+    --popover-foreground: 0 0% 98%;
+
     /* Zinc Scale */
-    --muted: 240 4% 16%;
+    --muted: 240 5% 10%;
     --muted-foreground: 240 5% 65%;
-    
-    --accent: 0 0% 10%;
-    --accent-foreground: 0 0% 100%;
-    
-    --secondary: 0 0% 8%;
-    --secondary-foreground: 0 0% 100%;
-    
-    --destructive: 0 84% 60%;
-    --destructive-foreground: 0 0% 100%;
-    
+
+    --accent: 20 100% 50%;
+    --accent-foreground: 0 0% 98%;
+
+    --secondary: 240 5% 10%;
+    --secondary-foreground: 0 0% 98%;
+
+    --destructive: 0 62.8% 30.6%;
+    --destructive-foreground: 0 0% 98%;
+
     /* Industrial Borders */
-    --border: 0 0% 100% / 0.05;
+    --border: 240 5% 12%;
     --border-industrial: 0 0% 100% / 0.08;
-    --input: 0 0% 15%;
-    --ring: 24 100% 52%;
-    
-    --radius: 0.5rem;
-    
+    --input: 240 5% 12%;
+    --ring: 20 100% 50%;
+
+    --radius: 0.3rem;
+
     /* Sidebar */
     --sidebar-background: 0 0% 2%;
     --sidebar-foreground: 0 0% 100%;
@@ -56,13 +56,13 @@
     --sidebar-accent-foreground: 0 0% 100%;
     --sidebar-border: 0 0% 100% / 0.05;
     --sidebar-ring: 24 100% 52%;
-    
+
     /* Custom Uniafy Tokens */
     --uniafy-orange: 24 100% 52%;
     --uniafy-success: 142 76% 36%;
     --uniafy-warning: 38 92% 50%;
     --uniafy-danger: 0 84% 60%;
-    
+
     /* Zinc Scale for text hierarchy */
     --zinc-400: 240 5% 65%;
     --zinc-500: 240 4% 46%;
@@ -81,58 +81,80 @@
     @apply bg-background text-foreground font-sans antialiased;
     font-family: 'Inter', sans-serif;
   }
-  
+
   /* Industrial Typography */
   .text-industrial {
-    @apply uppercase tracking-wider;
+    @apply uppercase;
   }
-  
+
   .text-industrial-italic {
-    @apply uppercase tracking-wider italic;
+    @apply uppercase italic;
   }
 }
 
 @layer components {
+
   /* Industrial Card with Glassmorphism */
-  .card-industrial {
-    @apply bg-background-tertiary/40 backdrop-blur-xl border border-border-industrial rounded-lg;
+  /* Glassmorphism & Depth Utilities */
+  .glass-panel {
+    @apply bg-card/40 backdrop-blur-xl border border-white/5 shadow-2xl;
   }
-  
+
+  .glass-card {
+    @apply bg-white/[0.02] backdrop-blur-md border border-white/[0.05] shadow-xl;
+  }
+
+  .border-metal {
+    @apply border-[#1F1F23];
+  }
+
+  .text-shadow-glow {
+    text-shadow: 0 0 15px rgba(255, 85, 0, 0.3);
+  }
+
+  .card-industrial {
+    @apply bg-card border border-border shadow-2xl transition-all duration-300;
+  }
+
+  .card-industrial:hover {
+    @apply border-primary/20 shadow-primary/5 bg-white/[0.03];
+  }
+
   /* Glowing accent border */
   .border-glow {
     @apply border-l-2 border-l-primary;
   }
-  
+
   /* Status indicators */
   .status-stable {
     @apply text-green-500;
   }
-  
+
   .status-warning {
     @apply text-orange-500;
   }
-  
+
   .status-critical {
     @apply text-red-500;
   }
-  
+
   /* Module navigation item */
   .nav-module {
     @apply flex items-center gap-3 px-4 py-3 text-muted-foreground hover:text-foreground hover:bg-accent transition-all duration-300 rounded-md cursor-pointer;
   }
-  
+
   .nav-module.active {
     @apply bg-primary/10 text-primary border-l-2 border-l-primary;
   }
-  
+
   /* KPI Card */
   .kpi-card {
     @apply card-industrial p-4 flex flex-col gap-2;
   }
-  
+
   /* Industrial Button */
   .btn-industrial {
-    @apply uppercase tracking-wider font-semibold text-sm px-6 py-3 transition-all duration-300;
+    @apply uppercase font-semibold text-sm px-6 py-3 transition-all duration-300;
   }
 }
 
@@ -140,7 +162,7 @@
   .text-gradient-orange {
     @apply bg-gradient-to-r from-orange-500 to-orange-400 bg-clip-text text-transparent;
   }
-  
+
   .glow-orange {
     box-shadow: 0 0 20px hsl(24 100% 52% / 0.3);
   }

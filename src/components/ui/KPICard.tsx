@@ -17,10 +17,10 @@ const iconMap = {
   wifi: Wifi,
 };
 
-export function KPICard({ 
-  label, 
-  value, 
-  change, 
+export function KPICard({
+  label,
+  value,
+  change,
   status = 'sync',
   variant = 'default',
   icon
@@ -52,9 +52,7 @@ export function KPICard({
   return (
     <div className="card-industrial p-5 flex flex-col gap-3">
       <div className="flex items-center justify-between">
-        <span className="text-xs uppercase tracking-wider text-muted-foreground">
-          {label}
-        </span>
+        <span className="text-[10px] uppercase font-bold text-muted-foreground mr-auto">{label}</span>
         {Icon && (
           <Icon className="w-4 h-4 text-muted-foreground" />
         )}

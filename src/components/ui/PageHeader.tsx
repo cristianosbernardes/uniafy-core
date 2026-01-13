@@ -15,24 +15,24 @@ interface PageHeaderProps {
   }[];
 }
 
-export function PageHeader({ 
-  title, 
+export function PageHeader({
+  title,
   titleAccent,
-  subtitle, 
+  subtitle,
   badge,
-  actions 
+  actions
 }: PageHeaderProps) {
   return (
     <div className="flex items-start justify-between">
       <div>
-        <h1 className="text-3xl font-bold tracking-tight uppercase italic">
+        <h1 className="text-4xl font-black uppercase italic leading-none">
           <span className="text-foreground">{title}</span>
           {titleAccent && (
-            <span className="text-primary ml-2">{titleAccent}</span>
+            <span className="text-primary ml-3">{titleAccent}</span>
           )}
         </h1>
         {subtitle && (
-          <p className="text-xs uppercase tracking-widest text-muted-foreground mt-1">
+          <p className="text-[11px] uppercase text-muted-foreground mt-2 font-bold opacity-60 tracking-wider">
             {subtitle}
           </p>
         )}
@@ -40,12 +40,12 @@ export function PageHeader({
 
       <div className="flex items-center gap-3">
         {badge && (
-          <span className="px-3 py-1.5 text-xs uppercase tracking-wider border border-primary text-primary rounded-md flex items-center gap-2">
-            <span className="w-1.5 h-1.5 rounded-full bg-primary animate-pulse" />
+          <span className="px-3 py-1.5 text-[10px] uppercase font-black border border-primary/30 text-primary bg-primary/5 rounded flex items-center gap-3 shadow-lg shadow-primary/5">
+            <span className="w-2 h-2 rounded-full bg-primary animate-pulse shadow-[0_0_10px_rgba(255,85,0,0.5)]" />
             {badge}
           </span>
         )}
-        
+
         {actions?.map((action, index) => {
           const Icon = action.icon;
           return (
@@ -53,10 +53,10 @@ export function PageHeader({
               key={index}
               variant={action.variant === 'primary' ? 'default' : 'outline'}
               className={cn(
-                "uppercase tracking-wider text-xs font-semibold",
-                action.variant === 'primary' 
-                  ? "bg-primary text-primary-foreground hover:bg-primary/90" 
-                  : "border-border-industrial text-muted-foreground hover:text-foreground hover:border-foreground"
+                "uppercase text-[11px] font-black h-10 px-6 rounded transition-all duration-300",
+                action.variant === 'primary'
+                  ? "bg-primary text-black hover:bg-primary/90 shadow-lg shadow-primary/20"
+                  : "border-border bg-white/5 text-muted-foreground hover:text-foreground hover:border-foreground"
               )}
               onClick={action.onClick}
             >

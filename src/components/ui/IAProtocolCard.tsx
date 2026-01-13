@@ -39,7 +39,7 @@ export function IAProtocolCard({
         {/* Badge */}
         <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md border border-border-industrial bg-background/50 mb-4">
           <Info className="w-3.5 h-3.5 text-primary" />
-          <span className="text-xs uppercase tracking-wider text-muted-foreground">
+          <span className="text-xs uppercase text-muted-foreground">
             IA EXPERT PROTOCOL
           </span>
         </div>
@@ -63,7 +63,7 @@ export function IAProtocolCard({
         {/* Actions */}
         <div className="flex items-center gap-3">
           {primaryAction && (
-            <Button 
+            <Button
               className="bg-primary text-primary-foreground hover:bg-primary/90 uppercase tracking-wider text-xs font-semibold"
               onClick={primaryAction.onClick}
             >
@@ -71,7 +71,7 @@ export function IAProtocolCard({
             </Button>
           )}
           {secondaryAction && (
-            <Button 
+            <Button
               variant="outline"
               className="border-border-industrial text-muted-foreground hover:text-foreground hover:border-foreground uppercase tracking-wider text-xs font-semibold"
               onClick={secondaryAction.onClick}

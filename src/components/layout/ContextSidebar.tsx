@@ -1,13 +1,13 @@
 import { useState } from 'react';
-import { 
-  ChevronLeft, 
-  Building2, 
-  Activity, 
-  Settings2, 
-  LayoutGrid, 
-  ListChecks, 
-  Users, 
-  Timer, 
+import {
+  ChevronLeft,
+  Building2,
+  Activity,
+  Settings2,
+  LayoutGrid,
+  ListChecks,
+  Users,
+  Timer,
   RefreshCw,
   LayoutDashboard,
   Radio,
@@ -25,12 +25,22 @@ import {
   Bell,
   CreditCard,
   Palette,
-  Brush
+  Brush,
+  ChevronRight,
+  Database,
+  Search,
+  FileText,
+  HeartPulse,
+  Rocket,
+  Wallet,
+  PenTool,
+  Microscope,
+  Globe
 } from 'lucide-react';
 import { NAV_MODULES } from '@/config/navigation';
 import { NavItem, UserRole } from '@/types/uniafy';
 import { cn } from '@/lib/utils';
-import { useNavigate, useLocation } from 'react-router-dom';
+import { useNavigate, useLocation, Link } from 'react-router-dom';
 
 interface ContextSidebarProps {
   activeModule: string;
@@ -38,31 +48,40 @@ interface ContextSidebarProps {
 }
 
 const iconMap: Record<string, React.ReactNode> = {
-  Building2: <Building2 className="w-4 h-4" />,
-  Activity: <Activity className="w-4 h-4" />,
-  Settings2: <Settings2 className="w-4 h-4" />,
-  LayoutGrid: <LayoutGrid className="w-4 h-4" />,
-  ListChecks: <ListChecks className="w-4 h-4" />,
-  Users: <Users className="w-4 h-4" />,
-  Timer: <Timer className="w-4 h-4" />,
-  RefreshCw: <RefreshCw className="w-4 h-4" />,
-  LayoutDashboard: <LayoutDashboard className="w-4 h-4" />,
-  Radio: <Radio className="w-4 h-4" />,
-  MessageSquare: <MessageSquare className="w-4 h-4" />,
-  BarChart3: <BarChart3 className="w-4 h-4" />,
-  Brain: <Brain className="w-4 h-4" />,
-  Megaphone: <Megaphone className="w-4 h-4" />,
-  Calendar: <Calendar className="w-4 h-4" />,
-  Target: <Target className="w-4 h-4" />,
-  PieChart: <PieChart className="w-4 h-4" />,
-  Radar: <Radar className="w-4 h-4" />,
-  Eye: <Eye className="w-4 h-4" />,
-  User: <User className="w-4 h-4" />,
-  Zap: <Zap className="w-4 h-4" />,
-  Bell: <Bell className="w-4 h-4" />,
-  CreditCard: <CreditCard className="w-4 h-4" />,
-  Palette: <Palette className="w-4 h-4" />,
-  Brush: <Brush className="w-4 h-4" />,
+  Building2: <Building2 className="w-3 h-3" />,
+  Activity: <Activity className="w-3 h-3" />,
+  Settings2: <Settings2 className="w-3 h-3" />,
+  LayoutGrid: <LayoutGrid className="w-3 h-3" />,
+  ListChecks: <ListChecks className="w-3 h-3" />,
+  Users: <Users className="w-3 h-3" />,
+  Timer: <Timer className="w-3 h-3" />,
+  RefreshCw: <RefreshCw className="w-3 h-3" />,
+  LayoutDashboard: <LayoutDashboard className="w-3 h-3" />,
+  Radio: <Radio className="w-3 h-3" />,
+  MessageSquare: <MessageSquare className="w-3 h-3" />,
+  BarChart3: <BarChart3 className="w-3 h-3" />,
+  Brain: <Brain className="w-3 h-3" />,
+  Megaphone: <Megaphone className="w-3 h-3" />,
+  Calendar: <Calendar className="w-3 h-3" />,
+  Target: <Target className="w-3 h-3" />,
+  PieChart: <PieChart className="w-3 h-3" />,
+  Radar: <Radar className="w-3 h-3" />,
+  Eye: <Eye className="w-3 h-3" />,
+  User: <User className="w-3 h-3" />,
+  Zap: <Zap className="w-3 h-3" />,
+  Bell: <Bell className="w-3 h-3" />,
+  CreditCard: <CreditCard className="w-3 h-3" />,
+  Palette: <Palette className="w-3 h-3" />,
+  Brush: <Brush className="w-3 h-3" />,
+  Database: <Database className="w-3 h-3" />,
+  Search: <Search className="w-3 h-3" />,
+  FileText: <FileText className="w-3 h-3" />,
+  HeartPulse: <HeartPulse className="w-3 h-3" />,
+  Rocket: <Rocket className="w-3 h-3" />,
+  Wallet: <Wallet className="w-3 h-3" />,
+  PenTool: <PenTool className="w-3 h-3" />,
+  Microscope: <Microscope className="w-3 h-3" />,
+  Globe: <Globe className="w-3 h-3" />,
 };
 
 export function ContextSidebar({ activeModule, userRole }: ContextSidebarProps) {
@@ -74,62 +93,67 @@ export function ContextSidebar({ activeModule, userRole }: ContextSidebarProps) 
   const items = currentModule?.items.filter(item => item.roles.includes(userRole)) || [];
 
   return (
-    <aside 
-      className={cn(
-        "bg-background-secondary border-r border-border-industrial transition-all duration-500 flex flex-col",
-        isCollapsed ? "w-[56px]" : "w-[290px]"
-      )}
-    >
+    <aside className={cn(
+      "h-[calc(100vh-64px)] bg-card/60 backdrop-blur-xl border-r border-border transition-all duration-300 overflow-hidden flex flex-col z-30 fixed top-16",
+      isCollapsed ? "w-16" : "w-64"
+    )} style={{
+      left: 'var(--module-sidebar-width, 64px)',
+      '--context-sidebar-width': isCollapsed ? '64px' : '256px'
+    } as any}>
+      {/* Noise Texture Overlay */}
+      <div className="absolute inset-0 pointer-events-none opacity-[0.02] bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
       {/* Header */}
-      <div className="h-12 px-4 flex items-center justify-between border-b border-border-industrial">
-        {!isCollapsed && (
-          <span className="text-xs uppercase tracking-widest text-muted-foreground italic">
-            {activeModule.toUpperCase()}_CONTEXTO
-          </span>
-        )}
+      <div className={cn(
+        "h-16 px-6 flex items-center justify-between border-b border-border relative z-10",
+        isCollapsed && "px-0 justify-center"
+      )}>
+        <span className={cn(
+          "text-[10px] font-black text-muted-foreground opacity-40 transition-all duration-300",
+          isCollapsed ? "opacity-0 invisible w-0" : "opacity-40 visible"
+        )}>
+          {activeModule.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')} / Contexto
+        </span>
         <button
           onClick={() => setIsCollapsed(!isCollapsed)}
-          className="w-6 h-6 flex items-center justify-center text-muted-foreground hover:text-foreground transition-colors ml-auto"
+          className="p-1.5 rounded border border-border hover:bg-white/5 hover:text-primary transition-all duration-300"
         >
-          <ChevronLeft className={cn("w-4 h-4 transition-transform duration-300", isCollapsed && "rotate-180")} />
+          {isCollapsed ? <ChevronRight className="w-3.5 h-3.5" /> : <ChevronLeft className="w-3.5 h-3.5" />}
         </button>
       </div>
 
-      {/* Navigation Items */}
-      <nav className="flex-1 py-2 px-2 space-y-1 overflow-y-auto">
+      <nav className="flex-1 py-6 px-4 space-y-2 relative z-10 overflow-auto">
         {items.map((item) => {
           const isActive = location.pathname === item.path;
+          const Icon = item.icon && iconMap[item.icon as keyof typeof iconMap];
+
           return (
-            <button
-              key={item.id}
-              onClick={() => navigate(item.path)}
+            <Link
+              key={item.path}
+              to={item.path}
               className={cn(
-                "w-full flex items-start gap-3 px-3 py-3 rounded-md transition-all duration-300 text-left",
-                isActive
-                  ? "bg-primary/10 border-l-2 border-l-primary"
-                  : "hover:bg-accent border-l-2 border-l-transparent"
+                "group flex items-center transition-all duration-300 relative",
+                isCollapsed
+                  ? "justify-center w-12 h-12 mx-auto rounded-lg mb-2"
+                  : "gap-3 p-3 rounded-md mb-1",
+                isActive ? "bg-white/5 shadow-inner" : "hover:bg-white/[0.03]"
               )}
             >
-              <span className={cn(
-                "mt-0.5 flex-shrink-0",
-                isActive ? "text-primary" : "text-muted-foreground"
+              <div className={cn(
+                "transition-all duration-300 flex items-center justify-center shrink-0",
+                isCollapsed ? "w-10 h-10" : "p-2",
+                isActive
+                  ? "text-primary drop-shadow-[0_0_5px_rgba(255,85,0,0.3)]"
+                  : "text-muted-foreground group-hover:text-foreground"
               )}>
-                {iconMap[item.icon]}
-              </span>
+                {Icon}
+              </div>
+
               {!isCollapsed && (
-                <div className="flex-1 min-w-0">
-                  <p className={cn(
-                    "text-sm font-medium truncate",
-                    isActive ? "text-foreground" : "text-muted-foreground"
-                  )}>
-                    {item.title}
-                  </p>
-                  <p className="text-xs text-muted-foreground/70 truncate mt-0.5">
-                    {item.description}
-                  </p>
-                </div>
+                <span className="text-sm font-bold transition-all duration-300 truncate">
+                  {item.title}
+                </span>
               )}
-            </button>
+            </Link>
           );
         })}
       </nav>
