@@ -2,7 +2,7 @@ import { NavModule, UserRole } from '@/types/uniafy';
 
 export const NAV_MODULES: NavModule[] = [
   {
-    id: 'master',
+    id: 'mestre',
     label: 'MASTER & ADMIN',
     icon: 'Crown',
     roles: [UserRole.OWNER],
