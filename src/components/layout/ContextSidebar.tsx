@@ -106,7 +106,7 @@ export function ContextSidebar({ activeModule, userRole }: ContextSidebarProps) 
       "h-[calc(100vh-64px)] bg-card/60 backdrop-blur-xl border-r border-border transition-all duration-300 overflow-hidden flex flex-col z-30 fixed top-16",
       isCollapsed ? "w-16" : "w-64"
     )} style={{
-      left: 'var(--module-sidebar-width, 64px)',
+      left: 'var(--module-sidebar-width, 64px)', // Depends on DashboardShell state now
       '--context-sidebar-width': isCollapsed ? '64px' : '256px'
     } as any}>
       {/* Noise Texture Overlay */}
@@ -118,7 +118,7 @@ export function ContextSidebar({ activeModule, userRole }: ContextSidebarProps) 
         isCollapsed && "px-0 justify-center"
       )}>
         <span className={cn(
-          "text-[10px] font-black text-muted-foreground opacity-40 transition-all duration-300 uppercase tracking-widest",
+          "text-[10px] font-black text-muted-foreground opacity-40 transition-all duration-300 tracking-widest", // Removed uppercase
           isCollapsed ? "opacity-0 invisible w-0" : "opacity-40 visible"
         )}>
           {activeModule.replace('-', ' ')} / Contexto
@@ -159,7 +159,7 @@ export function ContextSidebar({ activeModule, userRole }: ContextSidebarProps) 
               </div>
 
               {!isCollapsed && (
-                <span className="text-sm font-bold transition-all duration-300 truncate uppercase tracking-tight">
+                <span className="text-sm font-bold transition-all duration-300 truncate tracking-tight"> {/* Removed uppercase */}
                   {item.title}
                 </span>
               )}

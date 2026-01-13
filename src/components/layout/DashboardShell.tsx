@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useLocation, useNavigate, Outlet } from 'react-router-dom';
 import { DashboardHeader } from './DashboardHeader';
 import { ModuleSidebar } from './ModuleSidebar';
@@ -13,6 +14,7 @@ export function DashboardShell({ children }: DashboardShellProps) {
   const location = useLocation();
   const navigate = useNavigate();
   const { user, loading } = useAuth();
+  const [isSidebarExpanded, setIsSidebarExpanded] = useState(false);
 
   // Extrai o primeiro segmento da URL como o módulo ativo (ex: /growth/hunter -> growth)
   const activeModule = location.pathname.split('/')[1] || 'growth';
@@ -30,7 +32,14 @@ export function DashboardShell({ children }: DashboardShellProps) {
   return (
     <div className="min-h-screen bg-background flex flex-col">
       <DashboardHeader user={user} />
-      <div className="flex-1 flex overflow-hidden h-[calc(100vh-64px)]">
+      {/* 
+        This wrapper applies the width variable to all children.
+        When ModuleSidebar expands, this variable updates, pushing ContextSidebar and Main content.
+      */}
+      <div
+        className="flex-1 flex overflow-hidden h-[calc(100vh-64px)] relative"
+        style={{ '--module-sidebar-width': isSidebarExpanded ? '280px' : '64px' } as any}
+      >
         <ModuleSidebar
           activeModule={activeModule}
           onModuleChange={(moduleId) => {
@@ -40,6 +49,8 @@ export function DashboardShell({ children }: DashboardShellProps) {
             }
           }}
           userRole={user.role}
+          isExpanded={isSidebarExpanded}
+          onExpand={setIsSidebarExpanded}
         />
 
         <ContextSidebar
@@ -48,9 +59,9 @@ export function DashboardShell({ children }: DashboardShellProps) {
         />
 
         <main
-          className="flex-1 overflow-auto bg-background"
+          className="flex-1 overflow-auto bg-background transition-all duration-300"
           style={{
-            marginLeft: 'calc(var(--module-sidebar-width, 64px) + (var(--context-sidebar-width, 256px)))'
+            marginLeft: 'calc(var(--module-sidebar-width, 64px) + var(--context-sidebar-width, 256px))'
           }}
         >
           {children || <Outlet />}

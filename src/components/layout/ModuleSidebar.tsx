@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import {
   Crown,
@@ -12,7 +11,8 @@ import {
   LayoutGrid,
   LogOut,
   Building,
-  Laptop
+  Laptop,
+  LayoutDashboard
 } from 'lucide-react';
 import { NAV_MODULES } from '@/config/navigation';
 import { NavModule, UserRole } from '@/types/uniafy';
@@ -23,6 +23,8 @@ interface ModuleSidebarProps {
   activeModule: string;
   onModuleChange: (moduleId: string) => void;
   userRole: UserRole;
+  isExpanded: boolean;
+  onExpand: (expanded: boolean) => void;
 }
 
 const iconMap: Record<string, React.ReactNode> = {
@@ -37,10 +39,10 @@ const iconMap: Record<string, React.ReactNode> = {
   LayoutGrid: <LayoutGrid className="w-4 h-4" />,
   Building: <Building className="w-4 h-4" />,
   Laptop: <Laptop className="w-4 h-4" />,
+  LayoutDashboard: <LayoutDashboard className="w-4 h-4" />, // Adicionado para módulo Client Success
 };
 
-export function ModuleSidebar({ activeModule, onModuleChange, userRole }: ModuleSidebarProps) {
-  const [isExpanded, setIsExpanded] = useState(false);
+export function ModuleSidebar({ activeModule, onModuleChange, userRole, isExpanded, onExpand }: ModuleSidebarProps) {
   const { signOut } = useAuth();
   const navigate = useNavigate();
 
@@ -59,13 +61,13 @@ export function ModuleSidebar({ activeModule, onModuleChange, userRole }: Module
 
   return (
     <aside
-      onMouseEnter={() => setIsExpanded(true)}
-      onMouseLeave={() => setIsExpanded(false)}
+      onMouseEnter={() => onExpand(true)}
+      onMouseLeave={() => onExpand(false)}
       className={cn(
         "h-[calc(100vh-64px)] bg-card border-r border-border transition-all duration-300 group/sidebar overflow-hidden flex flex-col z-40 fixed top-16 left-0",
         isExpanded ? "w-[280px]" : "w-[64px]"
       )}
-      style={{ '--module-sidebar-width': isExpanded ? '280px' : '64px' } as any}
+    // Removed CSS variable from here since it's now handled by DashboardShell container
     >
       {/* Noise Texture Overlay */}
       <div className="absolute inset-0 pointer-events-none opacity-[0.03] bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
@@ -73,7 +75,7 @@ export function ModuleSidebar({ activeModule, onModuleChange, userRole }: Module
       <div className="flex-1 py-6 px-3 flex flex-col gap-2 relative z-10 overflow-x-hidden overflow-y-auto">
         {filteredModules.map((module) => {
           const isActive = activeModule === module.id;
-          const Icon = iconMap[module.icon];
+          const Icon = iconMap[module.icon] || <LayoutGrid className="w-4 h-4" />;
 
           return (
             <div key={module.id} className="relative group/module">
@@ -97,7 +99,7 @@ export function ModuleSidebar({ activeModule, onModuleChange, userRole }: Module
 
                 <div className="flex flex-col items-start overflow-hidden">
                   <span className={cn(
-                    "text-[13px] font-bold whitespace-nowrap transition-all duration-500 uppercase tracking-wider",
+                    "text-[13px] font-bold whitespace-nowrap transition-all duration-500 tracking-wider", // Removed uppercase
                     isExpanded ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-4",
                     isActive ? "text-primary" : "text-muted-foreground"
                   )}>
@@ -121,7 +123,7 @@ export function ModuleSidebar({ activeModule, onModuleChange, userRole }: Module
         >
           <LogOut className="w-5 h-5 shrink-0" />
           {isExpanded && (
-            <span className="text-[13px] font-bold uppercase tracking-wider whitespace-nowrap">
+            <span className="text-[13px] font-bold tracking-wider whitespace-nowrap"> {/* Removed uppercase */}
               Sair
             </span>
           )}
