@@ -8,12 +8,12 @@ interface DashboardHeaderProps {
 export function DashboardHeader({ user }: DashboardHeaderProps) {
   const getRoleLabel = (role: string) => {
     switch (role) {
-      case 'SUPER_ADMIN':
+      case 'OWNER':
         return 'ADMINISTRADOR_MESTRE';
-      case 'TENANT_ADMIN':
-        return 'ADMINISTRADOR_AGÊNCIA';
-      case 'END_USER':
-        return 'OPERADOR';
+      case 'AGENCY':
+        return 'GESTOR_AGENCIA';
+      case 'CLIENT':
+        return 'CLIENTE_FINAL';
       default:
         return role;
     }

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Database, Play, Trash2, List, Code, AlertTriangle, CheckCircle2, XCircle, Clock, Terminal, History } from 'lucide-react';
+import { Database, Play, Trash2, List, Code, AlertTriangle, CheckCircle2, XCircle, Clock } from 'lucide-react';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -50,7 +50,6 @@ export default function SqlBank() {
         setResults(null);
 
         try {
-            // Usando RPC para executar o SQL (requer a função admin_exec_sql instalada no Supabase)
             const { data, error: rpcError } = await supabase.rpc('admin_exec_sql', {
                 sql_query: query
             });
@@ -77,25 +76,25 @@ export default function SqlBank() {
         setQuery('');
         setResults(null);
         setError(null);
-        setLastExecuted(null); // Clear last executed time
+        setLastExecuted(null);
     };
 
     return (
-        <div className="p-8 space-y-6">
+        <div className="p-8 space-y-6 animate-in fade-in duration-700">
             <PageHeader
                 title="BANCO SQL"
-                titleAccent="MASTER"
-                subtitle="CONSOLE DE COMANDO • EXECUÇÃO DIRETA DE QUERIES NO ECOSSISTEMA"
+                titleAccent="INDUSTRIAL"
+                subtitle="V5.9.6 MASTER • EXECUÇÃO DIRETA DE COMANDOS"
             />
 
-            <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
-                {/* Query Editor Section */}
-                <div className="lg:col-span-3 space-y-4">
+            <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
+                {/* Editor Section */}
+                <div className="lg:col-span-8 space-y-6">
                     <div className="card-industrial p-6 space-y-4">
                         <div className="flex items-center justify-between border-b border-white/5 pb-3">
                             <div className="flex items-center gap-2">
-                                <Database className="w-4 h-4 text-primary" />
-                                <span className="text-[10px] uppercase font-bold text-muted-foreground">Editor de Protocolos SQL</span>
+                                <Code className="w-4 h-4 text-primary" />
+                                <span className="text-[10px] uppercase font-bold text-muted-foreground mr-4">Editor de Query SQL</span>
                             </div>
                             {lastExecuted && (
                                 <div className="flex items-center gap-2 text-[10px] text-muted-foreground lowercase italic">
@@ -106,49 +105,43 @@ export default function SqlBank() {
                         </div>
 
                         <div className="relative group">
-                            <div className="absolute -inset-0.5 bg-gradient-to-b from-primary/20 to-transparent opacity-0 group-focus-within:opacity-100 transition-opacity rounded-lg" />
-                            <textarea
+                            <div className="absolute inset-0 bg-primary/5 blur-xl group-focus-within:bg-primary/10 transition-all rounded-lg" />
+                            <Textarea
                                 value={query}
                                 onChange={(e) => setQuery(e.target.value)}
-                                placeholder="DIGITE SUA QUERY SQL AQUI... (EX: SELECT * FROM PROJETOS LIMIT 10;)"
-                                className="relative w-full h-80 bg-black/60 border border-white/5 rounded-lg p-6 text-sm text-primary focus:outline-none focus:border-primary/30 transition-all resize-none font-sans"
-                                spellCheck={false}
+                                placeholder="SELECT * FROM table..."
+                                className="min-h-[280px] font-mono text-sm bg-black/60 border-white/5 focus:border-primary/50 text-foreground/90 p-4 resize-none relative z-10"
                             />
                         </div>
 
-                        <div className="flex justify-between items-center">
-                            <div className="flex gap-2">
-                                <Button
-                                    variant="outline"
-                                    size="sm"
-                                    onClick={() => setQuery('')}
-                                    className="h-9 border-white/5 bg-white/5 text-[10px] uppercase font-bold text-muted-foreground hover:text-white"
-                                >
-                                    <Trash2 className="w-3.5 h-3.5 mr-2" />
-                                    Limpar
-                                </Button>
-                            </div>
-
+                        <div className="flex justify-between pt-2">
+                            <Button
+                                variant="outline"
+                                size="sm"
+                                onClick={clearQuery}
+                                className="h-9 border-white/5 bg-white/5 text-[10px] uppercase font-bold text-muted-foreground hover:text-white"
+                            >
+                                <Trash2 className="w-4 h-4 mr-2" />
+                                Limpar
+                            </Button>
                             <Button
                                 onClick={handleRunQuery}
-                                disabled={loading || !query.trim()}
-                                className="h-10 bg-primary hover:bg-primary/90 text-black font-bold uppercase px-8 gap-2 shadow-lg shadow-primary/10 overflow-hidden group relative"
+                                disabled={loading || !query}
+                                className="bg-primary hover:bg-primary/90 text-primary-foreground font-bold uppercase tracking-wider h-11 px-8 gap-2 group shadow-lg shadow-primary/20"
                             >
                                 {loading ? (
-                                    <>
-                                        <div className="w-4 h-4 border-2 border-black/20 border-t-black rounded-full animate-spin" />
-                                        PROCESSANDO...
-                                    </>
+                                    'Processando...'
                                 ) : (
                                     <>
-                                        EXECUTAR COMANDO
-                                        <Play className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
+                                        Executar Query
+                                        <Play className="w-4 h-4 fill-current group-hover:scale-110 transition-transform" />
                                     </>
                                 )}
                             </Button>
                         </div>
                     </div>
-                    {/* Painel de Resultados */}
+
+                    {/* Results Panel */}
                     <AnimatePresence mode="wait">
                         {(results || error) && (
                             <motion.div
@@ -158,7 +151,7 @@ export default function SqlBank() {
                                 className="card-industrial overflow-hidden border-white/5"
                             >
                                 <div className="p-4 bg-muted/30 border-b border-white/5 flex items-center justify-between">
-                                    <span className="text-[10px] uppercase font-sans text-muted-foreground">
+                                    <span className="text-[10px] uppercase tracking-widest font-mono text-muted-foreground">
                                         Saída de Dados
                                     </span>
                                     {error ? (
@@ -169,7 +162,7 @@ export default function SqlBank() {
                                 </div>
 
                                 {error ? (
-                                    <div className="p-6 bg-destructive/10 text-destructive font-sans text-sm border-l-2 border-destructive">
+                                    <div className="p-6 bg-destructive/10 text-destructive font-mono text-sm border-l-2 border-destructive">
                                         <div className="flex gap-2 items-start">
                                             <AlertTriangle className="w-4 h-4 mt-1 flex-shrink-0" />
                                             <pre className="whitespace-pre-wrap">{error}</pre>
@@ -178,7 +171,7 @@ export default function SqlBank() {
                                 ) : (
                                     <div className="overflow-x-auto max-h-[400px]">
                                         {results && results.length > 0 ? (
-                                            <table className="w-full text-left text-sm font-sans whitespace-nowrap">
+                                            <table className="w-full text-left text-sm font-mono whitespace-nowrap">
                                                 <thead>
                                                     <tr className="bg-white/5">
                                                         {Object.keys(results[0]).map((key) => (
@@ -212,10 +205,10 @@ export default function SqlBank() {
                     </AnimatePresence>
                 </div>
 
-                {/* Lateral de Presets */}
+                {/* Lateral of Presets */}
                 <div className="lg:col-span-4 gap-6">
                     <div className="card-industrial p-6 sticky top-8">
-                        <h3 className="text-xs font-bold uppercase text-primary mb-6 flex items-center gap-2">
+                        <h3 className="text-xs font-bold uppercase tracking-widest text-primary mb-6 flex items-center gap-2">
                             <List className="w-4 h-4" />
                             Presets Rápidos
                         </h3>

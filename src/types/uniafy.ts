@@ -1,9 +1,9 @@
 // Uniafy v5.9.6 Type Definitions
 
 export enum UserRole {
-  SUPER_ADMIN = 'SUPER_ADMIN',
-  TENANT_ADMIN = 'TENANT_ADMIN',
-  END_USER = 'END_USER'
+  OWNER = 'OWNER',
+  AGENCY = 'AGENCY',
+  CLIENT = 'CLIENT'
 }
 
 export type PipelineStatus = 'PAGAMENTO' | 'ONBOARDING' | 'SETUP' | 'ATIVO';

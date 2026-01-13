@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import {
   ChevronLeft,
+  ChevronRight,
   Building2,
   Activity,
   Settings2,
@@ -26,7 +27,6 @@ import {
   CreditCard,
   Palette,
   Brush,
-  ChevronRight,
   Database,
   Search,
   FileText,
@@ -35,7 +35,12 @@ import {
   Wallet,
   PenTool,
   Microscope,
-  Globe
+  Globe,
+  CheckCircle2,
+  Share2,
+  Building,
+  Crown,
+  Laptop
 } from 'lucide-react';
 import { NAV_MODULES } from '@/config/navigation';
 import { NavItem, UserRole } from '@/types/uniafy';
@@ -48,45 +53,49 @@ interface ContextSidebarProps {
 }
 
 const iconMap: Record<string, React.ReactNode> = {
-  Building2: <Building2 className="w-3 h-3" />,
-  Activity: <Activity className="w-3 h-3" />,
-  Settings2: <Settings2 className="w-3 h-3" />,
-  LayoutGrid: <LayoutGrid className="w-3 h-3" />,
-  ListChecks: <ListChecks className="w-3 h-3" />,
-  Users: <Users className="w-3 h-3" />,
-  Timer: <Timer className="w-3 h-3" />,
-  RefreshCw: <RefreshCw className="w-3 h-3" />,
-  LayoutDashboard: <LayoutDashboard className="w-3 h-3" />,
-  Radio: <Radio className="w-3 h-3" />,
-  MessageSquare: <MessageSquare className="w-3 h-3" />,
-  BarChart3: <BarChart3 className="w-3 h-3" />,
-  Brain: <Brain className="w-3 h-3" />,
-  Megaphone: <Megaphone className="w-3 h-3" />,
-  Calendar: <Calendar className="w-3 h-3" />,
-  Target: <Target className="w-3 h-3" />,
-  PieChart: <PieChart className="w-3 h-3" />,
-  Radar: <Radar className="w-3 h-3" />,
-  Eye: <Eye className="w-3 h-3" />,
-  User: <User className="w-3 h-3" />,
-  Zap: <Zap className="w-3 h-3" />,
-  Bell: <Bell className="w-3 h-3" />,
-  CreditCard: <CreditCard className="w-3 h-3" />,
-  Palette: <Palette className="w-3 h-3" />,
-  Brush: <Brush className="w-3 h-3" />,
-  Database: <Database className="w-3 h-3" />,
-  Search: <Search className="w-3 h-3" />,
-  FileText: <FileText className="w-3 h-3" />,
-  HeartPulse: <HeartPulse className="w-3 h-3" />,
-  Rocket: <Rocket className="w-3 h-3" />,
-  Wallet: <Wallet className="w-3 h-3" />,
-  PenTool: <PenTool className="w-3 h-3" />,
-  Microscope: <Microscope className="w-3 h-3" />,
-  Globe: <Globe className="w-3 h-3" />,
+  Building2: <Building2 className="w-4 h-4" />,
+  Activity: <Activity className="w-4 h-4" />,
+  Settings2: <Settings2 className="w-4 h-4" />,
+  LayoutGrid: <LayoutGrid className="w-4 h-4" />,
+  ListChecks: <ListChecks className="w-4 h-4" />,
+  Users: <Users className="w-4 h-4" />,
+  Timer: <Timer className="w-4 h-4" />,
+  RefreshCw: <RefreshCw className="w-4 h-4" />,
+  LayoutDashboard: <LayoutDashboard className="w-4 h-4" />,
+  Radio: <Radio className="w-4 h-4" />,
+  MessageSquare: <MessageSquare className="w-4 h-4" />,
+  BarChart3: <BarChart3 className="w-4 h-4" />,
+  Brain: <Brain className="w-4 h-4" />,
+  Megaphone: <Megaphone className="w-4 h-4" />,
+  Calendar: <Calendar className="w-4 h-4" />,
+  Target: <Target className="w-4 h-4" />,
+  PieChart: <PieChart className="w-4 h-4" />,
+  Radar: <Radar className="w-4 h-4" />,
+  Eye: <Eye className="w-4 h-4" />,
+  User: <User className="w-4 h-4" />,
+  Zap: <Zap className="w-4 h-4" />,
+  Bell: <Bell className="w-4 h-4" />,
+  CreditCard: <CreditCard className="w-4 h-4" />,
+  Palette: <Palette className="w-4 h-4" />,
+  Brush: <Brush className="w-4 h-4" />,
+  Database: <Database className="w-4 h-4" />,
+  Search: <Search className="w-4 h-4" />,
+  FileText: <FileText className="w-4 h-4" />,
+  HeartPulse: <HeartPulse className="w-4 h-4" />,
+  Rocket: <Rocket className="w-4 h-4" />,
+  Wallet: <Wallet className="w-4 h-4" />,
+  PenTool: <PenTool className="w-4 h-4" />,
+  Microscope: <Microscope className="w-4 h-4" />,
+  Globe: <Globe className="w-4 h-4" />,
+  CheckCircle2: <CheckCircle2 className="w-4 h-4" />,
+  Share2: <Share2 className="w-4 h-4" />,
+  Building: <Building className="w-4 h-4" />,
+  Crown: <Crown className="w-4 h-4" />,
+  Laptop: <Laptop className="w-4 h-4" />,
 };
 
 export function ContextSidebar({ activeModule, userRole }: ContextSidebarProps) {
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const navigate = useNavigate();
   const location = useLocation();
 
   const currentModule = NAV_MODULES.find(m => m.id === activeModule);
@@ -102,16 +111,17 @@ export function ContextSidebar({ activeModule, userRole }: ContextSidebarProps) 
     } as any}>
       {/* Noise Texture Overlay */}
       <div className="absolute inset-0 pointer-events-none opacity-[0.02] bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
+
       {/* Header */}
       <div className={cn(
         "h-16 px-6 flex items-center justify-between border-b border-border relative z-10",
         isCollapsed && "px-0 justify-center"
       )}>
         <span className={cn(
-          "text-[10px] font-black text-muted-foreground opacity-40 transition-all duration-300",
+          "text-[10px] font-black text-muted-foreground opacity-40 transition-all duration-300 uppercase tracking-widest",
           isCollapsed ? "opacity-0 invisible w-0" : "opacity-40 visible"
         )}>
-          {activeModule.split('-').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ')} / Contexto
+          {activeModule.replace('-', ' ')} / Contexto
         </span>
         <button
           onClick={() => setIsCollapsed(!isCollapsed)}
@@ -149,7 +159,7 @@ export function ContextSidebar({ activeModule, userRole }: ContextSidebarProps) 
               </div>
 
               {!isCollapsed && (
-                <span className="text-sm font-bold transition-all duration-300 truncate">
+                <span className="text-sm font-bold transition-all duration-300 truncate uppercase tracking-tight">
                   {item.title}
                 </span>
               )}

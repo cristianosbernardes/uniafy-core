@@ -3,30 +3,33 @@ import { DashboardHeader } from './DashboardHeader';
 import { ModuleSidebar } from './ModuleSidebar';
 import { ContextSidebar } from './ContextSidebar';
 import { NAV_MODULES } from '@/config/navigation';
-import { User, UserRole } from '@/types/uniafy';
+import { useAuth } from '@/contexts/AuthContext';
 
 interface DashboardShellProps {
   children?: React.ReactNode;
 }
 
-// Mock user - in production this comes from auth
-const mockUser: User = {
-  id: '1',
-  name: 'Cristiano bernardes',
-  email: 'cristiano@uniafy.com',
-  role: UserRole.SUPER_ADMIN,
-};
-
 export function DashboardShell({ children }: DashboardShellProps) {
   const location = useLocation();
   const navigate = useNavigate();
+  const { user, loading } = useAuth();
 
-  // Extrai o primeiro segmento da URL como o módulo ativo (ex: /master/sql -> master)
-  const activeModule = location.pathname.split('/')[1] || 'prospeccao';
+  // Extrai o primeiro segmento da URL como o módulo ativo (ex: /growth/hunter -> growth)
+  const activeModule = location.pathname.split('/')[1] || 'growth';
+
+  if (loading || !user) {
+    return (
+      <div className="min-h-screen bg-[#050505] flex items-center justify-center">
+        <div className="text-primary font-mono uppercase tracking-[0.3em] animate-pulse">
+          Sincronizando Dados Uniafy...
+        </div>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <DashboardHeader user={mockUser} />
+      <DashboardHeader user={user} />
       <div className="flex-1 flex overflow-hidden h-[calc(100vh-64px)]">
         <ModuleSidebar
           activeModule={activeModule}
@@ -36,12 +39,12 @@ export function DashboardShell({ children }: DashboardShellProps) {
               navigate(module.items[0].path);
             }
           }}
-          userRole={mockUser.role}
+          userRole={user.role}
         />
 
         <ContextSidebar
           activeModule={activeModule}
-          userRole={mockUser.role}
+          userRole={user.role}
         />
 
         <main

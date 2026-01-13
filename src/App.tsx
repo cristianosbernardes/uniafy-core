@@ -3,10 +3,12 @@ import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
+import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import Dashboard from "./pages/Dashboard";
 import GestaoClientes from "./pages/GestaoClientes";
 import MeuPerfil from "./pages/MeuPerfil";
 import NotFound from "./pages/NotFound";
+import Login from "./pages/Login";
 import SqlBank from "./pages/SqlBank";
 import GHunter from "./pages/GHunter";
 import CnpjSniper from "./pages/CnpjSniper";
@@ -14,57 +16,81 @@ import { DashboardShell } from "./components/layout/DashboardShell";
 
 const queryClient = new QueryClient();
 
+const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="min-h-screen bg-[#050505] flex items-center justify-center">
+        <div className="text-primary font-mono uppercase tracking-[0.3em] animate-pulse">
+          Iniciando Uniafy Core...
+        </div>
+      </div>
+    );
+  }
+
+  if (!user) {
+    return <Navigate to="/login" replace />;
+  }
+
+  return <>{children}</>;
+};
+
+const AppRoutes = () => {
+  return (
+    <Routes>
+      <Route path="/login" element={<Login />} />
+
+      {/* Main Layout Wrapping Private Routes */}
+      <Route element={<PrivateRoute><DashboardShell /></PrivateRoute>}>
+        <Route path="/" element={<Navigate to="/growth/hunter" replace />} />
+
+        {/* Mestre Routes */}
+        <Route path="/mestre/agencias" element={<GestaoClientes />} />
+        <Route path="/mestre/sql" element={<SqlBank />} />
+
+        {/* Growth Engine Routes */}
+        <Route path="/growth/hunter" element={<GHunter />} />
+        <Route path="/growth/sniper" element={<Dashboard />} />
+        <Route path="/growth/cnpj" element={<CnpjSniper />} />
+        <Route path="/growth/crm" element={<Dashboard />} />
+
+        {/* Agency OS Routes */}
+        <Route path="/agency-os/onboarding" element={<Dashboard />} />
+        <Route path="/agency-os/squads" element={<Dashboard />} />
+        <Route path="/agency-os/financeiro" element={<Dashboard />} />
+
+        {/* Traffic Commander Routes */}
+        <Route path="/traffic/analytics" element={<Dashboard />} />
+        <Route path="/traffic/auditor" element={<Dashboard />} />
+        <Route path="/traffic/otimizador" element={<Dashboard />} />
+
+        {/* Client Success Routes */}
+        <Route path="/success/portal" element={<Dashboard />} />
+        <Route path="/success/aprovacao" element={<Dashboard />} />
+        <Route path="/success/health" element={<Dashboard />} />
+
+        {/* Sistema Routes */}
+        <Route path="/sistema/perfil" element={<MeuPerfil />} />
+      </Route>
+
+      {/* Catch-all */}
+      <Route path="*" element={<NotFound />} />
+    </Routes>
+  );
+};
+
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <Routes>
-          {/* Main Layout Wrapping Routes */}
-          <Route element={<DashboardShell />}>
-            <Route path="/" element={<Navigate to="/prospeccao/hunter" replace />} />
-
-            {/* MASTER & ADMIN */}
-            <Route path="/master/dashboard" element={<Dashboard />} />
-            <Route path="/master/white-label" element={<Dashboard />} />
-            <Route path="/master/squads" element={<Dashboard />} />
-            <Route path="/master/sql" element={<SqlBank />} />
-
-            {/* MÁQUINA DE PROSPECÇÃO */}
-            <Route path="/prospeccao/hunter" element={<GHunter />} />
-            <Route path="/prospeccao/sniper" element={<Dashboard />} />
-            <Route path="/prospeccao/cnpj" element={<CnpjSniper />} />
-            <Route path="/prospeccao/crm" element={<Dashboard />} />
-
-            {/* GESTÃO DE CARTEIRA */}
-            <Route path="/carteira/onboarding" element={<Dashboard />} />
-            <Route path="/carteira/whatsapp" element={<Dashboard />} />
-            <Route path="/carteira/churn" element={<Dashboard />} />
-
-            {/* TRÁFEGO & OPERAÇÃO */}
-            <Route path="/trafego/lancador" element={<Dashboard />} />
-            <Route path="/trafego/saldos" element={<Dashboard />} />
-            <Route path="/trafego/auditor" element={<Dashboard />} />
-
-            {/* INTELIGÊNCIA & ESTRATÉGIA */}
-            <Route path="/inteligencia/spy" element={<Dashboard />} />
-            <Route path="/inteligencia/conteudo" element={<Dashboard />} />
-            <Route path="/inteligencia/lab" element={<Dashboard />} />
-
-            {/* RELATÓRIOS & DATA */}
-            <Route path="/relatorios/agendador" element={<Dashboard />} />
-            <Route path="/relatorios/live" element={<Dashboard />} />
-
-            {/* Sistema Routes */}
-            <Route path="/sistema/perfil" element={<MeuPerfil />} />
-          </Route>
-
-          {/* Catch-all outside shell if needed, but here we redirect */}
-          <Route path="*" element={<Navigate to="/prospeccao/hunter" replace />} />
-        </Routes>
-      </BrowserRouter>
-    </TooltipProvider>
+    <AuthProvider>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <BrowserRouter>
+          <AppRoutes />
+        </BrowserRouter>
+      </TooltipProvider>
+    </AuthProvider>
   </QueryClientProvider>
 );
 
