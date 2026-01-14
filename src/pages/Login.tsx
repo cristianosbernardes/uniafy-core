@@ -2,7 +2,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { supabase } from '@/integrations/supabase/client';
 import { motion } from 'framer-motion';
-import { Shield, Lock, ArrowRight, ShieldCheck, Loader2, Mail } from 'lucide-react';
+import { ArrowRight, Loader2, CheckCircle2 } from 'lucide-react';
 import { toast } from 'sonner';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -24,117 +24,109 @@ export default function Login() {
             });
 
             if (error) {
-                if (error.message === 'Invalid login credentials') {
-                    toast.error('Credenciais inválidas. Verifique seu e-mail e senha.');
-                } else {
-                    toast.error(error.message);
-                }
+                toast.error('Credenciais inválidas. Verifique seus dados.');
                 return;
             }
 
-            toast.success('Acesso autorizado. Bem-vindo ao Uniafy!');
+            toast.success('Login realizado com sucesso!');
             navigate('/');
         } catch (error: any) {
-            toast.error('Erro ao realizar login.');
+            toast.error('Erro de conexão.');
         } finally {
             setLoading(false);
         }
     };
 
     return (
-        <div className="min-h-screen w-full bg-[#050505] flex items-center justify-center p-4 relative overflow-hidden font-sans">
-            {/* Background Effects */}
-            <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary/10 blur-[120px] rounded-full animate-pulse" />
-            <div className="absolute bottom-[-10%] right-[-10%] w-[40%] h-[40%] bg-blue-500/5 blur-[120px] rounded-full animate-pulse delay-700" />
+        <div className="min-h-screen w-full bg-[#0a0a0a] flex flex-col items-center justify-center p-4 relative font-sans text-slate-100">
 
-            {/* Grain Overlay */}
-            <div className="absolute inset-0 pointer-events-none opacity-[0.03] bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
+            {/* Background Ambience */}
+            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                <div className="absolute -top-[30%] -left-[10%] w-[70%] h-[70%] bg-blue-900/10 rounded-full blur-[120px]" />
+                <div className="absolute -bottom-[30%] -right-[10%] w-[70%] h-[70%] bg-orange-900/10 rounded-full blur-[120px]" />
+            </div>
 
             <motion.div
-                initial={{ opacity: 0, scale: 0.95 }}
-                animate={{ opacity: 1, scale: 1 }}
+                initial={{ opacity: 0, y: 10 }}
+                animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.5 }}
-                className="w-full max-w-[400px] z-10"
+                className="w-full max-w-[400px] z-10 space-y-8"
             >
-                <div className="text-center mb-10 space-y-4">
-                    <div className="flex justify-center">
-                        <div className="h-16 w-16 bg-primary flex items-center justify-center rounded-2xl rotate-45 border border-primary/20 shadow-[0_0_30px_rgba(255,85,0,0.2)]">
-                            <Shield className="w-8 h-8 text-black -rotate-45" />
+                {/* Header */}
+                <div className="text-center space-y-2">
+                    <div className="flex justify-center mb-6">
+                        <div className="h-12 w-12 bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg flex items-center justify-center shadow-lg shadow-orange-500/20">
+                            <span className="font-bold text-xl text-white">U</span>
                         </div>
                     </div>
-                    <div className="space-y-1">
-                        <h1 className="text-4xl font-black uppercase tracking-tighter text-white italic">
-                            UNIAFY <span className="text-primary">CORE</span>
-                        </h1>
-                        <p className="text-muted-foreground text-[10px] font-black uppercase tracking-[0.3em] opacity-60">
-                            V5.9.6 PRECISION INDUSTRIAL
-                        </p>
-                    </div>
+                    <h1 className="text-3xl font-bold tracking-tight text-white">
+                        Bem-vindo de volta
+                    </h1>
+                    <p className="text-slate-400 text-sm">
+                        Acesse sua conta para continuar gerenciando suas campanhas.
+                    </p>
                 </div>
 
-                <div className="glass-card p-10 space-y-8 relative border-white/5">
-                    <form onSubmit={handleLogin} className="space-y-6">
-                        <div className="space-y-3">
-                            <label className="text-[10px] uppercase font-black tracking-widest text-muted-foreground ml-1">
-                                Assinatura de Acesso (E-mail)
-                            </label>
-                            <div className="relative group">
-                                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-primary opacity-50 group-focus-within:opacity-100 transition-opacity" />
-                                <Input
-                                    type="email"
-                                    placeholder="CEO@UNIAFY.APP"
-                                    value={email}
-                                    onChange={(e) => setEmail(e.target.value)}
-                                    className="h-14 pl-12 bg-black/40 border-white/10 focus:border-primary/50 text-white font-bold transition-all uppercase"
-                                    required
-                                />
-                            </div>
+                {/* Card */}
+                <div className="bg-[#111111] border border-white/5 rounded-2xl p-6 shadow-2xl">
+                    <form onSubmit={handleLogin} className="space-y-5">
+                        <div className="space-y-2">
+                            <label className="text-sm font-medium text-slate-300">Email</label>
+                            <Input
+                                type="email"
+                                placeholder="nome@empresa.com"
+                                value={email}
+                                onChange={(e) => setEmail(e.target.value)}
+                                className="h-11 bg-[#0a0a0a] border-white/10 rounded-lg focus:border-orange-500/50 focus:ring-1 focus:ring-orange-500/20 text-slate-200 placeholder:text-slate-600 transition-all font-sans"
+                                required
+                            />
                         </div>
 
-                        <div className="space-y-3">
-                            <div className="flex justify-between items-center ml-1">
-                                <label className="text-[10px] uppercase font-black tracking-widest text-muted-foreground">
-                                    Chave de Segurança (Senha)
-                                </label>
+                        <div className="space-y-2">
+                            <div className="flex items-center justify-between">
+                                <label className="text-sm font-medium text-slate-300">Senha</label>
+                                <a href="#" className="text-xs text-orange-500 hover:text-orange-400 font-medium transition-colors">
+                                    Esqueceu a senha?
+                                </a>
                             </div>
-                            <div className="relative group">
-                                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-primary opacity-50 group-focus-within:opacity-100 transition-opacity" />
-                                <Input
-                                    type="password"
-                                    placeholder="••••••••"
-                                    value={password}
-                                    onChange={(e) => setPassword(e.target.value)}
-                                    className="h-14 pl-12 bg-black/40 border-white/10 focus:border-primary/50 text-white font-bold transition-all"
-                                    required
-                                />
-                            </div>
+                            <Input
+                                type="password"
+                                placeholder="••••••••"
+                                value={password}
+                                onChange={(e) => setPassword(e.target.value)}
+                                className="h-11 bg-[#0a0a0a] border-white/10 rounded-lg focus:border-orange-500/50 focus:ring-1 focus:ring-orange-500/20 text-slate-200 placeholder:text-slate-600 transition-all font-sans"
+                                required
+                            />
                         </div>
 
                         <Button
                             type="submit"
-                            className="w-full h-14 bg-primary hover:bg-primary/90 text-black font-black uppercase text-sm tracking-widest transition-all duration-300 group shadow-xl shadow-primary/20"
+                            className="w-full h-11 bg-orange-600 hover:bg-orange-500 text-white font-semibold rounded-lg transition-all duration-200 shadow-lg shadow-orange-900/20"
                             disabled={loading}
                         >
                             {loading ? (
                                 <Loader2 className="w-5 h-5 animate-spin" />
                             ) : (
-                                <>
-                                    Autenticar Protocolo
-                                    <ArrowRight className="w-5 h-5 ml-2 group-hover:translate-x-1 transition-transform" />
-                                </>
+                                <span className="flex items-center gap-2">
+                                    Entrar
+                                    <ArrowRight className="w-4 h-4 ml-1" />
+                                </span>
                             )}
                         </Button>
                     </form>
-
-                    <div className="flex items-center justify-center gap-2 text-[10px] text-muted-foreground font-black uppercase tracking-widest pt-4 border-t border-white/5">
-                        <ShieldCheck className="w-3 h-3 text-primary" />
-                        Ambiente Seguro • Encriptação Militar
-                    </div>
                 </div>
 
-                <p className="mt-8 text-center text-[9px] text-muted-foreground/40 font-black uppercase tracking-[0.3em]">
-                    SISTEMA OPERACIONAL UNIAFY v5.9.6
-                </p>
+                {/* Social Proof / Footer */}
+                <div className="flex flex-col items-center gap-4 pt-4">
+                    <div className="flex items-center gap-2 text-slate-500 text-xs font-medium bg-white/5 px-3 py-1.5 rounded-full border border-white/5">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-green-500" />
+                        <span>Plataforma Segura & Otimizada por IA</span>
+                    </div>
+                    <p className="text-xs text-slate-600">
+                        &copy; 2026 Uniafy Inc. Todos os direitos reservados.
+                    </p>
+                </div>
+
             </motion.div>
         </div>
     );

@@ -49,6 +49,7 @@ export interface NavItem {
   icon: string;
   path: string;
   roles: UserRole[];
+  badge?: string;
 }
 
 export interface NavModule {
@@ -66,4 +67,55 @@ export interface KPIMetric {
   change?: number;
   status?: 'sync' | 'pending' | 'error';
   icon?: string;
+}
+
+// --- MASTER SUITE TYPES ---
+
+export type SubscriptionStatus = 'active' | 'past_due' | 'canceled' | 'trial';
+export type BillingPeriod = 'monthly' | 'yearly';
+
+export interface Plan {
+  id: string;
+  name: string;
+  price: number;
+  period: BillingPeriod;
+  features: string[];
+  max_users: number;
+  max_connections: number;
+  is_active: boolean;
+}
+
+export interface AgencySubscription {
+  id: string;
+  tenant_id: string; // ID da Agência
+  tenant_name: string; // Nome da Agência (Cache)
+  plan_id: string;
+  status: SubscriptionStatus;
+  start_date: string;
+  next_billing_date: string;
+  amount: number;
+  payment_method: PaymentMethod;
+}
+
+export interface MasterNotificationConfig {
+  id: string;
+  trigger_days_before: number; // Ex: 3
+  message_title: string;
+  message_body: string;
+  is_active: boolean;
+  channels: {
+    popup: boolean;
+    email: boolean;
+    whatsapp: boolean;
+  };
+}
+
+export interface FinancialTransaction {
+  id: string;
+  tenant_id: string;
+  tenant_name: string;
+  date: string;
+  amount: number;
+  status: 'paid' | 'pending' | 'failed';
+  type: 'subscription' | 'addon';
 }

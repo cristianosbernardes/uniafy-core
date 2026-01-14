@@ -8,12 +8,12 @@ export default function Dashboard() {
     <div className="p-8 space-y-8">
       {/* Page Header */}
       <PageHeader
-        title="DASHBOARD"
-        titleAccent="CENTRAL"
-        subtitle="V5.9.1 MASTER • UNIAFY CENTRAL"
+        title="Dashboard"
+        titleAccent="Central"
+        subtitle="V5.9.1 Master • Uniafy Central"
         actions={[
           {
-            label: 'EXPORTAR RELATÓRIO',
+            label: 'Exportar Relatório',
             icon: FileEdit,
             variant: 'outline',
           },
@@ -45,7 +45,7 @@ export default function Dashboard() {
         />
         <KPICard
           label="Status Rede"
-          value="ACTIVE"
+          value="Active"
           status="sync"
           variant="status"
           icon="wifi"
@@ -55,15 +55,15 @@ export default function Dashboard() {
       {/* IA Protocol Card */}
       <IAProtocolCard
         version="5.9.1"
-        title="OTIMIZAÇÃO"
-        titleAccent="SISTÊMICA"
-        description="DETECTAMOS SATURAÇÃO DE PÚBLICO NO CLUSTER FACEBOOK ADS. RECOMENDAMOS ESCALA HORIZONTAL IMEDIATA ATRAVÉS DE NOVOS NODES DE CRIATIVOS."
+        title="Otimização"
+        titleAccent="Sistêmica"
+        description="Detectamos saturação de público no cluster Facebook Ads. Recomendamos escala horizontal imediata através de novos nodes de criativos."
         primaryAction={{
-          label: 'APLICAR ESCALA',
+          label: 'Aplicar Escala',
           onClick: () => console.log('Apply scale'),
         }}
         secondaryAction={{
-          label: 'DETALHES',
+          label: 'Detalhes',
           onClick: () => console.log('Show details'),
         }}
       />

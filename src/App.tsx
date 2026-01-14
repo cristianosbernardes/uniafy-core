@@ -12,6 +12,7 @@ import Login from "./pages/Login";
 import SqlBank from "./pages/SqlBank";
 import GHunter from "./pages/GHunter";
 import CnpjSniper from "./pages/CnpjSniper";
+import MasterSettings from "./pages/MasterSettings";
 import { DashboardShell } from "./components/layout/DashboardShell";
 
 const queryClient = new QueryClient();
@@ -46,31 +47,38 @@ const AppRoutes = () => {
         <Route path="/" element={<Navigate to="/growth/hunter" replace />} />
 
         {/* Mestre Routes */}
+        <Route path="/mestre" element={<Navigate to="/mestre/agencias" replace />} />
         <Route path="/mestre/agencias" element={<GestaoClientes />} />
         <Route path="/mestre/sql" element={<SqlBank />} />
+        <Route path="/mestre/config" element={<MasterSettings />} />
 
         {/* Growth Engine Routes */}
+        <Route path="/growth" element={<Navigate to="/growth/hunter" replace />} />
         <Route path="/growth/hunter" element={<GHunter />} />
         <Route path="/growth/sniper" element={<Dashboard />} />
         <Route path="/growth/cnpj" element={<CnpjSniper />} />
         <Route path="/growth/crm" element={<Dashboard />} />
 
         {/* Agency OS Routes */}
+        <Route path="/agency-os" element={<Navigate to="/agency-os/onboarding" replace />} />
         <Route path="/agency-os/onboarding" element={<Dashboard />} />
         <Route path="/agency-os/squads" element={<Dashboard />} />
         <Route path="/agency-os/financeiro" element={<Dashboard />} />
 
         {/* Traffic Commander Routes */}
+        <Route path="/traffic" element={<Navigate to="/traffic/analytics" replace />} />
         <Route path="/traffic/analytics" element={<Dashboard />} />
         <Route path="/traffic/auditor" element={<Dashboard />} />
         <Route path="/traffic/otimizador" element={<Dashboard />} />
 
         {/* Client Success Routes */}
+        <Route path="/success" element={<Navigate to="/success/portal" replace />} />
         <Route path="/success/portal" element={<Dashboard />} />
         <Route path="/success/aprovacao" element={<Dashboard />} />
         <Route path="/success/health" element={<Dashboard />} />
 
         {/* Sistema Routes */}
+        <Route path="/sistema" element={<Navigate to="/sistema/perfil" replace />} />
         <Route path="/sistema/perfil" element={<MeuPerfil />} />
       </Route>
 

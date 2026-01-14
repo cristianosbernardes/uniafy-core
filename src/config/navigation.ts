@@ -3,7 +3,7 @@ import { NavModule, UserRole } from '@/types/uniafy';
 export const NAV_MODULES: NavModule[] = [
   {
     id: 'mestre',
-    label: 'MASTER & ADMIN',
+    label: 'Master',
     icon: 'Crown',
     roles: [UserRole.OWNER],
     items: [
@@ -16,6 +16,14 @@ export const NAV_MODULES: NavModule[] = [
         roles: [UserRole.OWNER],
       },
       {
+        id: 'config',
+        title: 'Configurações Globais',
+        description: 'Automação de cobrança e alertas',
+        icon: 'Settings',
+        path: '/mestre/config',
+        roles: [UserRole.OWNER],
+      },
+      {
         id: 'banco-sql',
         title: 'Banco SQL',
         description: 'Execução direta de comandos no banco de dados',
@@ -23,20 +31,12 @@ export const NAV_MODULES: NavModule[] = [
         path: '/mestre/sql',
         roles: [UserRole.OWNER],
       },
-      {
-        id: 'config-globais',
-        title: 'Configurações Globais',
-        description: 'Parâmetros mestre do ecossistema Uniafy',
-        icon: 'Settings2',
-        path: '/mestre/configuracoes',
-        roles: [UserRole.OWNER],
-      }
     ],
   },
   {
     id: 'growth',
-    label: 'GROWTH ENGINE',
-    icon: 'Radar',
+    label: 'Growth',
+    icon: 'Target',
     roles: [UserRole.OWNER, UserRole.AGENCY],
     items: [
       {
@@ -67,8 +67,8 @@ export const NAV_MODULES: NavModule[] = [
   },
   {
     id: 'agency-os',
-    label: 'AGENCY OS',
-    icon: 'Building',
+    label: 'Agência',
+    icon: 'Building2',
     roles: [UserRole.OWNER, UserRole.AGENCY],
     items: [
       {
@@ -99,8 +99,8 @@ export const NAV_MODULES: NavModule[] = [
   },
   {
     id: 'traffic',
-    label: 'TRAFFIC COMMANDER',
-    icon: 'Settings',
+    label: 'Tráfego',
+    icon: 'Zap',
     roles: [UserRole.OWNER, UserRole.AGENCY, UserRole.CLIENT],
     items: [
       {
@@ -131,8 +131,8 @@ export const NAV_MODULES: NavModule[] = [
   },
   {
     id: 'success',
-    label: 'CLIENT SUCCESS',
-    icon: 'LayoutDashboard',
+    label: 'Clientes',
+    icon: 'Users',
     roles: [UserRole.OWNER, UserRole.AGENCY, UserRole.CLIENT],
     items: [
       {
@@ -163,8 +163,8 @@ export const NAV_MODULES: NavModule[] = [
   },
   {
     id: 'sistema',
-    label: 'SISTEMA',
-    icon: 'Laptop',
+    label: 'Sistema',
+    icon: 'Settings',
     roles: [UserRole.OWNER, UserRole.AGENCY, UserRole.CLIENT],
     items: [
       {

@@ -25,14 +25,14 @@ export function PageHeader({
   return (
     <div className="flex items-start justify-between">
       <div>
-        <h1 className="text-4xl font-black uppercase italic leading-none">
+        <h1 className="text-4xl font-black italic leading-none">
           <span className="text-foreground">{title}</span>
           {titleAccent && (
             <span className="text-primary ml-3">{titleAccent}</span>
           )}
         </h1>
         {subtitle && (
-          <p className="text-[11px] uppercase text-muted-foreground mt-2 font-bold opacity-60 tracking-wider">
+          <p className="text-[11px] text-muted-foreground mt-2 font-bold opacity-60 tracking-wider">
             {subtitle}
           </p>
         )}
@@ -40,7 +40,7 @@ export function PageHeader({
 
       <div className="flex items-center gap-3">
         {badge && (
-          <span className="px-3 py-1.5 text-[10px] uppercase font-black border border-primary/30 text-primary bg-primary/5 rounded flex items-center gap-3 shadow-lg shadow-primary/5">
+          <span className="px-3 py-1.5 text-[10px] font-black border border-primary/30 text-primary bg-primary/5 rounded flex items-center gap-3 shadow-lg shadow-primary/5">
             <span className="w-2 h-2 rounded-full bg-primary animate-pulse shadow-[0_0_10px_rgba(255,85,0,0.5)]" />
             {badge}
           </span>
@@ -53,7 +53,7 @@ export function PageHeader({
               key={index}
               variant={action.variant === 'primary' ? 'default' : 'outline'}
               className={cn(
-                "uppercase text-[11px] font-black h-10 px-6 rounded transition-all duration-300",
+                "text-[11px] font-black h-10 px-6 rounded transition-all duration-300",
                 action.variant === 'primary'
                   ? "bg-primary text-black hover:bg-primary/90 shadow-lg shadow-primary/20"
                   : "border-border bg-white/5 text-muted-foreground hover:text-foreground hover:border-foreground"

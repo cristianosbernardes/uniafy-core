@@ -1,134 +1,126 @@
-import { useNavigate } from 'react-router-dom';
 import {
-  Crown,
-  Settings,
-  Radar,
-  Brain,
-  BarChart3,
-  Handshake,
-  Database,
-  Globe,
+  ChevronsRight,
+  LayoutDashboard,
+  Building2,
+  Activity,
+  Settings2,
   LayoutGrid,
-  LogOut,
-  Building,
-  Laptop,
-  LayoutDashboard
+  ListChecks,
+  Users,
+  Timer,
+  RefreshCw,
+  FolderOpen
 } from 'lucide-react';
 import { NAV_MODULES } from '@/config/navigation';
-import { NavModule, UserRole } from '@/types/uniafy';
+import { UserRole } from '@/types/uniafy';
 import { cn } from '@/lib/utils';
+import { useNavigate } from 'react-router-dom';
 import { useAuth } from '@/contexts/AuthContext';
+import { UserProfile } from './UserProfile';
 
 interface ModuleSidebarProps {
   activeModule: string;
   onModuleChange: (moduleId: string) => void;
   userRole: UserRole;
-  isExpanded: boolean;
-  onExpand: (expanded: boolean) => void;
+  isContextOpen: boolean;
+  onToggleContext: () => void;
 }
 
 const iconMap: Record<string, React.ReactNode> = {
-  Crown: <Crown className="w-4 h-4" />,
-  Settings: <Settings className="w-4 h-4" />,
-  Radar: <Radar className="w-4 h-4" />,
-  Handshake: <Handshake className="w-4 h-4" />,
-  Brain: <Brain className="w-4 h-4" />,
-  BarChart3: <BarChart3 className="w-4 h-4" />,
-  Database: <Database className="w-4 h-4" />,
-  Globe: <Globe className="w-4 h-4" />,
-  LayoutGrid: <LayoutGrid className="w-4 h-4" />,
-  Building: <Building className="w-4 h-4" />,
-  Laptop: <Laptop className="w-4 h-4" />,
-  LayoutDashboard: <LayoutDashboard className="w-4 h-4" />, // Adicionado para módulo Client Success
+  Building2: <Building2 className="w-5 h-5" />,
+  Activity: <Activity className="w-5 h-5" />,
+  Settings2: <Settings2 className="w-5 h-5" />,
+  LayoutGrid: <LayoutGrid className="w-5 h-5" />,
+  ListChecks: <ListChecks className="w-5 h-5" />,
+  Users: <Users className="w-5 h-5" />,
+  Timer: <Timer className="w-5 h-5" />,
+  RefreshCw: <RefreshCw className="w-5 h-5" />,
+  LayoutDashboard: <LayoutDashboard className="w-5 h-5" />,
+  FolderOpen: <FolderOpen className="w-5 h-5" />,
 };
 
-export function ModuleSidebar({ activeModule, onModuleChange, userRole, isExpanded, onExpand }: ModuleSidebarProps) {
-  const { signOut } = useAuth();
+export function ModuleSidebar({
+  activeModule,
+  onModuleChange,
+  userRole,
+  isContextOpen,
+  onToggleContext
+}: ModuleSidebarProps) {
+  const { user } = useAuth();
   const navigate = useNavigate();
 
-  const filteredModules = NAV_MODULES.filter(module =>
-    module.roles.includes(userRole)
+  // Only show modules the user has access to
+  const availableModules = NAV_MODULES.filter(module =>
+    module.items.some(item => item.roles.includes(userRole))
   );
 
-  const handleModuleClick = (module: NavModule) => {
-    onModuleChange(module.id);
-  };
-
-  const handleSignOut = async () => {
-    await signOut();
-    navigate('/login');
-  };
-
   return (
-    <aside
-      onMouseEnter={() => onExpand(true)}
-      onMouseLeave={() => onExpand(false)}
+    <nav
       className={cn(
-        "h-[calc(100vh-64px)] bg-card border-r border-border transition-all duration-300 group/sidebar overflow-hidden flex flex-col z-40 fixed top-16 left-0",
-        isExpanded ? "w-[280px]" : "w-[64px]"
+        "w-full h-full flex flex-col items-center py-2 relative z-50 transition-colors duration-300",
+        // No background here, handled by parent container via CSS var
       )}
-    // Removed CSS variable from here since it's now handled by DashboardShell container
     >
-      {/* Noise Texture Overlay */}
-      <div className="absolute inset-0 pointer-events-none opacity-[0.03] bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
+      {/* 
+        ClickUp Style Expand Trigger 
+      */}
+      {!isContextOpen && (
+        <div className="w-full flex flex-col items-center mb-1 animate-in fade-in duration-300">
+          <button
+            onClick={onToggleContext}
+            className="w-10 h-10 flex items-center justify-center rounded-xl text-zinc-500 hover:text-white hover:bg-white/5 transition-all mb-1 group"
+            title="Expandir Submenu"
+          >
+            <ChevronsRight className="w-5 h-5 group-hover:text-primary transition-colors" />
+          </button>
 
-      <div className="flex-1 py-6 px-3 flex flex-col gap-2 relative z-10 overflow-x-hidden overflow-y-auto">
-        {filteredModules.map((module) => {
+          <div className="w-8 h-[1px] bg-white/5" />
+        </div>
+      )}
+
+      {/* Navigation Items - No Logo here anymore */}
+      <div className="flex-1 w-full flex flex-col gap-1.5 items-center pt-1">
+        {availableModules.map((module) => {
           const isActive = activeModule === module.id;
-          const Icon = iconMap[module.icon] || <LayoutGrid className="w-4 h-4" />;
+          const IconNode = iconMap[module.icon] || <LayoutDashboard className="w-5 h-5" />;
 
           return (
-            <div key={module.id} className="relative group/module">
-              <button
-                onClick={() => handleModuleClick(module)}
-                className={cn(
-                  "group/btn w-full flex items-center gap-4 p-1 rounded transition-all duration-300 relative min-h-[56px]",
-                  isActive
-                    ? "bg-white/5 border border-white/10 text-primary shadow-xl"
-                    : "text-muted-foreground hover:text-foreground hover:bg-white/[0.03]"
-                )}
-              >
-                <div className={cn(
-                  "p-3 transition-all duration-300 relative z-10 flex items-center justify-center shrink-0",
-                  isActive
-                    ? "text-primary drop-shadow-[0_0_8px_rgba(255,85,0,0.5)]"
-                    : "text-muted-foreground group-hover/btn:text-foreground"
-                )}>
-                  {Icon}
-                </div>
+            <button
+              key={module.id}
+              onClick={() => onModuleChange(module.id)}
+              className="group relative flex flex-col items-center justify-center w-14 h-14 rounded-xl transition-all duration-200 gap-1"
+              title={module.label}
+            >
+              {/* 
+                Icon Wrapper: 32x32 (w-8 h-8) 
+                Holds the background color when active 
+              */}
+              <div className={cn(
+                "relative z-10 w-8 h-8 rounded-[9px] flex items-center justify-center transition-all duration-200",
+                isActive
+                  ? "bg-primary text-white shadow-md shadow-orange-900/40"
+                  : "bg-transparent text-white/80 group-hover:text-white group-hover:bg-white/5"
+              )}>
+                {IconNode}
+              </div>
 
-                <div className="flex flex-col items-start overflow-hidden">
-                  <span className={cn(
-                    "text-[13px] font-bold whitespace-nowrap transition-all duration-500 tracking-wider", // Removed uppercase
-                    isExpanded ? "opacity-100 translate-x-0" : "opacity-0 -translate-x-4",
-                    isActive ? "text-primary" : "text-muted-foreground"
-                  )}>
-                    {module.label}
-                  </span>
-                </div>
-              </button>
-            </div>
+              <span className={cn(
+                "text-[10px] font-bold tracking-wide leading-none transition-colors",
+                isActive ? "text-white" : "text-white/80 group-hover:text-white"
+              )}>
+                {module.label}
+              </span>
+
+              {/* Active Indicator Removed for Cleaner Look */}
+            </button>
           );
         })}
       </div>
 
-      <div className="p-3 border-t border-white/5 relative z-10">
-        <button
-          onClick={handleSignOut}
-          className={cn(
-            "w-full flex items-center gap-4 p-3 rounded text-muted-foreground hover:text-destructive hover:bg-destructive/10 transition-all duration-300",
-            !isExpanded && "justify-center"
-          )}
-          title="Sair do Sistema"
-        >
-          <LogOut className="w-5 h-5 shrink-0" />
-          {isExpanded && (
-            <span className="text-[13px] font-bold tracking-wider whitespace-nowrap"> {/* Removed uppercase */}
-              Sair
-            </span>
-          )}
-        </button>
+      {/* User Profile at Bottom (Re-added if needed, or kept clean) */}
+      <div className="mt-auto mb-4">
+        <UserProfile showLabel={false} />
       </div>
-    </aside>
+    </nav>
   );
 }

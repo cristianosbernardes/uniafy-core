@@ -40,7 +40,8 @@ import {
   Share2,
   Building,
   Crown,
-  Laptop
+  Laptop,
+  ChevronsLeft
 } from 'lucide-react';
 import { NAV_MODULES } from '@/config/navigation';
 import { NavItem, UserRole } from '@/types/uniafy';
@@ -50,6 +51,8 @@ import { useNavigate, useLocation, Link } from 'react-router-dom';
 interface ContextSidebarProps {
   activeModule: string;
   userRole: UserRole;
+  isOpen?: boolean;
+  onToggle?: () => void;
 }
 
 const iconMap: Record<string, React.ReactNode> = {
@@ -94,44 +97,41 @@ const iconMap: Record<string, React.ReactNode> = {
   Laptop: <Laptop className="w-4 h-4" />,
 };
 
-export function ContextSidebar({ activeModule, userRole }: ContextSidebarProps) {
-  const [isCollapsed, setIsCollapsed] = useState(false);
+export function ContextSidebar({ activeModule, userRole, isOpen = true, onToggle }: ContextSidebarProps) {
   const location = useLocation();
 
   const currentModule = NAV_MODULES.find(m => m.id === activeModule);
+  // Use 'title', 'label' or appropriate field. The interface usually has 'icon', 'path', 'label' or 'title'. 
+  // Let's assume 'title' based on previous edits, but check NAV_MODULES types if possible. 
+  // Previous file content showed 'item.title'.
   const items = currentModule?.items.filter(item => item.roles.includes(userRole)) || [];
 
   return (
-    <aside className={cn(
-      "h-[calc(100vh-64px)] bg-card/60 backdrop-blur-xl border-r border-border transition-all duration-300 overflow-hidden flex flex-col z-30 fixed top-16",
-      isCollapsed ? "w-16" : "w-64"
-    )} style={{
-      left: 'var(--module-sidebar-width, 64px)', // Depends on DashboardShell state now
-      '--context-sidebar-width': isCollapsed ? '64px' : '256px'
-    } as any}>
-      {/* Noise Texture Overlay */}
-      <div className="absolute inset-0 pointer-events-none opacity-[0.02] bg-[url('https://grainy-gradients.vercel.app/noise.svg')]" />
+    <div className="flex flex-col h-full w-full">
 
-      {/* Header */}
-      <div className={cn(
-        "h-16 px-6 flex items-center justify-between border-b border-border relative z-10",
-        isCollapsed && "px-0 justify-center"
-      )}>
-        <span className={cn(
-          "text-[10px] font-black text-muted-foreground opacity-40 transition-all duration-300 tracking-widest", // Removed uppercase
-          isCollapsed ? "opacity-0 invisible w-0" : "opacity-40 visible"
-        )}>
-          {activeModule.replace('-', ' ')} / Contexto
-        </span>
+      {/* 
+        CONTEXT HEADER (ClickUp Style)
+        - Title: 16px font-bold (Matches user request)
+        - Collapse Action: Icon to retract submenu
+      */}
+      <div className="flex items-center justify-between p-4 pb-2 shrink-0 group/header">
+        <h2 className="text-[16px] font-bold text-white leading-tight truncate">
+          {currentModule?.label || (activeModule === 'growth' ? 'Growth Engine' : 'Módulo')}
+        </h2>
         <button
-          onClick={() => setIsCollapsed(!isCollapsed)}
-          className="p-1.5 rounded border border-border hover:bg-white/5 hover:text-primary transition-all duration-300"
+          onClick={onToggle}
+          className="p-1 rounded-lg text-zinc-500 hover:text-white hover:bg-white/10 transition-all opacity-0 group-hover/header:opacity-100"
+          title="Recolher Submenu"
         >
-          {isCollapsed ? <ChevronRight className="w-3.5 h-3.5" /> : <ChevronLeft className="w-3.5 h-3.5" />}
+          <ChevronsLeft className="w-4 h-4" />
         </button>
       </div>
 
-      <nav className="flex-1 py-6 px-4 space-y-2 relative z-10 overflow-auto">
+      {/* Workspace Selector / Breadcrumb (Optional - keeping simplified or removing based on new header) */}
+      {/* Keeping it simple as requested: Just the menu items list below using the custom scrollbar */}
+
+      {/* Menu Items Area */}
+      <div className="flex-1 overflow-y-auto py-2 custom-scrollbar pr-1">
         {items.map((item) => {
           const isActive = location.pathname === item.path;
           const Icon = item.icon && iconMap[item.icon as keyof typeof iconMap];
@@ -140,33 +140,42 @@ export function ContextSidebar({ activeModule, userRole }: ContextSidebarProps) 
             <Link
               key={item.path}
               to={item.path}
-              className={cn(
-                "group flex items-center transition-all duration-300 relative",
-                isCollapsed
-                  ? "justify-center w-12 h-12 mx-auto rounded-lg mb-2"
-                  : "gap-3 p-3 rounded-md mb-1",
-                isActive ? "bg-white/5 shadow-inner" : "hover:bg-white/[0.03]"
-              )}
+              className="group relative flex items-center w-full px-3 py-1.5 mb-0.5"
             >
-              <div className={cn(
-                "transition-all duration-300 flex items-center justify-center shrink-0",
-                isCollapsed ? "w-10 h-10" : "p-2",
-                isActive
-                  ? "text-primary drop-shadow-[0_0_5px_rgba(255,85,0,0.3)]"
-                  : "text-muted-foreground group-hover:text-foreground"
-              )}>
-                {Icon}
-              </div>
+              {/* Active State: Rounded Background */}
+              <div
+                className={cn(
+                  "absolute inset-0 mx-2 rounded-md transition-all duration-200",
+                  isActive ? "bg-[#292929]" : "bg-transparent group-hover:bg-[#161616]"
+                )}
+              />
 
-              {!isCollapsed && (
-                <span className="text-sm font-bold transition-all duration-300 truncate tracking-tight"> {/* Removed uppercase */}
+              <div className="relative flex items-center z-10 w-full px-2">
+                <div className={cn("transition-colors shrink-0 mr-3", isActive ? "text-primary" : "text-zinc-500 group-hover:text-zinc-300")}>
+                  {Icon}
+                </div>
+                <span className={cn(
+                  "text-[14px] font-medium transition-colors truncate leading-none pt-0.5", // 14px Font
+                  isActive ? "text-white" : "text-zinc-400 group-hover:text-zinc-200"
+                )}>
                   {item.title}
                 </span>
-              )}
+
+                {item.badge && (
+                  <span
+                    className={cn(
+                      "ml-auto text-[10px] px-1.5 py-0.5 rounded-full font-bold",
+                      isActive ? "bg-primary/20 text-primary" : "bg-white/10 text-zinc-400"
+                    )}
+                  >
+                    {item.badge}
+                  </span>
+                )}
+              </div>
             </Link>
           );
         })}
-      </nav>
-    </aside>
+      </div>
+    </div>
   );
 }

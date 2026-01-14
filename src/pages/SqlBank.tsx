@@ -32,6 +32,82 @@ const PRESETS: Preset[] = [
         title: 'Ver Configurações',
         query: 'SELECT * FROM information_schema.tables WHERE table_schema = \'public\'',
         icon: <Database className="w-4 h-4" />
+    },
+    {
+        id: 'deploy-master',
+        title: '[CRÍTICO] Deploy Master Suite v1.1 (Safe)',
+        query: `
+DO $$
+BEGIN
+    -- 1. Plans Table
+    IF NOT EXISTS (SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename = 'plans') THEN
+        CREATE TABLE public.plans (
+            id uuid default gen_random_uuid() primary key,
+            name text not null,
+            price decimal(10,2) not null,
+            period text check (period in ('monthly', 'yearly')),
+            features jsonb default '[]'::jsonb,
+            max_users int default 1,
+            max_connections int default 1,
+            is_active boolean default true,
+            created_at timestamp with time zone default timezone('utc'::text, now())
+        );
+        ALTER TABLE public.plans ENABLE ROW LEVEL SECURITY;
+        CREATE POLICY "Public Read Plans" on public.plans for select using (true);
+        CREATE POLICY "Master Write Plans" on public.plans for insert with check (true);
+        
+        -- Seed Plans
+        INSERT INTO public.plans (name, price, period, max_users, max_connections, features) VALUES
+        ('Uniafy Starter', 297.00, 'monthly', 3, 1, '["Gestão de Leads"]'),
+        ('Uniafy Growth', 597.00, 'monthly', 10, 5, '["G-Hunter", "Automação"]'),
+        ('Uniafy Black', 997.00, 'monthly', 999, 999, '["Ilimitado"]');
+    END IF;
+
+    -- 2. Subscriptions Table
+    IF NOT EXISTS (SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename = 'subscriptions') THEN
+        CREATE TABLE public.subscriptions (
+            id uuid default gen_random_uuid() primary key,
+            tenant_id uuid not null,
+            plan_id uuid references public.plans(id),
+            status text check (status in ('active', 'past_due', 'canceled', 'trial')),
+            start_date timestamp with time zone default now(),
+            next_billing_date timestamp with time zone,
+            amount decimal(10,2),
+            payment_method text,
+            created_at timestamp with time zone default timezone('utc'::text, now())
+        );
+        ALTER TABLE public.subscriptions ENABLE ROW LEVEL SECURITY;
+        CREATE POLICY "Agency Read Own Sub" on public.subscriptions for select using (true);
+    END IF;
+
+    -- 3. Master Global Config
+    IF NOT EXISTS (SELECT FROM pg_tables WHERE schemaname = 'public' AND tablename = 'master_config') THEN
+        CREATE TABLE public.master_config (
+            id uuid default gen_random_uuid() primary key,
+            trigger_days_before int default 3,
+            message_title text default 'Atenção Master',
+            message_body text default 'Sua licença expira em breve.',
+            is_active boolean default true,
+            channels jsonb default '{"popup": true, "email": true}'::jsonb,
+            updated_at timestamp with time zone default now()
+        );
+        ALTER TABLE public.master_config ENABLE ROW LEVEL SECURITY;
+        CREATE POLICY "Public Read Config" on public.master_config for select using (true);
+        
+        -- Seed Config
+        INSERT INTO public.master_config (trigger_days_before, message_title, is_active) VALUES
+        (3, 'Renove sua Licença', true);
+    END IF;
+
+END $$;
+        `,
+        icon: <AlertTriangle className="w-4 h-4 text-orange-500" />
+    },
+    {
+        id: 'debug-rpc',
+        title: '[DEBUG] Ver Definição do RPC',
+        query: "SELECT pg_get_functiondef('admin_exec_sql'::regproc)",
+        icon: <Code className="w-4 h-4 text-blue-500" />
     }
 ];
 

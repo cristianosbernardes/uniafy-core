@@ -39,13 +39,13 @@ export function IAProtocolCard({
         {/* Badge */}
         <div className="inline-flex items-center gap-2 px-3 py-1.5 rounded-md border border-border-industrial bg-background/50 mb-4">
           <Info className="w-3.5 h-3.5 text-primary" />
-          <span className="text-xs uppercase text-muted-foreground">
+          <span className="text-xs text-muted-foreground">
             IA EXPERT PROTOCOL
           </span>
         </div>
 
         {/* Title */}
-        <h3 className="text-lg font-bold uppercase tracking-tight mb-3">
+        <h3 className="text-lg font-bold tracking-tight mb-3">
           <span className="text-foreground">{title}</span>
           {titleAccent && (
             <span className="text-primary ml-2">{titleAccent}</span>
@@ -56,7 +56,7 @@ export function IAProtocolCard({
         </h3>
 
         {/* Description */}
-        <p className="text-sm text-muted-foreground uppercase tracking-wide leading-relaxed mb-6 max-w-2xl">
+        <p className="text-sm text-muted-foreground tracking-wide leading-relaxed mb-6 max-w-2xl">
           {description}
         </p>
 
@@ -64,7 +64,7 @@ export function IAProtocolCard({
         <div className="flex items-center gap-3">
           {primaryAction && (
             <Button
-              className="bg-primary text-primary-foreground hover:bg-primary/90 uppercase tracking-wider text-xs font-semibold"
+              className="bg-primary text-primary-foreground hover:bg-primary/90 tracking-wider text-xs font-semibold"
               onClick={primaryAction.onClick}
             >
               {primaryAction.label}
@@ -73,7 +73,7 @@ export function IAProtocolCard({
           {secondaryAction && (
             <Button
               variant="outline"
-              className="border-border-industrial text-muted-foreground hover:text-foreground hover:border-foreground uppercase tracking-wider text-xs font-semibold"
+              className="border-border-industrial text-muted-foreground hover:text-foreground hover:border-foreground tracking-wider text-xs font-semibold"
               onClick={secondaryAction.onClick}
             >
               {secondaryAction.label}

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react';
-import { Search, MapPin, Filter, Database, Globe, Phone, Mail, Instagram, CheckCircle2, AlertCircle, Info, Send, Building2, User, Radar, Play, RefreshCw, Cpu, Target, Download } from 'lucide-react';
+import { Search, MapPin, Filter, Database, Globe, Phone, Mail, Instagram, CheckCircle2, AlertCircle, Info, Send, Building2, User, Radar, Play, RefreshCw, Cpu, Target, Download, Plus, Bot } from 'lucide-react';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
@@ -8,6 +8,9 @@ import { toast } from 'sonner';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '@/integrations/supabase/client';
 import { cn } from '@/lib/utils';
+import { CreationCard } from '@/components/ui/CreationCard';
+import { ScrollHint } from '@/components/ui/ScrollHint';
+import { triggerGHunterScrape } from '@/services/n8n';
 
 interface Lead {
     id: string;
@@ -53,20 +56,41 @@ export default function GHunter() {
         }
     };
 
-    const handleStartScrape = () => {
+    const handleStartScrape = async () => {
         if (!nicho || !cidade) {
             toast.error('Informe o nicho e a cidade para iniciar a busca.');
             return;
         }
 
         setIsScraping(true);
-        toast.info(`Workflow n8n disparado para ${nicho} em ${cidade}.`);
+        toast.info(`Iniciando motor G-Hunter para ${nicho}...`);
 
-        setTimeout(() => {
+        try {
+            // Import dinâmico ou estático (vou adicionar o import no topo depois se precisar, 
+            // mas aqui vou assumir que o usuário aceita que eu adicione o import via replace separado ou auto-fix)
+            // PREFERÊNCIA: Fazer o import no topo primeiro? Não, vou usar o replace_file_content para o bloco todo se possível, 
+            // mas preciso adicionar o import.
+            // Vou usar uma estratégia segura: Adicionar o import primeiro.
+
+            // Wait, I can't simple add lines easily without shifting lines.
+            // I will implement the logic here assuming the import exists, and then add the import in a second step.
+
+            await triggerGHunterScrape({ nicho, cidade });
+
+            toast.success('Comando enviado! O agente está varrendo o Google Maps.');
+
+            // Opcional: Recarregar leads após um tempo se o N8N for rápido, 
+            // mas geralmente é assíncrono. Vamos manter um timeout curto para UX.
+            setTimeout(() => {
+                fetchLeads();
+            }, 2000);
+
+        } catch (error) {
+            console.error(error);
+            toast.error('Erro ao conectar com o motor de busca.');
+        } finally {
             setIsScraping(false);
-            toast.success('Busca concluída! Os dados estão sendo processados pela IA.');
-            fetchLeads();
-        }, 4000);
+        }
     };
 
     return (
@@ -169,68 +193,77 @@ export default function GHunter() {
                     </div>
 
                     <AnimatePresence>
-                        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            {loadingLeads ? (
-                                Array.from({ length: 6 }).map((_, i) => (
-                                    <div key={i} className="h-[200px] glass-card animate-pulse bg-white/5 border-white/5" />
-                                ))
-                            ) : leads.map((lead) => (
-                                <motion.div
-                                    key={lead.id}
-                                    initial={{ opacity: 0, scale: 0.95 }}
-                                    animate={{ opacity: 1, scale: 1 }}
-                                    className="glass-card p-5 flex flex-col gap-4 group hover:border-primary/30 transition-all bg-black/40"
-                                >
-                                    <div className="flex justify-between items-start">
-                                        <div className="space-y-1">
-                                            <h4 className="font-bold text-white uppercase tracking-tight line-clamp-1">{lead.nome_empresa}</h4>
-                                            <p className="text-[10px] text-muted-foreground uppercase flex items-center gap-1">
-                                                <MapPin className="w-3 h-3" /> {lead.cidade} • {lead.nicho}
-                                            </p>
-                                        </div>
-                                        {lead.possui_pixel ? (
-                                            <Badge variant="outline" className="text-[9px] border-green-500/20 bg-green-500/5 text-green-500">ADS ATIVO</Badge>
-                                        ) : (
-                                            <Badge variant="outline" className="text-[9px] border-red-500/20 bg-red-500/5 text-red-500">SEM PIXEL</Badge>
-                                        )}
-                                    </div>
+                        <ScrollHint height="h-[600px]" className="pr-2">
+                            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 pb-20">
+                                <CreationCard
+                                    title="Nova Varredura"
+                                    description="Criar nova automação G-Hunter"
+                                    icon={Radar}
+                                    onClick={() => document.querySelector<HTMLInputElement>('input')?.focus()}
+                                />
 
-                                    <div className="grid grid-cols-2 gap-2 mt-2">
-                                        <div className="p-2 rounded bg-white/5 border border-white/5 flex flex-col gap-1">
-                                            <span className="text-[9px] text-muted-foreground font-mono uppercase">Nota G-Maps</span>
-                                            <div className="flex items-center gap-1">
-                                                <span className="text-sm font-bold text-white">{lead.maps_rating}</span>
-                                                <div className="flex">
-                                                    {Array.from({ length: 5 }).map((_, i) => (
-                                                        <div key={i} className={`w-1.5 h-1.5 rounded-full ${i < Math.floor(lead.maps_rating) ? 'bg-primary' : 'bg-white/10'}`} />
-                                                    ))}
+                                {loadingLeads ? (
+                                    Array.from({ length: 5 }).map((_, i) => (
+                                        <div key={i} className="h-[200px] glass-card animate-pulse bg-white/5 border-white/5" />
+                                    ))
+                                ) : leads.map((lead) => (
+                                    <motion.div
+                                        key={lead.id}
+                                        initial={{ opacity: 0, scale: 0.95 }}
+                                        animate={{ opacity: 1, scale: 1 }}
+                                        className="glass-card p-5 flex flex-col gap-4 group hover:border-primary/30 transition-all bg-black/40"
+                                    >
+                                        <div className="flex justify-between items-start">
+                                            <div className="space-y-1">
+                                                <h4 className="font-bold text-white uppercase tracking-tight line-clamp-1">{lead.nome_empresa}</h4>
+                                                <p className="text-[10px] text-muted-foreground uppercase flex items-center gap-1">
+                                                    <MapPin className="w-3 h-3" /> {lead.cidade} • {lead.nicho}
+                                                </p>
+                                            </div>
+                                            {lead.possui_pixel ? (
+                                                <Badge variant="outline" className="text-[9px] border-green-500/20 bg-green-500/5 text-green-500">ADS ATIVO</Badge>
+                                            ) : (
+                                                <Badge variant="outline" className="text-[9px] border-red-500/20 bg-red-500/5 text-red-500">SEM PIXEL</Badge>
+                                            )}
+                                        </div>
+
+                                        <div className="grid grid-cols-2 gap-2 mt-2">
+                                            <div className="p-2 rounded bg-white/5 border border-white/5 flex flex-col gap-1">
+                                                <span className="text-[9px] text-muted-foreground font-mono uppercase">Nota G-Maps</span>
+                                                <div className="flex items-center gap-1">
+                                                    <span className="text-sm font-bold text-white">{lead.maps_rating}</span>
+                                                    <div className="flex">
+                                                        {Array.from({ length: 5 }).map((_, i) => (
+                                                            <div key={i} className={`w-1.5 h-1.5 rounded-full ${i < Math.floor(lead.maps_rating) ? 'bg-primary' : 'bg-white/10'}`} />
+                                                        ))}
+                                                    </div>
                                                 </div>
                                             </div>
+                                            <div className="p-2 rounded bg-white/5 border border-white/5 flex flex-col gap-1">
+                                                <span className="text-[9px] text-muted-foreground font-mono uppercase">Status CRM</span>
+                                                <span className="text-[10px] font-bold text-primary uppercase">{lead.status_crm}</span>
+                                            </div>
                                         </div>
-                                        <div className="p-2 rounded bg-white/5 border border-white/5 flex flex-col gap-1">
-                                            <span className="text-[9px] text-muted-foreground font-mono uppercase">Status CRM</span>
-                                            <span className="text-[10px] font-bold text-primary uppercase">{lead.status_crm}</span>
-                                        </div>
-                                    </div>
 
-                                    <div className="flex gap-2 pt-2 border-t border-white/5 mt-auto">
-                                        {lead.telefone && (
-                                            <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-white" title={lead.telefone}>
-                                                <Phone className="w-3.5 h-3.5" />
+                                        <div className="flex gap-2 pt-2 border-t border-white/5 mt-auto">
+                                            {lead.telefone && (
+                                                <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-white" title={lead.telefone}>
+                                                    <Phone className="w-3.5 h-3.5" />
+                                                </Button>
+                                            )}
+                                            {lead.site && (
+                                                <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-white" onClick={() => window.open(lead.site, '_blank')}>
+                                                    <Globe className="w-3.5 h-3.5" />
+                                                </Button>
+                                            )}
+                                            <Button className="ml-auto h-8 text-[10px] font-bold uppercase px-3 gap-1.5 bg-primary/10 hover:bg-primary/20 text-primary border-none">
+                                                Abrir Lead <Send className="w-3 h-3" />
                                             </Button>
-                                        )}
-                                        {lead.site && (
-                                            <Button variant="ghost" size="icon" className="h-8 w-8 text-muted-foreground hover:text-white" onClick={() => window.open(lead.site, '_blank')}>
-                                                <Globe className="w-3.5 h-3.5" />
-                                            </Button>
-                                        )}
-                                        <Button className="ml-auto h-8 text-[10px] font-bold uppercase px-3 gap-1.5 bg-primary/10 hover:bg-primary/20 text-primary border-none">
-                                            Abrir Lead <Send className="w-3 h-3" />
-                                        </Button>
-                                    </div>
-                                </motion.div>
-                            ))}
-                        </div>
+                                        </div>
+                                    </motion.div>
+                                ))}
+                            </div>
+                        </ScrollHint>
                     </AnimatePresence>
 
                     {leads.length === 0 && !loadingLeads && (

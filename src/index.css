@@ -12,6 +12,9 @@
     --primary: 24 100% 52%;
     --primary-foreground: 0 0% 0%;
 
+    /* Force Inter Globally */
+    font-family: 'Inter', sans-serif;
+
     /* Dark Industrial Backgrounds */
     --background: 240 10% 2%;
     --foreground: 0 0% 98%;
@@ -19,11 +22,25 @@
     --background-secondary: 0 0% 2%;
     --background-tertiary: 0 0% 6%;
 
-    /* Card with glassmorphism */
-    --card: 240 10% 4%;
+    /* Layout Segmentation Colors (ClickUp Rich Dark Theme - User Specs) */
+    --bg-layout-base: #111111;
+    /* #2 - Background & Header */
+    --bg-layout-workspace: #090909;
+    /* #1 - Main Content Deep Black */
+
+    /* MENU: "Corresponding Dark Orange" - User Proposed #3d200c */
+    --bg-layout-menu: #3d200c;
+
+    --bg-layout-submenu: #191919;
+    /* User Spec */
+
+    /* Card with glassmorphism (Updated for Rich Dark) */
+    --card: #111111;
+    /* User Spec */
     --card-foreground: 0 0% 98%;
 
-    --popover: 240 10% 4%;
+    --popover: #191919;
+    /* Matches Submenu/Modals */
     --popover-foreground: 0 0% 98%;
 
     /* Zinc Scale */
@@ -42,6 +59,8 @@
     /* Industrial Borders */
     --border: 240 5% 12%;
     --border-industrial: 0 0% 100% / 0.08;
+    --border-subtle: #272727;
+    /* User Spec */
     --input: 240 5% 12%;
     --ring: 20 100% 50%;
 
@@ -82,13 +101,13 @@
     font-family: 'Inter', sans-serif;
   }
 
-  /* Industrial Typography */
+  /* Industrial Typography - REFINED */
   .text-industrial {
-    @apply uppercase;
+    @apply tracking-tight font-semibold;
   }
 
   .text-industrial-italic {
-    @apply uppercase italic;
+    @apply italic text-zinc-400;
   }
 }
 
@@ -165,5 +184,28 @@
 
   .glow-orange {
     box-shadow: 0 0 20px hsl(24 100% 52% / 0.3);
+  }
+}
+
+@layer utilities {
+
+  /* Scrollbar Industrial (ClickUp Standard: 8px) */
+  .custom-scrollbar::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb {
+    @apply bg-zinc-600 rounded-lg;
+    border: 1px solid transparent;
+    background-clip: content-box;
+  }
+
+  .custom-scrollbar::-webkit-scrollbar-thumb:hover {
+    @apply bg-zinc-500;
   }
 }
