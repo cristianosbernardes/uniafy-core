@@ -41,7 +41,10 @@ import {
   Building,
   Crown,
   Laptop,
-  ChevronsLeft
+  ChevronsLeft,
+  ShieldAlert,
+  TrendingUp,
+  Settings
 } from 'lucide-react';
 import { NAV_MODULES } from '@/config/navigation';
 import { NavItem, UserRole } from '@/types/uniafy';
@@ -95,7 +98,11 @@ const iconMap: Record<string, React.ReactNode> = {
   Building: <Building className="w-4 h-4" />,
   Crown: <Crown className="w-4 h-4" />,
   Laptop: <Laptop className="w-4 h-4" />,
+  ShieldAlert: <ShieldAlert className="w-4 h-4" />,
+  TrendingUp: <TrendingUp className="w-4 h-4" />,
+  Settings: <Settings className="w-4 h-4" />,
 };
+
 
 export function ContextSidebar({ activeModule, userRole, isOpen = true, onToggle }: ContextSidebarProps) {
   const location = useLocation();

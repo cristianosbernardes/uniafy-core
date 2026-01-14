@@ -14,6 +14,10 @@ import GHunter from "./pages/GHunter";
 import CnpjSniper from "./pages/CnpjSniper";
 import MasterSettings from "./pages/MasterSettings";
 import { DashboardShell } from "./components/layout/DashboardShell";
+import AuditLogs from "./pages/master/AuditLogs";
+import ProductAnalytics from "./pages/master/ProductAnalytics";
+import SaasMetrics from "./pages/master/SaasMetrics";
+import WhiteLabelFactory from "./pages/master/WhiteLabelFactory";
 
 const queryClient = new QueryClient();
 
@@ -51,6 +55,10 @@ const AppRoutes = () => {
         <Route path="/mestre/agencias" element={<GestaoClientes />} />
         <Route path="/mestre/sql" element={<SqlBank />} />
         <Route path="/mestre/config" element={<MasterSettings />} />
+        <Route path="/mestre/audit" element={<AuditLogs />} />
+        <Route path="/mestre/analytics" element={<ProductAnalytics />} />
+        <Route path="/mestre/metrics" element={<SaasMetrics />} />
+        <Route path="/mestre/whitelabel" element={<WhiteLabelFactory />} />
 
         {/* Growth Engine Routes */}
         <Route path="/growth" element={<Navigate to="/growth/hunter" replace />} />

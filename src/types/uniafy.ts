@@ -119,3 +119,50 @@ export interface FinancialTransaction {
   status: 'paid' | 'pending' | 'failed';
   type: 'subscription' | 'addon';
 }
+
+// --- SAAS SUITE TYPES ---
+
+export type AuditAction = 'LOGIN' | 'CREATE' | 'UPDATE' | 'DELETE' | 'EXPORT' | 'IMPERSONATE';
+
+export interface AuditLog {
+  id: string;
+  actor_id: string;
+  actor_name: string;
+  action: AuditAction;
+  target: string; // Ex: "Agency Alpha", "Config Global"
+  metadata: Record<string, any>; // JSON com detalhes
+  ip_address: string;
+  created_at: string;
+}
+
+export interface TelemetryEvent {
+  id: string;
+  user_id: string;
+  module: string; // Ex: "growth/hunter"
+  action: string; // Ex: "search_triggered"
+  timestamp: string;
+}
+
+export interface SaasMetric {
+  label: string;
+  value: number;
+  change: number;
+  period: string;
+  trend: 'up' | 'down' | 'neutral';
+}
+
+export interface CustomDomain {
+  id: string;
+  domain: string;
+  tenant_id: string; // Agência dona
+  status: 'active' | 'pending_dns' | 'ssl_error' | 'verifying';
+  dns_record_type: 'CNAME';
+  dns_record_value: string;
+  created_at: string;
+  branding?: {
+    logo_url?: string;
+    primary_color?: string;
+    favicon_url?: string;
+  }
+}
+
