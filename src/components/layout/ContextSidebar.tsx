@@ -146,7 +146,7 @@ export function ContextSidebar({ activeModule, userRole, isOpen = true, onToggle
               <div
                 className={cn(
                   "absolute inset-0 mx-2 rounded-md transition-all duration-200",
-                  isActive ? "bg-[#292929]" : "bg-transparent group-hover:bg-[#161616]"
+                  isActive ? "bg-[#292929]" : "bg-transparent group-hover:bg-[#191919]"
                 )}
               />
 

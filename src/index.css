@@ -28,11 +28,11 @@
     --bg-layout-workspace: #090909;
     /* #1 - Main Content Deep Black */
 
-    /* MENU: "Corresponding Dark Orange" - User Proposed #3d200c */
-    --bg-layout-menu: #3d200c;
+    /* MENU: "Modern Black" - Removes 'Rust' feel, highlights Neon Orange Icon */
+    --bg-layout-menu: #050505;
 
-    --bg-layout-submenu: #191919;
-    /* User Spec */
+    --bg-layout-submenu: #0C0C0C;
+    /* Darkened from #161616 per user request */
 
     /* Card with glassmorphism (Updated for Rich Dark) */
     --card: #111111;
