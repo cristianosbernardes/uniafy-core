@@ -58,11 +58,8 @@ export const masterService = {
         return data;
     },
 
-    async updateGlobalConfig(config: Partial<MasterNotificationConfig>) {
-        // Updates the singleton row
-        // First get ID
-        const current = await this.getGlobalConfig();
-        if (!current) throw new Error("Config not found");
+    async updateGlobalConfig(config: MasterNotificationConfig) {
+        if (!config.id) throw new Error("Config ID is missing");
 
         const { error } = await supabase
             .from('master_config')
@@ -73,8 +70,11 @@ export const masterService = {
                 is_active: config.is_active,
                 channels: config.channels
             })
-            .eq('id', current.id);
+            .eq('id', config.id);
 
-        if (error) throw error;
+        if (error) {
+            console.error("Supabase Update Error:", error);
+            throw error;
+        }
     }
 };

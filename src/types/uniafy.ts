@@ -40,6 +40,7 @@ export interface User {
   role: UserRole;
   avatar?: string;
   tenant_id?: string;
+  subscription?: AgencySubscription | null;
 }
 
 export interface NavItem {

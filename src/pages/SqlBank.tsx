@@ -110,6 +110,37 @@ END $$;
         icon: <Code className="w-4 h-4 text-blue-500" />
     },
     {
+        id: 'setup-trial-user',
+        title: '[SETUP] Criar Assinatura Trial (User Atual)',
+        query: `
+-- Primeiro remove qualquer assinatura anterior para evitar duplicidade
+DELETE FROM public.subscriptions WHERE tenant_id = auth.uid();
+
+-- Insere nova assinatura TRIAL expirando em 3 dias
+INSERT INTO public.subscriptions (
+  tenant_id,
+  plan_id,
+  status,
+  start_date,
+  next_billing_date,
+  amount,
+  payment_method
+)
+SELECT 
+  auth.uid(),
+  (SELECT id FROM public.plans WHERE name = 'Uniafy Growth' LIMIT 1),
+  'trial',
+  now(),
+  now() + interval '3 days',
+  0.00,
+  'CC'
+FROM auth.users WHERE id = auth.uid();
+
+SELECT 'Assinatura TRIAL criada com sucesso para o usuário atual.' as status;
+`,
+        icon: <CheckCircle2 className="w-4 h-4 text-orange-500" />
+    },
+    {
         id: 'setup-agency-v1',
         title: '[MIGRAÇÃO] Setup Agência e Trial (Safe Mode)',
         query: `ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS role text DEFAULT 'client' CHECK (role IN ('owner', 'agency', 'client'));
@@ -122,6 +153,31 @@ ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS branding_colors jsonb DEFAU
 CREATE OR REPLACE FUNCTION public.handle_new_user() RETURNS trigger AS $fn$ BEGIN INSERT INTO public.profiles (id, email, full_name, role, trial_start_date, subscription_status) VALUES (new.id, new.email, new.raw_user_meta_data->>'full_name', COALESCE(new.raw_user_meta_data->>'role', 'client'), NOW(), 'trial'); RETURN new; END; $fn$ LANGUAGE plpgsql SECURITY DEFINER;
 SELECT 'Migração Safe Mode Concluída: Colunas criadas e Função atualizada.' as status;`,
         icon: <Database className="w-4 h-4 text-emerald-500" />
+    },
+    {
+        id: 'fix-master-update',
+        title: '[FIX] Permitir Edição Master Config',
+        query: `
+-- Cria política para permitir UPDATE na tabela master_config
+-- Isso resolve o problema de "Salvamento Fake" no painel Master
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT FROM pg_policies 
+        WHERE tablename = 'master_config' 
+        AND policyname = 'Master Update Config'
+    ) THEN
+        CREATE POLICY "Master Update Config" 
+        ON public.master_config 
+        FOR UPDATE 
+        USING (true) 
+        WITH CHECK (true);
+    END IF;
+END $$;
+
+SELECT 'Política de UPDATE criada com sucesso para master_config.' as status;
+`,
+        icon: <CheckCircle2 className="w-4 h-4 text-yellow-500" />
     }
 ];
 

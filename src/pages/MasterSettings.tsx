@@ -32,10 +32,12 @@ export default function MasterSettings() {
     const handleSave = async () => {
         if (!config) return;
         setIsLoading(true);
+        console.log("Saving config:", config); // DEBUG
         try {
             await masterService.updateGlobalConfig(config);
             toast.success('Configurações globais atualizadas com sucesso!');
         } catch (error) {
+            console.error("Error saving config:", error); // DEBUG
             toast.error('Erro ao salvar no banco de dados.');
         } finally {
             setIsLoading(false);

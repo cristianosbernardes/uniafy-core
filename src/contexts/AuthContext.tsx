@@ -32,35 +32,38 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     };
 
     useEffect(() => {
+        // Helper function to update user state with subscription
+        const updateUserData = async (session: any) => {
+            if (session?.user) {
+                // Fetch Subscription Data
+                const { data: subData } = await supabase
+                    .from('subscriptions')
+                    .select('*')
+                    .eq('tenant_id', session.user.id)
+                    .maybeSingle();
+
+                setUser({
+                    id: session.user.id,
+                    name: session.user.user_metadata.name || session.user.email?.split('@')[0] || 'Usuário',
+                    email: session.user.email || '',
+                    role: getRoleFromEmail(session.user.email),
+                    avatar: session.user.user_metadata.avatar_url,
+                    subscription: subData as any,
+                });
+            } else {
+                setUser(null);
+            }
+            setLoading(false);
+        };
+
         // Check active session
         supabase.auth.getSession().then(({ data: { session } }) => {
-            if (session?.user) {
-                setUser({
-                    id: session.user.id,
-                    name: session.user.user_metadata.name || session.user.email?.split('@')[0] || 'Usuário',
-                    email: session.user.email || '',
-                    role: getRoleFromEmail(session.user.email),
-                    avatar: session.user.user_metadata.avatar_url,
-                });
-            } else {
-                setUser(null);
-            }
-            setLoading(false);
+            updateUserData(session);
         });
 
+        // Listen for changes
         const { data: { subscription } } = supabase.auth.onAuthStateChange((_event, session) => {
-            if (session?.user) {
-                setUser({
-                    id: session.user.id,
-                    name: session.user.user_metadata.name || session.user.email?.split('@')[0] || 'Usuário',
-                    email: session.user.email || '',
-                    role: getRoleFromEmail(session.user.email),
-                    avatar: session.user.user_metadata.avatar_url,
-                });
-            } else {
-                setUser(null);
-            }
-            setLoading(false);
+            updateUserData(session);
         });
 
         return () => subscription.unsubscribe();
