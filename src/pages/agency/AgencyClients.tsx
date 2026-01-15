@@ -42,13 +42,14 @@ import {
     DropdownMenuSeparator,
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
+import { ClientOnboardingWizard } from "@/components/agency/ClientOnboardingWizard";
 
 export default function AgencyClients() {
     const { user } = useAuth();
     const [clients, setClients] = useState<any[]>([]);
     const [loading, setLoading] = useState(true);
     const [inviteOpen, setInviteOpen] = useState(false);
-    const [clientData, setClientData] = useState({ name: "", email: "", plan: "pro" });
+    const [clientData, setClientData] = useState<any>({});
 
     useEffect(() => {
         if (user) loadClients();
@@ -78,26 +79,26 @@ export default function AgencyClients() {
         }
     };
 
-    const handleCreateClient = async () => {
+    const handleCreateClient = async (data: any) => {
         if (!user) return;
         try {
-            await agencyService.createClient(user.id, clientData);
-            toast.success("Cliente cadastrado com sucesso!");
+            await agencyService.createClient(user.id, data);
+            toast.success("Onboarding iniciado com sucesso! O acesso será enviado em breve.");
             setInviteOpen(false);
 
             // Mock update
             setClients([...clients, {
                 id: crypto.randomUUID(),
-                full_name: clientData.name,
-                email: clientData.email,
-                plan: clientData.plan === 'pro' ? 'Pro' : 'Enterprise',
-                status: 'active',
+                full_name: data.name,
+                email: data.email,
+                plan: data.monthlyBudget > 10000 ? 'Enterprise' : 'Pro',
+                status: 'trial',
                 ltv: 'R$ 0'
             }]);
 
-            setClientData({ name: "", email: "", plan: "pro" });
+            // Trigger confetti or success animation here if possible
         } catch (error) {
-            toast.error("Erro ao criar cliente.");
+            toast.error("Erro ao iniciar onboarding.");
         }
     };
 
@@ -126,57 +127,11 @@ export default function AgencyClients() {
                             Novo Cliente
                         </Button>
                     </DialogTrigger>
-                    <DialogContent className="bg-zinc-950 border-white/10 text-white">
-                        <DialogHeader>
-                            <DialogTitle>Adicionar Cliente</DialogTitle>
-                            <DialogDescription className="text-zinc-400">
-                                Cadastre um novo cliente para gerenciar no seu painel.
-                            </DialogDescription>
-                        </DialogHeader>
-                        <div className="space-y-4 py-4">
-                            <div className="space-y-2">
-                                <Label>Nome da Empresa / Cliente</Label>
-                                <Input
-                                    className="bg-black/50 border-white/10"
-                                    placeholder="Ex: Empresa X"
-                                    value={clientData.name}
-                                    onChange={(e) => setClientData({ ...clientData, name: e.target.value })}
-                                />
-                            </div>
-                            <div className="space-y-2">
-                                <Label>E-mail do Responsável</Label>
-                                <Input
-                                    className="bg-black/50 border-white/10"
-                                    placeholder="cliente@empresa.com"
-                                    value={clientData.email}
-                                    onChange={(e) => setClientData({ ...clientData, email: e.target.value })}
-                                />
-                            </div>
-                            <div className="space-y-2">
-                                <Label>Plano Contratado</Label>
-                                <Select
-                                    value={clientData.plan}
-                                    onValueChange={(val) => setClientData({ ...clientData, plan: val })}
-                                >
-                                    <SelectTrigger className="bg-black/50 border-white/10">
-                                        <SelectValue placeholder="Selecione um plano" />
-                                    </SelectTrigger>
-                                    <SelectContent className="bg-zinc-900 border-white/10">
-                                        <SelectItem value="basic">Basic (Monitoramento)</SelectItem>
-                                        <SelectItem value="pro">Pro (Gestão Completa)</SelectItem>
-                                        <SelectItem value="enterprise">Enterprise (White Label)</SelectItem>
-                                    </SelectContent>
-                                </Select>
-                            </div>
-                        </div>
-                        <DialogFooter>
-                            <Button variant="outline" onClick={() => setInviteOpen(false)} className="border-white/10 hover:bg-white/5 text-zinc-300">
-                                Cancelar
-                            </Button>
-                            <Button onClick={handleCreateClient} className="bg-primary hover:bg-primary/90">
-                                Cadastrar
-                            </Button>
-                        </DialogFooter>
+                    <DialogContent className="bg-transparent border-none shadow-none max-w-4xl p-0 overflow-hidden">
+                        <ClientOnboardingWizard
+                            onComplete={handleCreateClient}
+                            onCancel={() => setInviteOpen(false)}
+                        />
                     </DialogContent>
                 </Dialog>
             </div>

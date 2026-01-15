@@ -24,6 +24,9 @@ import AgencyClients from "./pages/agency/AgencyClients";
 import AgencySquads from "./pages/agency/AgencySquads";
 import AgencyFinance from "./pages/agency/AgencyFinance";
 import AgencyChurn from "./pages/agency/AgencyChurn";
+import AgencyOnboarding from "./pages/agency/AgencyOnboarding";
+
+import AgencyIntegrations from "@/pages/agency/AgencyIntegrations";
 
 const queryClient = new QueryClient();
 
@@ -77,9 +80,11 @@ const AppRoutes = () => {
         <Route path="/agency" element={<Navigate to="/agency/users" replace />} />
         <Route path="/agency/users" element={<AgencyUsers />} />
         <Route path="/agency/whitelabel" element={<AgencyWhiteLabel />} />
+
         <Route path="/agency/clients" element={<AgencyClients />} />
-        <Route path="/agency/onboarding" element={<Dashboard />} />
+        <Route path="/agency/onboarding" element={<AgencyOnboarding />} />
         <Route path="/agency/squads" element={<AgencySquads />} />
+        <Route path="/agency/integrations" element={<AgencyIntegrations />} />
         <Route path="/agency/finance" element={<AgencyFinance />} />
         <Route path="/agency/churn-alert" element={<AgencyChurn />} />
 

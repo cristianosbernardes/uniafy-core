@@ -145,6 +145,14 @@ export const NAV_MODULES: NavModule[] = [
         roles: [UserRole.OWNER, UserRole.AGENCY],
       },
       {
+        id: 'agency-integrations',
+        title: 'Integrações',
+        description: 'Conexão com plataformas (Meta, Google)',
+        icon: 'Link',
+        path: '/agency/integrations',
+        roles: [UserRole.OWNER, UserRole.AGENCY],
+      },
+      {
         id: 'financeiro-fee',
         title: 'Contratos & Financeiro',
         description: 'Controle de faturamento e alertas de atraso',

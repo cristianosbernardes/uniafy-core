@@ -93,10 +93,17 @@ export const agencyService = {
         return data as any[];
     },
 
-    async createClient(agencyId: string, clientData: { name: string, email: string, plan: string }) {
-        // Mock: Simula criação de cliente
-        console.log("Creating client:", { agencyId, ...clientData });
-        await new Promise(resolve => setTimeout(resolve, 1500));
+    async createClient(agencyId: string, clientData: any) {
+        // Mock: Simula criação de cliente com dados do Onboarding Mágico
+        console.log("🚀 Iniciando Onboarding Mágico:", { agencyId, ...clientData });
+
+        // Simulação de delay para "Processamento IA" e "Webhooks"
+        await new Promise(resolve => setTimeout(resolve, 2500));
+
+        console.log("✅ Webhook disparado: CRM atualizado");
+        console.log("✅ Estrutura de pastas criada no Drive");
+        console.log("✅ Convite de acesso enviado");
+
         return { success: true, id: crypto.randomUUID() };
     }
 };
