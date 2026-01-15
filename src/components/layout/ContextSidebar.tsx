@@ -44,7 +44,9 @@ import {
   ChevronsLeft,
   ShieldAlert,
   TrendingUp,
-  Settings
+  Settings,
+  Briefcase,
+  Siren
 } from 'lucide-react';
 import { NAV_MODULES } from '@/config/navigation';
 import { NavItem, UserRole } from '@/types/uniafy';
@@ -101,6 +103,8 @@ const iconMap: Record<string, React.ReactNode> = {
   ShieldAlert: <ShieldAlert className="w-4 h-4" />,
   TrendingUp: <TrendingUp className="w-4 h-4" />,
   Settings: <Settings className="w-4 h-4" />,
+  Briefcase: <Briefcase className="w-4 h-4" />,
+  Siren: <Siren className="w-4 h-4" />,
 };
 
 

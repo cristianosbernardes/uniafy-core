@@ -108,6 +108,20 @@ END $$;
         title: '[DEBUG] Ver Definição do RPC',
         query: "SELECT pg_get_functiondef('admin_exec_sql'::regproc)",
         icon: <Code className="w-4 h-4 text-blue-500" />
+    },
+    {
+        id: 'setup-agency-v1',
+        title: '[MIGRAÇÃO] Setup Agência e Trial (Safe Mode)',
+        query: `ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS role text DEFAULT 'client' CHECK (role IN ('owner', 'agency', 'client'));
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS subscription_status text DEFAULT 'trial' CHECK (subscription_status IN ('trial', 'active', 'past_due', 'canceled'));
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS trial_start_date timestamp with time zone DEFAULT now();
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS parent_agency_id uuid REFERENCES public.profiles(id);
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS custom_domain text UNIQUE;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS branding_logo text;
+ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS branding_colors jsonb DEFAULT '{"primary": "#F97316", "secondary": "#000000"}'::jsonb;
+CREATE OR REPLACE FUNCTION public.handle_new_user() RETURNS trigger AS $fn$ BEGIN INSERT INTO public.profiles (id, email, full_name, role, trial_start_date, subscription_status) VALUES (new.id, new.email, new.raw_user_meta_data->>'full_name', COALESCE(new.raw_user_meta_data->>'role', 'client'), NOW(), 'trial'); RETURN new; END; $fn$ LANGUAGE plpgsql SECURITY DEFINER;
+SELECT 'Migração Safe Mode Concluída: Colunas criadas e Função atualizada.' as status;`,
+        icon: <Database className="w-4 h-4 text-emerald-500" />
     }
 ];
 

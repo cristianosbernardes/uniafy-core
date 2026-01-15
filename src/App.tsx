@@ -18,6 +18,12 @@ import AuditLogs from "./pages/master/AuditLogs";
 import ProductAnalytics from "./pages/master/ProductAnalytics";
 import SaasMetrics from "./pages/master/SaasMetrics";
 import WhiteLabelFactory from "./pages/master/WhiteLabelFactory";
+import AgencyUsers from "./pages/agency/AgencyUsers";
+import AgencyWhiteLabel from "./pages/agency/AgencyWhiteLabel";
+import AgencyClients from "./pages/agency/AgencyClients";
+import AgencySquads from "./pages/agency/AgencySquads";
+import AgencyFinance from "./pages/agency/AgencyFinance";
+import AgencyChurn from "./pages/agency/AgencyChurn";
 
 const queryClient = new QueryClient();
 
@@ -68,10 +74,14 @@ const AppRoutes = () => {
         <Route path="/growth/crm" element={<Dashboard />} />
 
         {/* Agency OS Routes */}
-        <Route path="/agency-os" element={<Navigate to="/agency-os/onboarding" replace />} />
-        <Route path="/agency-os/onboarding" element={<Dashboard />} />
-        <Route path="/agency-os/squads" element={<Dashboard />} />
-        <Route path="/agency-os/financeiro" element={<Dashboard />} />
+        <Route path="/agency" element={<Navigate to="/agency/users" replace />} />
+        <Route path="/agency/users" element={<AgencyUsers />} />
+        <Route path="/agency/whitelabel" element={<AgencyWhiteLabel />} />
+        <Route path="/agency/clients" element={<AgencyClients />} />
+        <Route path="/agency/onboarding" element={<Dashboard />} />
+        <Route path="/agency/squads" element={<AgencySquads />} />
+        <Route path="/agency/finance" element={<AgencyFinance />} />
+        <Route path="/agency/churn-alert" element={<AgencyChurn />} />
 
         {/* Traffic Commander Routes */}
         <Route path="/traffic" element={<Navigate to="/traffic/analytics" replace />} />
