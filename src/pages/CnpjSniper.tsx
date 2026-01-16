@@ -69,12 +69,12 @@ export default function CnpjSniper() {
     };
 
     return (
-        <div className="p-8 animate-in fade-in duration-700">
+        <div className="">
             <div className="max-w-[1600px] mx-auto space-y-8">
                 <PageHeader
                     title="CNPJ"
                     titleAccent="SNIPER"
-                    subtitle="MOTOR DE BUSCA ESTRATÉGICO • INTELIGÊNCIA DE DADOS EMPRESARIAIS"
+                    subtitle="Motor de busca estratégico • Inteligência de dados empresariais"
                 />
 
                 {/* Industrial Filter Panel */}

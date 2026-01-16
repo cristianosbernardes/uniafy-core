@@ -72,15 +72,14 @@ export default function AgencyWhiteLabel() {
         }
     };
 
-    if (loading) return <div className="p-8 text-muted-foreground animate-pulse">Carregando configurações da agência...</div>;
-
     return (
-        <div className="p-8 space-y-8 animate-in fade-in duration-700">
+        <div className="space-y-8">
             <PageHeader
                 title="SETUP"
                 titleAccent="WHITE LABEL"
-                subtitle="PERSONALIZE A EXPERIÊNCIA DO SEU CLIENTE"
+                subtitle="Personalize a experiência do seu cliente"
             />
+            {loading && <div className="text-xs text-muted-foreground animate-pulse absolute top-4 right-8">Sincronizando...</div>}
 
             <Tabs defaultValue="domain" className="space-y-6">
                 <TabsList className="bg-white/5 border border-white/5 p-1 h-auto">

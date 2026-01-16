@@ -41,11 +41,11 @@ export default function SaasMetrics() {
     };
 
     return (
-        <div className="p-8 space-y-8 animate-in fade-in duration-700">
+        <div className="space-y-8">
             <PageHeader
                 title="MÉTRICAS"
                 titleAccent="SAAS"
-                subtitle="MASTER SUITE • INTELIGÊNCIA FINANCEIRA E RECORRÊNCIA"
+                subtitle="Master Suite • Inteligência financeira e recorrência"
                 actions={[
                     { label: 'Relatório PDF', icon: DollarSign, variant: 'outline' }
                 ]}

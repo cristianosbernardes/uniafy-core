@@ -94,12 +94,12 @@ export default function GHunter() {
     };
 
     return (
-        <div className="p-8 space-y-8 animate-in fade-in duration-700">
+        <div className="space-y-8">
             <div className="max-w-[1600px] mx-auto space-y-8">
                 <PageHeader
                     title="G-HUNTER"
                     titleAccent="SCRAPER"
-                    subtitle="GROWTH ENGINE • EXTRAÇÃO ESTRATÉGICA GOOGLE MAPS"
+                    subtitle="Growth Engine • Extração estratégica Google Maps"
                 />
 
                 {/* Search Panel */}

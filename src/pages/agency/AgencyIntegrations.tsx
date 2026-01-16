@@ -5,6 +5,7 @@ import { CheckCircle2, AlertCircle, RefreshCw, Link2, ExternalLink } from "lucid
 import { useState } from "react";
 import { toast } from "sonner";
 import { motion } from "framer-motion";
+import { PageHeader } from "@/components/ui/PageHeader";
 
 export default function AgencyIntegrations() {
     const [connections, setConnections] = useState({
@@ -41,16 +42,13 @@ export default function AgencyIntegrations() {
     };
 
     return (
-        <div className="space-y-8 animate-in fade-in duration-500">
-            <div>
-                <h1 className="text-3xl font-bold tracking-tight text-white flex items-center gap-2">
-                    <Link2 className="w-8 h-8 text-primary" />
-                    Integrações
-                </h1>
-                <p className="text-muted-foreground mt-2 text-lg">
-                    Conecte suas contas de gerenciador (BM/MCC) para habilitar as automações do Onboarding Mágico.
-                </p>
-            </div>
+
+        <div className="space-y-8">
+            <PageHeader
+                title="AGÊNCIA"
+                titleAccent="INTEGRAÇÕES"
+                subtitle="Conecte suas contas de gerenciador (BM/MCC) para habilitar automações."
+            />
 
             <div className="grid gap-6 md:grid-cols-2">
                 {/* Meta Ads Card */}

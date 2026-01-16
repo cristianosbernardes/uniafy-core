@@ -20,6 +20,26 @@ Este documento centraliza as regras e diretrizes que devem ser seguidas rigorosa
 *   **Tema Industrial:** Manter a paleta escura (`#050505`, `#09090b`) com acentos em Laranja (`primary`) ou Branco (`foreground`).
 *   **White Label:** Componentes devem ser preparados para receber variáveis CSS de cor (`var(--primary)`) para suportar personalização.
 
+### 1.3. Padrão "Premium" de Layout (Golden Ratio)
+Este padrão define a sensação de amplitude e organização "high-ticket" da plataforma.
+
+*   **Estrutura de Padding:**
+    *   **Container Global:** O `DashboardShell` já fornece um padding de **32px** (`p-8`) em desktop. NUNCA adicione `p-8` extra no container raiz das páginas.
+    *   **Espaçamento Vertical:** Use `space-y-8` (32px) no container raiz para separar o Cabeçalho do Conteúdo.
+*   **Cabeçalho (PageHeader):**
+    *   **Uso:** Obrigatório usar o componente `<PageHeader />`.
+    *   **Subtítulo:**
+        *   **Capitalização:** **Sentence case** (Apenas a 1ª letra maiúscula). NUNCA usar `lowercase` forçado nem `UPPERCASE`.
+        *   **Fonte:** `text-[14px]`, `font-medium`, `text-muted-foreground`.
+        *   *Exemplo:* "Gestão de contratos e assinaturas" (Correto) vs "GESTÃO DE CONTRATOS" (Errado).
+*   **Cards e Grids:**
+    *   **Gap entre Cards:** `gap-6` (24px).
+    *   **Padding Interno de Cards:** `p-6` (24px).
+*   **Visual Métrica:**
+    *   Borda da Tela: **32px** (Simetria Topo/Laterais).
+    *   Separador Título/Conteúdo: **32px**.
+    *   Separador entre Cards: **24px**.
+
 ## 2. Banco de Dados (Supabase)
 
 ### 2.1. Segurança (RLS)

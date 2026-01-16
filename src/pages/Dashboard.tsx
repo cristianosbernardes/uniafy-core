@@ -5,7 +5,7 @@ import { IAProtocolCard } from '@/components/ui/IAProtocolCard';
 
 export default function Dashboard() {
   return (
-    <div className="p-8 space-y-8">
+    <div className="space-y-8">
       {/* Page Header */}
       <PageHeader
         title="Dashboard"
@@ -60,11 +60,11 @@ export default function Dashboard() {
         description="Detectamos saturação de público no cluster Facebook Ads. Recomendamos escala horizontal imediata através de novos nodes de criativos."
         primaryAction={{
           label: 'Aplicar Escala',
-          onClick: () => console.log('Apply scale'),
+          onClick: () => { },
         }}
         secondaryAction={{
           label: 'Detalhes',
-          onClick: () => console.log('Show details'),
+          onClick: () => { },
         }}
       />
     </div>

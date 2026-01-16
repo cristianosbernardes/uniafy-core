@@ -23,6 +23,7 @@ import AgencyWhiteLabel from "./pages/agency/AgencyWhiteLabel";
 import AgencyClients from "./pages/agency/AgencyClients";
 import AgencySquads from "./pages/agency/AgencySquads";
 import AgencyFinance from "./pages/agency/AgencyFinance";
+import AgencyContracts from "./pages/agency/AgencyContracts";
 import AgencyChurn from "./pages/agency/AgencyChurn";
 import AgencyOnboarding from "./pages/agency/AgencyOnboarding";
 
@@ -85,6 +86,7 @@ const AppRoutes = () => {
         <Route path="/agency/onboarding" element={<AgencyOnboarding />} />
         <Route path="/agency/squads" element={<AgencySquads />} />
         <Route path="/agency/integrations" element={<AgencyIntegrations />} />
+        <Route path="/agency/contracts" element={<AgencyContracts />} />
         <Route path="/agency/finance" element={<AgencyFinance />} />
         <Route path="/agency/churn-alert" element={<AgencyChurn />} />
 

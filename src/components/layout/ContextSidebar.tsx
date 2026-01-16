@@ -47,7 +47,8 @@ import {
   Settings,
   Briefcase,
   Siren,
-  Link as LinkIcon
+  Link as LinkIcon,
+  FileSignature
 } from 'lucide-react';
 import { NAV_MODULES } from '@/config/navigation';
 import { NavItem, UserRole } from '@/types/uniafy';
@@ -107,6 +108,7 @@ const iconMap: Record<string, React.ReactNode> = {
   Briefcase: <Briefcase className="w-4 h-4" />,
   Siren: <Siren className="w-4 h-4" />,
   Link: <LinkIcon className="w-4 h-4" />, // Aliased to avoid conflict with react-router-dom Link
+  FileSignature: <FileSignature className="w-4 h-4" />,
 };
 
 

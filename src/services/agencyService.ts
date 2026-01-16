@@ -65,7 +65,7 @@ export const agencyService = {
         // 2. Aqui vamos simular criando o perfil diretamente ou chamando um RPC se existisse
 
         // Mock connection para UI Frontend:
-        console.log("Simulating invite:", { agencyId, email, role, fullName });
+
         await new Promise(resolve => setTimeout(resolve, 1500));
         return { success: true };
     },
@@ -95,14 +95,12 @@ export const agencyService = {
 
     async createClient(agencyId: string, clientData: any) {
         // Mock: Simula criação de cliente com dados do Onboarding Mágico
-        console.log("🚀 Iniciando Onboarding Mágico:", { agencyId, ...clientData });
+
 
         // Simulação de delay para "Processamento IA" e "Webhooks"
         await new Promise(resolve => setTimeout(resolve, 2500));
 
-        console.log("✅ Webhook disparado: CRM atualizado");
-        console.log("✅ Estrutura de pastas criada no Drive");
-        console.log("✅ Convite de acesso enviado");
+
 
         return { success: true, id: crypto.randomUUID() };
     }

@@ -32,7 +32,7 @@ export function PageHeader({
           )}
         </h1>
         {subtitle && (
-          <p className="text-[11px] text-muted-foreground mt-2 font-bold opacity-60 tracking-wider">
+          <p className="text-[14px] text-muted-foreground mt-2 font-medium tracking-wide">
             {subtitle}
           </p>
         )}

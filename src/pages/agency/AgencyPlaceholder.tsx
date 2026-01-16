@@ -8,7 +8,7 @@ interface PlaceholderProps {
 
 export default function AgencyPlaceholder({ title, subtitle }: PlaceholderProps) {
     return (
-        <div className="p-8 space-y-6 animate-in fade-in duration-700">
+        <div className="space-y-8">
             <PageHeader
                 title="AGÊNCIA"
                 titleAccent={title.toUpperCase()}

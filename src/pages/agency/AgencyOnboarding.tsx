@@ -30,11 +30,11 @@ export default function AgencyOnboarding() {
     };
 
     return (
-        <div className="p-8 space-y-8 animate-in fade-in duration-700">
+        <div className="space-y-8">
             <PageHeader
                 title="ONBOARDING"
                 titleAccent="MÁGICO"
-                subtitle="SISTEMA DE ENTRADA INTELIGENTE"
+                subtitle="Sistema de entrada inteligente"
             />
 
             <div className="flex justify-center items-start min-h-[60vh] pt-8">

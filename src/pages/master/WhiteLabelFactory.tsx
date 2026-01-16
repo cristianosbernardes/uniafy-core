@@ -93,11 +93,11 @@ export default function WhiteLabelFactory() {
     };
 
     return (
-        <div className="p-8 space-y-8 animate-in fade-in duration-700">
+        <div className="space-y-8">
             <PageHeader
                 title="FÁBRICA"
                 titleAccent="WHITE LABEL"
-                subtitle="MASTER SUITE • DOMÍNIOS E BRANDING MULTI-TENANT"
+                subtitle="Master Suite • Domínios e branding multi-tenant"
                 actions={[
                     {
                         label: 'Nova Agência / Domínio',

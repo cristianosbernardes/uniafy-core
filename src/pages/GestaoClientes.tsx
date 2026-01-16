@@ -35,11 +35,11 @@ export default function GestaoClientes() {
   };
 
   return (
-    <div className="p-8 space-y-8 animate-in fade-in duration-700">
+    <div className="space-y-8">
       <PageHeader
         title="GESTÃO DE"
         titleAccent="ASSINATURAS"
-        subtitle="MASTER SUITE • CONTROLE DE AGÊNCIAS E WHITE LABEL"
+        subtitle="Master Suite • Controle de agências e white label"
         actions={[
           {
             label: 'Novo Cliente',
@@ -94,14 +94,14 @@ export default function GestaoClientes() {
           <div className="relative w-full md:w-96">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
             <Input
-              placeholder="BUSCAR AGÊNCIA..."
-              className="pl-10 h-10 bg-black/40 border-white/10 text-xs font-bold uppercase"
+              placeholder="Buscar agência..."
+              className="pl-10 h-10 bg-black/40 border-white/10 text-xs font-bold"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
           <Button variant="outline" className="h-10 border-white/10 bg-white/5 gap-2 text-[10px] font-black uppercase">
-            <Filter className="w-4 h-4" /> Filtros
+            <Filter className="w-4 h-4" /> FILTROS
           </Button>
         </div>
 

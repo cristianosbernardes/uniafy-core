@@ -106,7 +106,7 @@ export const NAV_MODULES: NavModule[] = [
     items: [
       {
         id: 'agency-users',
-        title: 'Usuários & Time',
+        title: 'Time & Acesso',
         description: 'Gestão de equipe e permissões',
         icon: 'Users',
         path: '/agency/users',
@@ -114,7 +114,7 @@ export const NAV_MODULES: NavModule[] = [
       },
       {
         id: 'agency-whitelabel',
-        title: 'Setup White Label',
+        title: 'Personalização (White Label)',
         description: 'Domínio personalizado e branding',
         icon: 'Globe',
         path: '/agency/whitelabel',
@@ -122,7 +122,7 @@ export const NAV_MODULES: NavModule[] = [
       },
       {
         id: 'agency-clients',
-        title: 'Carteira de Clientes',
+        title: 'Clientes',
         description: 'CRM e integração de contas',
         icon: 'Briefcase',
         path: '/agency/clients',
@@ -130,7 +130,7 @@ export const NAV_MODULES: NavModule[] = [
       },
       {
         id: 'onboarding-magico',
-        title: 'Onboarding Mágico',
+        title: 'Onboarding',
         description: 'Setup automático de novos clientes',
         icon: 'Zap',
         path: '/agency/onboarding',
@@ -138,7 +138,7 @@ export const NAV_MODULES: NavModule[] = [
       },
       {
         id: 'gestao-squads',
-        title: 'Gestão de Squads',
+        title: 'Squads',
         description: 'Distribuição de clientes e tarefas por equipe',
         icon: 'LayoutGrid',
         path: '/agency/squads',
@@ -153,9 +153,17 @@ export const NAV_MODULES: NavModule[] = [
         roles: [UserRole.OWNER, UserRole.AGENCY],
       },
       {
-        id: 'financeiro-fee',
-        title: 'Contratos & Financeiro',
-        description: 'Controle de faturamento e alertas de atraso',
+        id: 'agency-contracts',
+        title: 'Contratos',
+        description: 'Gestão de contratos e assinaturas',
+        icon: 'FileSignature',
+        path: '/agency/contracts',
+        roles: [UserRole.OWNER, UserRole.AGENCY],
+      },
+      {
+        id: 'agency-finance',
+        title: 'Financeiro',
+        description: 'Controle de faturamento e dashboards',
         icon: 'CreditCard',
         path: '/agency/finance',
         roles: [UserRole.OWNER, UserRole.AGENCY],

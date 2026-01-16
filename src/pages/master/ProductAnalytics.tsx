@@ -42,11 +42,11 @@ export default function ProductAnalytics() {
     const COLORS = ['#F97316', '#3B82F6', '#10B981', '#EAB308', '#8B5CF6'];
 
     return (
-        <div className="p-8 space-y-8 animate-in fade-in duration-700">
+        <div className="space-y-8">
             <PageHeader
                 title="PRODUCT"
                 titleAccent="ANALYTICS"
-                subtitle="MASTER SUITE • TELEMETRIA E USO DO SISTEMA"
+                subtitle="Master Suite • Telemetria e uso do sistema"
                 badge="BETA"
             />
 

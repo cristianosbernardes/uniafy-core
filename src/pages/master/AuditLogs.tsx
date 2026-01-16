@@ -39,11 +39,11 @@ export default function AuditLogs() {
     );
 
     return (
-        <div className="p-8 space-y-8 animate-in fade-in duration-700">
+        <div className="space-y-8">
             <PageHeader
                 title="LOGS DE"
                 titleAccent="AUDITORIA"
-                subtitle="MASTER SUITE • SEGURANÇA E RASTREABILIDADE"
+                subtitle="Master Suite • Segurança e rastreabilidade"
                 actions={[
                     {
                         label: 'Exportar Logs',

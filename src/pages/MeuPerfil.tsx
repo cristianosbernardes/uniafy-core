@@ -10,12 +10,12 @@ export default function MeuPerfil() {
   const [themeMode, setThemeMode] = useState<'light' | 'dark' | 'auto'>('dark');
 
   return (
-    <div className="p-8 space-y-8 animate-in fade-in duration-700">
+    <div className="space-y-8">
       <PageHeader
         title="MEU"
         titleAccent="PERFIL"
-        subtitle="V5.2 INDUSTRIAL • CREDENCIAIS MASTER"
-        badge="ACESSO_NÍVEL_5"
+        subtitle="V5.2 Industrial • Credenciais master"
+        badge="ACESSO NÍVEL 5"
       />
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

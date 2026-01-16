@@ -226,11 +226,11 @@ export default function SqlBank() {
     };
 
     return (
-        <div className="p-8 space-y-6 animate-in fade-in duration-700">
+        <div className="space-y-8">
             <PageHeader
                 title="BANCO SQL"
                 titleAccent="INDUSTRIAL"
-                subtitle="V5.9.6 MASTER • EXECUÇÃO DIRETA DE COMANDOS"
+                subtitle="V5.9.6 Master • Execução direta de comandos"
             />
 
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">

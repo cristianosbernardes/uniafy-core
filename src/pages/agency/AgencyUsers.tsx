@@ -81,12 +81,13 @@ export default function AgencyUsers() {
     };
 
     return (
-        <div className="p-8 space-y-8 animate-in fade-in duration-700">
+
+        <div className="space-y-8">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <PageHeader
                     title="USUÁRIOS"
                     titleAccent="& TIME"
-                    subtitle="GESTÃO DE EQUIPE E PERMISSÕES"
+                    subtitle="Gestão de equipe e permissões"
                 />
 
                 <Dialog open={inviteOpen} onOpenChange={setInviteOpen}>

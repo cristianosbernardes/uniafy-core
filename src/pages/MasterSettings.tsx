@@ -12,8 +12,15 @@ import { masterService } from '@/services/masterService';
 import { MasterNotificationConfig } from '@/types/uniafy';
 
 export default function MasterSettings() {
-    const [config, setConfig] = useState<MasterNotificationConfig | null>(null);
+    const [config, setConfig] = useState<MasterNotificationConfig>({
+        is_active: false,
+        trigger_days_before: 5,
+        channels: { popup: true, email: true, whatsapp: false },
+        message_title: "Atenção Financeira",
+        message_body: "Sua fatura vence em {dias_restantes} dias."
+    });
     const [isLoading, setIsLoading] = useState(false);
+    const [isFetching, setIsFetching] = useState(true);
 
     useEffect(() => {
         loadConfig();
@@ -26,13 +33,15 @@ export default function MasterSettings() {
         } catch (error) {
             console.error('Erro ao carregar config:', error);
             toast.error('Falha ao carregar configurações.');
+        } finally {
+            setIsFetching(false);
         }
     };
 
     const handleSave = async () => {
         if (!config) return;
         setIsLoading(true);
-        console.log("Saving config:", config); // DEBUG
+
         try {
             await masterService.updateGlobalConfig(config);
             toast.success('Configurações globais atualizadas com sucesso!');
@@ -44,15 +53,16 @@ export default function MasterSettings() {
         }
     };
 
-    if (!config) return <div className="p-8">Carregando configurações...</div>;
+    // if (!config) return <div className="p-8">Carregando configurações...</div>; // Legacy blocking load removed
 
     return (
-        <div className="p-8 space-y-8 animate-in fade-in duration-700">
+        <div className="space-y-8">
             <PageHeader
                 title="CONFIGURAÇÕES"
                 titleAccent="GLOBAIS"
-                subtitle="MASTER SUITE • AUTOMAÇÃO DE COBRANÇA E ALERTAS"
+                subtitle="Master Suite • Automação de cobrança e alertas"
             />
+            {isFetching && <div className="text-xs text-muted-foreground animate-pulse absolute top-4 right-8">Sincronizando...</div>}
 
             <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
 

@@ -112,12 +112,12 @@ export default function AgencyClients() {
     };
 
     return (
-        <div className="p-8 space-y-8 animate-in fade-in duration-700">
+        <div className="space-y-8">
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
                 <PageHeader
                     title="CARTEIRA"
                     titleAccent="DE CLIENTES"
-                    subtitle="CRM E INTEGRAÇÃO DE CONTAS"
+                    subtitle="CRM e integração de contas"
                 />
 
                 <Dialog open={inviteOpen} onOpenChange={setInviteOpen}>
