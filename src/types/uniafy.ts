@@ -78,7 +78,10 @@ export type BillingPeriod = 'monthly' | 'yearly';
 export interface Plan {
   id: string;
   name: string;
+  description?: string;
   price: number;
+  monthly_price_amount?: number; // DB Field
+  yearly_price_amount?: number; // DB Field
   period: BillingPeriod;
   features: string[];
   max_users: number;

@@ -60,14 +60,14 @@ export default function SaasMetrics() {
                         </div>
 
                         <div className="flex justify-between items-start">
-                            <span className="text-[10px] font-black uppercase text-muted-foreground">{metric.label}</span>
+                            <span className="text-[10px] font-medium uppercase text-muted-foreground">{metric.label}</span>
                             <Badge variant="outline" className={`text-[9px] font-bold border-none ${metric.trend === 'up' ? 'text-green-500 bg-green-500/10' : 'text-red-500 bg-red-500/10'}`}>
                                 {metric.change > 0 ? '+' : ''}{metric.change}%
                             </Badge>
                         </div>
 
                         <div>
-                            <div className="text-2xl font-black text-white">
+                            <div className="text-2xl font-medium tracking-tight text-white">
                                 {typeof metric.value === 'number' && metric.value > 100
                                     ? formatCurrency(metric.value)
                                     : metric.value}
@@ -82,7 +82,7 @@ export default function SaasMetrics() {
 
                 {/* Gráfico MRR */}
                 <div className="lg:col-span-2 glass-card p-6">
-                    <h3 className="text-sm font-black uppercase text-white mb-6 flex items-center gap-2">
+                    <h3 className="text-sm font-bold uppercase text-white mb-6 flex items-center gap-2">
                         <span className="w-1 h-4 bg-green-500 rounded-full" />
                         Evolução do MRR (Receita Recorrente Mensal)
                     </h3>
@@ -130,7 +130,7 @@ export default function SaasMetrics() {
                 {/* Churn Radar & Transações */}
                 <div className="space-y-6">
                     <div className="glass-card p-6 h-[250px]">
-                        <h3 className="text-sm font-black uppercase text-white mb-2 flex items-center gap-2">
+                        <h3 className="text-sm font-bold uppercase text-white mb-2 flex items-center gap-2">
                             <span className="w-1 h-4 bg-red-500 rounded-full" />
                             Saúde da Base (Churn)
                         </h3>
@@ -157,7 +157,7 @@ export default function SaasMetrics() {
                             </ResponsiveContainer>
                             <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
                                 <div className="text-center">
-                                    <span className="block text-2xl font-black text-white">2.6%</span>
+                                    <span className="block text-2xl font-medium tracking-tight text-white">2.6%</span>
                                     <span className="text-[9px] text-muted-foreground uppercase">Churn</span>
                                 </div>
                             </div>
@@ -166,7 +166,7 @@ export default function SaasMetrics() {
 
                     <div className="glass-card p-0 overflow-hidden">
                         <div className="p-4 border-b border-white/5 bg-white/5">
-                            <h3 className="text-[10px] font-black uppercase text-white flex items-center gap-2">
+                            <h3 className="text-[10px] font-bold uppercase text-white flex items-center gap-2">
                                 <CreditCard className="w-3 h-3 text-primary" />
                                 Últimas Transações
                             </h3>

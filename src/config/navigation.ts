@@ -64,6 +64,14 @@ export const NAV_MODULES: NavModule[] = [
         path: '/mestre/whitelabel',
         roles: [UserRole.OWNER],
       },
+      {
+        id: 'gestao-planos',
+        title: 'Gestão de Planos',
+        description: 'Configuração de planos e preços',
+        icon: 'CreditCard',
+        path: '/mestre/planos',
+        roles: [UserRole.OWNER],
+      },
     ],
   },
   {

@@ -2,33 +2,43 @@ import { AgencySubscription, FinancialTransaction, MasterNotificationConfig, Pla
 
 export const MOCK_PLANS: Plan[] = [
     {
-        id: 'plan-basic',
-        name: 'Uniafy Starter',
+        id: 'plan_essential',
+        name: 'Essential',
         price: 297,
         period: 'monthly',
         max_users: 3,
         max_connections: 1,
-        features: ['Gestão de Leads', 'Kanban Básico'],
+        features: ['Gestão de Leads', 'Kanban Básico', 'Sem White Label'],
         is_active: true
     },
     {
-        id: 'plan-pro',
-        name: 'Uniafy Growth',
+        id: 'plan_scale',
+        name: 'Scale',
         price: 597,
         period: 'monthly',
         max_users: 10,
         max_connections: 5,
-        features: ['G-Hunter', 'Automação N8N', 'Whitelabel'],
+        features: ['White Label', 'Squads', 'G-Hunter', 'Automação N8N'],
         is_active: true
     },
     {
-        id: 'plan-black',
-        name: 'Uniafy Black',
+        id: 'plan_black',
+        name: 'Black',
         price: 997,
         period: 'monthly',
         max_users: 999,
         max_connections: 999,
-        features: ['Tudo Ilimitado', 'Suporte Dedicado'],
+        features: ['Tudo Ilimitado', 'IA Avançada', 'Suporte Dedicado', 'Prioridade'],
+        is_active: true
+    },
+    {
+        id: 'plan_enterprise',
+        name: 'Enterprise (Master)',
+        price: 0,
+        period: 'monthly',
+        max_users: 9999,
+        max_connections: 9999,
+        features: ['God Mode', 'Acesso Irrestrito'],
         is_active: true
     }
 ];
