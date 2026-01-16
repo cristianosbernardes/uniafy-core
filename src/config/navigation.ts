@@ -24,6 +24,14 @@ export const NAV_MODULES: NavModule[] = [
         roles: [UserRole.OWNER],
       },
       {
+        id: 'cofre',
+        title: 'Cofre API',
+        description: 'Chaves seguras (Stripe, Asaas)',
+        icon: 'Key',
+        path: '/mestre/cofre',
+        roles: [UserRole.OWNER],
+      },
+      {
         id: 'banco-sql',
         title: 'Banco SQL',
         description: 'Execução direta de comandos no banco de dados',

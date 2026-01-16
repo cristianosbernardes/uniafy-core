@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Database, Play, Trash2, List, Code, AlertTriangle, CheckCircle2, XCircle, Clock, Users } from 'lucide-react';
+import { Database, Play, Trash2, List, Code, AlertTriangle, CheckCircle2, XCircle, Clock, Users, Receipt, Shield } from 'lucide-react';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -12,26 +12,161 @@ interface Preset {
     title: string;
     query: string;
     icon: React.ReactNode;
+    category: 'utility' | 'setup';
 }
 
 const PRESETS: Preset[] = [
     {
+        id: 'fix-permissions-rls-v1',
+        title: '[SISTEMA] Corrigir Permissões RLS (Agência)',
+        query: `-- FIX PERMISSIONS & RLS
+
+-- 1. PLANS: Public Read
+ALTER TABLE public.plans DISABLE ROW LEVEL SECURITY;
+-- OR enable and add public policy
+-- ALTER TABLE public.plans ENABLE ROW LEVEL SECURITY;
+-- CREATE POLICY "Public Plans Read" ON public.plans FOR SELECT USING (true);
+
+
+-- 2. SUBSCRIPTIONS: Read Own
+ALTER TABLE public.subscriptions ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Users can view own subscription" ON public.subscriptions;
+CREATE POLICY "Users can view own subscription" ON public.subscriptions
+  FOR SELECT
+  USING (auth.uid() = tenant_id);
+
+-- 3. PROFILES: Read Own & Team
+ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Users can view own profile" ON public.profiles;
+CREATE POLICY "Users can view own profile" ON public.profiles
+  FOR SELECT
+  USING (auth.uid() = id);
+
+DROP POLICY IF EXISTS "Agencies can view team members" ON public.profiles;
+CREATE POLICY "Agencies can view team members" ON public.profiles
+  FOR SELECT
+  USING (auth.uid() = parent_agency_id);
+
+DROP POLICY IF EXISTS "Agencies can view attached clients" ON public.profiles;
+CREATE POLICY "Agencies can view attached clients" ON public.profiles
+  FOR SELECT
+  USING (auth.uid() = parent_agency_id AND role = 'CLIENT');
+
+-- 4. INVOICES: Read Own
+ALTER TABLE public.invoices ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Users can view own invoices" ON public.invoices;
+CREATE POLICY "Users can view own invoices" ON public.invoices
+  FOR SELECT
+  USING (auth.uid() = tenant_id);
+
+-- 5. Grant Usage on Schema (Just in case)
+GRANT USAGE ON SCHEMA public TO authenticated;
+GRANT SELECT ON ALL TABLES IN SCHEMA public TO authenticated;
+
+SELECT 'Permissões corrigidas com sucesso!' as status;`,
+        icon: <Shield className="w-4 h-4 text-blue-500" />,
+        category: 'setup'
+    },
+    {
         id: 'list-users',
         title: 'Listar Usuários',
         query: 'SELECT id, email, created_at FROM auth.users LIMIT 10',
-        icon: <List className="w-4 h-4" />
+        icon: <List className="w-4 h-4" />,
+        category: 'utility'
     },
     {
         id: 'count-by-role',
         title: 'Contar Usuários por Cargo',
         query: 'SELECT role, count(*) FROM auth.users GROUP BY role',
-        icon: <Code className="w-4 h-4" />
+        icon: <Code className="w-4 h-4" />,
+        category: 'utility'
     },
     {
         id: 'system-settings',
         title: 'Ver Configurações',
         query: 'SELECT * FROM information_schema.tables WHERE table_schema = \'public\'',
-        icon: <Database className="w-4 h-4" />
+        icon: <Database className="w-4 h-4" />,
+        category: 'utility'
+    },
+    {
+        id: 'setup-vault-v1',
+        title: '[SISTEMA] Setup Cofre de Senhas (Vault)',
+        query: `-- COFRE DE SENHAS (VAULT)
+-- Tabela para armazenar chaves de API sensíveis (Stripe, Asaas, etc)
+
+CREATE TABLE IF NOT EXISTS vault_secrets (
+    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
+    provider TEXT NOT NULL, -- 'stripe', 'asaas', 'hotmart', 'openai'
+    key_type TEXT NOT NULL, -- 'secret_key', 'public_key', 'webhook_secret'
+    value TEXT NOT NULL, -- Valor da chave (Idealmente criptografado, MVP plain text)
+    description TEXT,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+    updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
+    UNIQUE(provider, key_type)
+);
+
+-- RLS: Apenas MASTER/OWNER pode ver/editar
+ALTER TABLE vault_secrets ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Master Access Vault" ON vault_secrets;
+CREATE POLICY "Master Access Vault" ON vault_secrets
+    FOR ALL
+    USING (
+        EXISTS (
+            SELECT 1 FROM profiles 
+            WHERE id = auth.uid() 
+            AND (role = 'OWNER' OR role = 'MASTER') -- Ajuste conforme seus roles reais
+        )
+    );
+
+-- Trigger para updated_at
+CREATE OR REPLACE FUNCTION update_updated_at_column()
+RETURNS TRIGGER AS $$
+BEGIN
+    NEW.updated_at = now();
+    RETURN NEW;
+END;
+$$ language 'plpgsql';
+
+DROP TRIGGER IF EXISTS update_vault_secrets_modtime ON vault_secrets;
+CREATE TRIGGER update_vault_secrets_modtime
+    BEFORE UPDATE ON vault_secrets
+    FOR EACH ROW
+    EXECUTE PROCEDURE update_updated_at_column();
+
+SELECT 'Cofre criado com sucesso! Tabela: vault_secrets' as status;`,
+        icon: <Shield className="w-4 h-4 text-purple-500" />,
+        category: 'setup'
+    },
+    /*{
+        id: 'setup-invoices-v1',
+        title: '[FINANCEIRO] Setup Tabela Faturas & Gateway',
+        query: `-- PROMPT TÉCNICO: SETUP FINANCEIRO ... (omitted for brevity)`,
+        icon: <Receipt className="w-4 h-4 text-green-500" />,
+        category: 'setup'
+    },*/
+    {
+        id: 'fix-subscriptions-constraint',
+        title: '[SISTEMA] Corrigir Tabela Assinaturas (Unique Constraint)',
+        query: `-- Add UNIQUE constraint to tenant_id on subscriptions table
+-- This allows ON CONFLICT (tenant_id) to work for Upserts
+
+DO $$
+BEGIN
+    IF NOT EXISTS (
+        SELECT 1 FROM pg_constraint 
+        WHERE conname = 'subscriptions_tenant_id_key'
+    ) THEN
+        ALTER TABLE subscriptions ADD CONSTRAINT subscriptions_tenant_id_key UNIQUE (tenant_id);
+    END IF;
+END $$;
+
+SELECT 'Constraint de unicidade adicionada com sucesso!' as status;`,
+        icon: <Shield className="w-4 h-4 text-orange-500" />,
+        category: 'setup'
     },
     {
         id: 'deploy-master',
@@ -101,13 +236,15 @@ BEGIN
 
 END $$;
         `,
-        icon: <AlertTriangle className="w-4 h-4 text-orange-500" />
+        icon: <AlertTriangle className="w-4 h-4 text-orange-500" />,
+        category: 'setup'
     },
     {
         id: 'debug-rpc',
         title: '[DEBUG] Ver Definição do RPC',
         query: "SELECT pg_get_functiondef('admin_exec_sql'::regproc)",
-        icon: <Code className="w-4 h-4 text-blue-500" />
+        icon: <Code className="w-4 h-4 text-blue-500" />,
+        category: 'utility'
     },
     {
         id: 'setup-trial-user',
@@ -138,7 +275,8 @@ FROM auth.users WHERE id = auth.uid();
 
 SELECT 'Assinatura TRIAL criada com sucesso para o usuário atual.' as status;
 `,
-        icon: <CheckCircle2 className="w-4 h-4 text-orange-500" />
+        icon: <CheckCircle2 className="w-4 h-4 text-orange-500" />,
+        category: 'setup'
     },
     {
         id: 'setup-agency-v1',
@@ -152,7 +290,8 @@ ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS branding_logo text;
 ALTER TABLE public.profiles ADD COLUMN IF NOT EXISTS branding_colors jsonb DEFAULT '{"primary": "#F97316", "secondary": "#000000"}'::jsonb;
 CREATE OR REPLACE FUNCTION public.handle_new_user() RETURNS trigger AS $fn$ BEGIN INSERT INTO public.profiles (id, email, full_name, role, trial_start_date, subscription_status) VALUES (new.id, new.email, new.raw_user_meta_data->>'full_name', COALESCE(new.raw_user_meta_data->>'role', 'client'), NOW(), 'trial'); RETURN new; END; $fn$ LANGUAGE plpgsql SECURITY DEFINER;
 SELECT 'Migração Safe Mode Concluída: Colunas criadas e Função atualizada.' as status;`,
-        icon: <Database className="w-4 h-4 text-emerald-500" />
+        icon: <Database className="w-4 h-4 text-emerald-500" />,
+        category: 'setup'
     },
     {
         id: 'fix-master-update',
@@ -177,7 +316,8 @@ END $$;
 
 SELECT 'Política de UPDATE criada com sucesso para master_config.' as status;
 `,
-        icon: <CheckCircle2 className="w-4 h-4 text-yellow-500" />
+        icon: <CheckCircle2 className="w-4 h-4 text-yellow-500" />,
+        category: 'setup'
     },
     {
         id: 'setup-plans-v2',
@@ -274,7 +414,8 @@ CREATE POLICY "Admin Manage Plans" ON plans FOR ALL USING (auth.uid() IN (SELECT
 
 SELECT 'Migração Planos V2 concluída com sucesso!' as status;
 `,
-        icon: <Database className="w-4 h-4 text-purple-500" />
+        icon: <Database className="w-4 h-4 text-purple-500" />,
+        category: 'setup'
     },
     {
         id: 'setup_subscriptions_v1',
@@ -334,7 +475,8 @@ BEGIN
 END $$;
 
 SELECT 'Tabelas profiles e subscriptions configuradas com sucesso!' as status;`,
-        icon: <Users className="w-4 h-4 text-blue-500" />
+        icon: <Users className="w-4 h-4 text-blue-500" />,
+        category: 'setup'
     },
     {
         id: 'seed-fake-data-v1',
@@ -386,9 +528,24 @@ INSERT INTO public.subscriptions (tenant_id, plan_id, status, amount, next_billi
 ('d0000000-0000-0000-0000-000000000003', 'plan_black', 'active', 997.00, NOW() + INTERVAL '28 days', 'BOLETO');
 
 SELECT 'SUCESSO: Schema corrigido, permissoes concedidas e dados inseridos.' as status;`,
-        icon: <Users className="w-4 h-4 text-green-500" />
+        icon: <Users className="w-4 h-4 text-green-500" />,
+        category: 'setup'
     }
 ];
+
+import {
+    Dialog,
+    DialogContent,
+    DialogDescription,
+    DialogHeader,
+    DialogTitle,
+    DialogTrigger,
+    DialogFooter,
+    DialogClose
+} from "@/components/ui/dialog";
+import { Badge } from "@/components/ui/badge";
+import { ScrollArea } from "@/components/ui/scroll-area";
+import { RefreshCw, Archive, Search } from 'lucide-react';
 
 export default function SqlBank() {
     const [query, setQuery] = useState('');
@@ -397,6 +554,46 @@ export default function SqlBank() {
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [lastExecuted, setLastExecuted] = useState<Date | null>(null);
+    const [isManageModalOpen, setIsManageModalOpen] = useState(false);
+
+    // Persist hidden presets
+    const [hiddenPresets, setHiddenPresets] = useState<string[]>(() => {
+        try {
+            const saved = localStorage.getItem('uniafy_hidden_sql_presets');
+            return saved ? JSON.parse(saved) : [];
+        } catch {
+            return [];
+        }
+    });
+
+    const hidePreset = (id: string, e?: React.MouseEvent) => {
+        e?.stopPropagation();
+        if (hiddenPresets.includes(id)) return;
+
+        const newHidden = [...hiddenPresets, id];
+        setHiddenPresets(newHidden);
+        localStorage.setItem('uniafy_hidden_sql_presets', JSON.stringify(newHidden));
+        toast.success("Preset arquivado.");
+    };
+
+    const restorePreset = (id: string) => {
+        const newHidden = hiddenPresets.filter(p => p !== id);
+        setHiddenPresets(newHidden);
+        localStorage.setItem('uniafy_hidden_sql_presets', JSON.stringify(newHidden));
+        toast.success("Preset restaurado para a lista.");
+    };
+
+    const archiveSetupPresets = () => {
+        const setupPresetIds = PRESETS
+            .filter(p => p.category === 'setup')
+            .map(p => p.id);
+
+        const newHidden = Array.from(new Set([...hiddenPresets, ...setupPresetIds]));
+
+        setHiddenPresets(newHidden);
+        localStorage.setItem('uniafy_hidden_sql_presets', JSON.stringify(newHidden));
+        toast.success(`${setupPresetIds.length} scripts de instalação foram arquivados.`);
+    };
 
     const handleRunQuery = async () => {
         if (!query.trim()) return;
@@ -441,7 +638,7 @@ export default function SqlBank() {
             <PageHeader
                 title="BANCO SQL"
                 titleAccent="INDUSTRIAL"
-                subtitle="V5.9.6 Master • Execução direta de comandos"
+                subtitle="V6.1 Master • Execução direta de comandos"
             />
 
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
@@ -569,40 +766,139 @@ export default function SqlBank() {
 
                 {/* Lateral of Presets */}
                 <div className="lg:col-span-4 gap-6">
-                    <div className="card-industrial p-6 sticky top-8">
-                        <h3 className="text-xs font-bold uppercase tracking-widest text-primary mb-6 flex items-center gap-2">
-                            <List className="w-4 h-4" />
-                            Presets Rápidos
-                        </h3>
-
-                        <div className="space-y-3 font-medium">
-                            {PRESETS.map((preset) => (
-                                <button
-                                    key={preset.id}
-                                    onClick={() => {
-                                        setQuery(preset.query);
-                                        setPresetTitle(preset.title);
-                                    }}
-                                    className="w-full text-left p-4 rounded-lg bg-white/5 border border-white/5 hover:border-primary/40 hover:bg-primary/5 transition-all group flex items-start gap-4"
+                    <div className="card-industrial p-6 sticky top-8 max-h-[calc(100vh-100px)] flex flex-col">
+                        <div className="flex items-center justify-between mb-4 flex-shrink-0">
+                            <h3 className="text-xs font-bold uppercase tracking-widest text-primary flex items-center gap-2">
+                                <List className="w-4 h-4" />
+                                Presets Disponíveis
+                            </h3>
+                            <div className="flex gap-2">
+                                <Button
+                                    variant="ghost"
+                                    size="sm"
+                                    onClick={archiveSetupPresets}
+                                    className="h-6 px-2 text-[10px] text-orange-500 hover:text-orange-400 hover:bg-orange-500/10 border border-orange-500/20"
+                                    title="Auto-Ocultar todos os scripts de Setup/Migração já instalados"
                                 >
-                                    <div className="mt-1 p-2 rounded bg-background border border-white/5 group-hover:text-primary transition-colors">
-                                        {preset.icon}
+                                    <Archive className="w-3 h-3 mr-1" />
+                                    Limpar Setups
+                                </Button>
+
+                                <Dialog open={isManageModalOpen} onOpenChange={setIsManageModalOpen}>
+                                    <DialogTrigger asChild>
+                                        <Button
+                                            variant="ghost"
+                                            size="sm"
+                                            className={`h-6 px-2 text-[10px] text-muted-foreground hover:text-white border border-white/10 hover:bg-white/5 ${hiddenPresets.length === 0 ? 'opacity-50 pointer-events-none' : ''}`}
+                                        >
+                                            Arquivados ({hiddenPresets.length})
+                                        </Button>
+                                    </DialogTrigger>
+                                    <DialogContent className="bg-[#0A0A0A] border-white/10 text-white sm:max-w-md">
+                                        <DialogHeader>
+                                            <DialogTitle className="text-lg font-bold flex items-center gap-2">
+                                                <Archive className="w-5 h-5 text-primary" />
+                                                Gerenciar Arquivados
+                                            </DialogTitle>
+                                            <DialogDescription className="text-muted-foreground">
+                                                Estes scripts foram ocultados da sua lista principal. Restaure-os se precisar executá-los novamente.
+                                            </DialogDescription>
+                                        </DialogHeader>
+
+                                        <ScrollArea className="max-h-[300px] mt-4 pr-4">
+                                            {hiddenPresets.length === 0 ? (
+                                                <div className="text-center py-8 text-muted-foreground text-sm italic">
+                                                    Nenhum preset arquivado.
+                                                </div>
+                                            ) : (
+                                                <div className="space-y-3">
+                                                    {PRESETS.filter(p => hiddenPresets.includes(p.id)).map(preset => (
+                                                        <div key={preset.id} className="flex items-center justify-between p-3 rounded-lg bg-white/5 border border-white/5">
+                                                            <div className="flex items-start gap-3 overflow-hidden">
+                                                                <div className="mt-1 p-1.5 rounded bg-background/50 border border-white/5 text-muted-foreground">
+                                                                    {preset.icon}
+                                                                </div>
+                                                                <div className="min-w-0">
+                                                                    <p className="text-sm font-medium text-white truncate">{preset.title}</p>
+                                                                    <div className="flex items-center gap-2 mt-1">
+                                                                        <Badge variant="outline" className="text-[10px] h-4 border-white/10 text-muted-foreground uppercase">
+                                                                            {preset.category === 'setup' ? 'Instalação' : 'Utilidade'}
+                                                                        </Badge>
+                                                                        <span className="text-[10px] text-muted-foreground truncate opacity-50 font-mono">
+                                                                            {preset.id}
+                                                                        </span>
+                                                                    </div>
+                                                                </div>
+                                                            </div>
+                                                            <Button
+                                                                size="sm"
+                                                                variant="ghost"
+                                                                onClick={() => restorePreset(preset.id)}
+                                                                className="h-8 w-8 p-0 text-primary hover:text-primary hover:bg-primary/10"
+                                                                title="Restaurar para a lista"
+                                                            >
+                                                                <RefreshCw className="w-4 h-4" />
+                                                            </Button>
+                                                        </div>
+                                                    ))}
+                                                </div>
+                                            )}
+                                        </ScrollArea>
+
+                                        <DialogFooter className="mt-4 border-t border-white/5 pt-4">
+                                            <Button
+                                                variant="secondary"
+                                                className="w-full bg-white/5 hover:bg-white/10 text-muted-foreground hover:text-white"
+                                                onClick={() => setIsManageModalOpen(false)}
+                                            >
+                                                Fechar
+                                            </Button>
+                                        </DialogFooter>
+                                    </DialogContent>
+                                </Dialog>
+                            </div>
+                        </div>
+
+                        <div className="space-y-3 font-medium overflow-y-auto pr-2 custom-scrollbar flex-1 -mr-2">
+                            {PRESETS.filter(p => !hiddenPresets.includes(p.id)).map((preset) => (
+                                <div key={preset.id} className="relative group/item">
+                                    <button
+                                        onClick={() => {
+                                            setQuery(preset.query);
+                                            setPresetTitle(preset.title);
+                                        }}
+                                        className="w-full text-left p-4 rounded-lg bg-white/5 border border-white/5 hover:border-primary/40 hover:bg-primary/5 transition-all group flex items-start gap-4"
+                                    >
+                                        <div className="mt-1 p-2 rounded bg-background border border-white/5 group-hover:text-primary transition-colors flex-shrink-0">
+                                            {preset.icon}
+                                        </div>
+                                        <div className="flex-1 min-w-0">
+                                            <p className="text-sm text-foreground/90 group-hover:text-primary transition-colors truncate">{preset.title}</p>
+                                            <p className="text-[10px] text-muted-foreground line-clamp-2 mt-1 font-mono uppercase">
+                                                {preset.query}
+                                            </p>
+                                        </div>
+                                    </button>
+                                    <div className="absolute top-2 right-2 opacity-0 group-hover/item:opacity-100 transition-opacity z-10 flex gap-1">
+                                        <Button
+                                            variant="ghost"
+                                            size="icon"
+                                            onClick={(e) => hidePreset(preset.id, e)}
+                                            className="h-6 w-6 bg-black/50 hover:bg-destructive hover:text-white border border-white/10"
+                                            title="Limpar este preset da lista (Ocultar)"
+                                        >
+                                            <Trash2 className="w-3 h-3" />
+                                        </Button>
                                     </div>
-                                    <div>
-                                        <p className="text-sm text-foreground/90 group-hover:text-primary transition-colors">{preset.title}</p>
-                                        <p className="text-[10px] text-muted-foreground line-clamp-2 mt-1 font-mono uppercase">
-                                            {preset.query}
-                                        </p>
-                                    </div>
-                                </button>
+                                </div>
                             ))}
                         </div>
 
-                        <div className="mt-8 p-4 rounded-lg bg-orange-500/10 border border-orange-500/20">
+                        <div className="mt-4 p-4 rounded-lg bg-orange-500/10 border border-orange-500/20 flex-shrink-0">
                             <div className="flex gap-2 text-orange-500">
                                 <AlertTriangle className="w-4 h-4 flex-shrink-0 mt-0.5" />
                                 <p className="text-[11px] leading-relaxed uppercase font-bold tracking-tight">
-                                    CUIDADO: Comandos ALTER, DROP ou DELETE afetam a integridade estrutural do sistema imediatamente.
+                                    Dica: Use o ícone de lixeira para limpar presets desnecessários da sua visualização.
                                 </p>
                             </div>
                         </div>

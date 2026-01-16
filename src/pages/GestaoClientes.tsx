@@ -93,9 +93,9 @@ export default function GestaoClientes() {
         ]);
         setSubscriptions(subsData);
         setPlans(plansData);
-      } catch (error) {
-        console.error(error);
-        toast.error("Erro ao carregar assinaturas.");
+      } catch (error: any) {
+        console.error("Critical Error loading subscriptions:", error);
+        toast.error(`Erro ao carregar assinaturas: ${error.message || 'Erro desconhecido'}`);
       } finally {
         setLoading(false);
       }

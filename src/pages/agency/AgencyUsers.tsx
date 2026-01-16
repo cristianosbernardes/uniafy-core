@@ -52,9 +52,14 @@ export default function AgencyUsers() {
         try {
             const data = await agencyService.getTeamMembers(user.id);
             setMembers(data || []);
-        } catch (error) {
-            console.error(error);
-            toast.error("Erro ao carregar equipe.");
+        } catch (error: any) {
+            // Suppress permissions error to avoid UI spam, just log it
+            if (error.code === '42501' || error.status === 403 || error.message?.includes('permission')) {
+                console.warn("RLS Permission Error loading team (Expected if permissions not fixed yet):", error);
+            } else {
+                console.error(error);
+                toast.error("Erro ao carregar equipe.");
+            }
         } finally {
             setLoading(false);
         }

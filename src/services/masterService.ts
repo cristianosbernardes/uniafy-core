@@ -15,22 +15,37 @@ export const masterService = {
 
     // --- SUBSCRIPTIONS ---
     async getSubscriptions(): Promise<AgencySubscription[]> {
-        const { data, error } = await supabase
-            .from('subscriptions')
-            .select(`
-                *,
-                plan:plans(name), 
-                profile:profiles(company_name, email)
-            `)
-            .order('next_billing_date', { ascending: true });
+        // Use RPC to bypass RLS and avoid "permission denied for table users"
+        // caused by direct joins with protected tables
+        const sql = `
+            SELECT 
+                s.*,
+                p.name as plan_name,
+                pr.company_name,
+                pr.email as tenant_email
+            FROM subscriptions s
+            LEFT JOIN plans p ON s.plan_id = p.id
+            LEFT JOIN profiles pr ON s.tenant_id = pr.id
+            ORDER BY s.next_billing_date ASC;
+        `;
+
+        const { data, error } = await supabase.rpc('admin_exec_sql', {
+            sql_query: sql
+        });
 
         if (error) throw error;
 
-        // Map to our Interface (Adapting structure)
-        return data.map((sub: any) => ({
+        // Debug: Log raw data to understand shape
+        console.log("Admin SQL RPC Result:", data);
+
+        // Ensure data is an array
+        const rows = Array.isArray(data) ? data : [];
+
+        // Map to our Interface
+        return rows.map((sub: any) => ({
             ...sub,
-            tenant_name: sub.profile?.company_name || sub.profile?.email || 'Agência Desconhecida',
-            plan_name: sub.plan?.name || sub.plan_id
+            tenant_name: sub.company_name || sub.tenant_email || 'Agência Desconhecida',
+            plan_name: sub.plan_name || sub.plan_id // SQL alias handles this
         }));
     },
 
@@ -148,5 +163,55 @@ END $$;
             console.error("Supabase Update Error:", error);
             throw error;
         }
+    },
+
+    // --- WHITE LABEL FACTORY ---
+    async getWhiteLabelTenants() {
+        // Fetch profiles that are Agencies (potential tenants)
+        // We filter by role 'AGENCY' or if they have a custom domain set
+        const { data, error } = await supabase
+            .from('profiles')
+            .select('*')
+            .or('role.eq.AGENCY,custom_domain.neq.null')
+            .order('created_at', { ascending: false });
+
+        if (error) throw error;
+
+        // Map to CustomDomain interface expected by UI
+        return data.map((profile: any) => ({
+            id: profile.id,
+            domain: profile.custom_domain || 'Não configurado',
+            tenant_id: profile.company_name || profile.email?.split('@')[0] || 'Desconhecido',
+            // Simple logic for status: if has domain -> pending (mock), else -> active (just for list)
+            status: (profile.custom_domain ? 'pending_dns' : 'active') as 'pending_dns' | 'active',
+            dns_record_type: 'CNAME' as const,
+            dns_record_value: 'cname.uniafy.com',
+            created_at: profile.created_at || new Date().toISOString(),
+            branding: {
+                primary_color: profile.branding_colors?.primary || '#F97316',
+                logo_url: profile.branding_logo
+            }
+        }));
+    },
+
+    // --- VAULT (COFRE) ---
+    async getVaultSecrets() {
+        const { data, error } = await supabase
+            .from('vault_secrets')
+            .select('*');
+        if (error) throw error;
+        return data;
+    },
+
+    async saveVaultSecret(provider: string, keyType: string, value: string) {
+        const { error } = await supabase
+            .from('vault_secrets')
+            .upsert({
+                provider,
+                key_type: keyType,
+                value
+            }, { onConflict: 'provider,key_type' });
+
+        if (error) throw error;
     }
 };

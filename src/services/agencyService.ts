@@ -103,5 +103,76 @@ export const agencyService = {
 
 
         return { success: true, id: crypto.randomUUID() };
+    },
+
+    // --- FINANCEIRO & ASSINATURA ---
+
+    async getMySubscription(agencyId: string) {
+        const { data, error } = await supabase
+            .from('subscriptions')
+            .select(`
+                *,
+                plan:plans(*)
+            `)
+            .eq('tenant_id', agencyId)
+            .maybeSingle();
+
+        if (error) return null;
+        return data;
+    },
+
+    async getInvoices(agencyId: string) {
+        const { data, error } = await supabase
+            .from('invoices')
+            .select('*')
+            .eq('tenant_id', agencyId)
+            .order('created_at', { ascending: false });
+
+        if (error) {
+            console.warn("Could not fetch invoices (Table might not exist yet)", error);
+            return [];
+        }
+        return data;
+    },
+
+    async subscribePlan(agencyId: string, planId: string, price: number) {
+        // 1. CHECKOUT SIMULADO (Mock)
+        // Em produção, isso chamaria uma Edge Function que falaria com Stripe/Asaas
+        await new Promise(resolve => setTimeout(resolve, 2000));
+
+        // 2. Atualizar Assinatura Localmente
+        const { error: subError } = await supabase
+            .from('subscriptions')
+            .update({
+                plan_id: planId,
+                status: 'active',
+                amount: price,
+                current_period_end: new Date(new Date().setMonth(new Date().getMonth() + 1)).toISOString()
+            })
+            .eq('tenant_id', agencyId);
+
+        if (subError) throw subError;
+
+        // 3. Gerar Fatura (Invoice) de Registro
+        // Usamos RPC se disponível ou insert direto (se RLS permitir insert pelo user - geralmente não, mas simularemos)
+        // Para segurança real: Chamar RPC 'create_invoice'
+        const nextYear = new Date();
+        nextYear.setFullYear(nextYear.getFullYear() + 1);
+        const { error } = await supabase
+            .from('subscriptions')
+            .upsert({
+                tenant_id: agencyId,
+                plan_id: planId,
+                status: 'active',
+                start_date: new Date().toISOString(),
+                next_billing_date: nextYear.toISOString(), // Mock: 1 ano
+                amount: 99.90, // Mock price
+                payment_method: 'CC'
+            }, { onConflict: 'tenant_id' }) as any; // Type cast 'as any' to bypass strict type check if types aren't regenerated yet
+
+        if (error) console.warn("Erro ao gerar fatura de log:", error);
+
+        return { success: true };
     }
 };
+

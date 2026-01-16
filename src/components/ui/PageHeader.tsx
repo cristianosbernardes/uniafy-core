@@ -7,6 +7,7 @@ interface PageHeaderProps {
   titleAccent?: string;
   subtitle?: string;
   badge?: string;
+  action?: React.ReactNode;
   actions?: {
     label: string;
     icon?: LucideIcon;
@@ -20,6 +21,7 @@ export function PageHeader({
   titleAccent,
   subtitle,
   badge,
+  action,
   actions
 }: PageHeaderProps) {
   return (
@@ -46,22 +48,24 @@ export function PageHeader({
           </span>
         )}
 
-        {actions?.map((action, index) => {
-          const Icon = action.icon;
+        {action && action}
+
+        {actions?.map((actionItem, index) => {
+          const Icon = actionItem.icon;
           return (
             <Button
               key={index}
-              variant={action.variant === 'primary' ? 'default' : 'outline'}
+              variant={actionItem.variant === 'primary' ? 'default' : 'outline'}
               className={cn(
                 "text-sm font-semibold h-10 px-4 rounded transition-all duration-300",
-                action.variant === 'primary'
+                actionItem.variant === 'primary'
                   ? "bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20"
                   : "border-border bg-white/5 text-muted-foreground hover:text-foreground hover:border-foreground"
               )}
-              onClick={action.onClick}
+              onClick={actionItem.onClick}
             >
               {Icon && <Icon className="w-4 h-4 mr-2" />}
-              {action.label}
+              {actionItem.label}
             </Button>
           );
         })}

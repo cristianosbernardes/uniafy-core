@@ -94,6 +94,7 @@ export interface AgencySubscription {
   tenant_id: string; // ID da Agência
   tenant_name: string; // Nome da Agência (Cache)
   plan_id: string;
+  plan_name?: string; // Relation fetch
   status: SubscriptionStatus;
   start_date: string;
   next_billing_date: string;

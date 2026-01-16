@@ -20,6 +20,7 @@ import ProductAnalytics from "./pages/master/ProductAnalytics";
 import SaasMetrics from "./pages/master/SaasMetrics";
 import WhiteLabelFactory from "./pages/master/WhiteLabelFactory";
 import PlanManager from "./pages/master/PlanManager";
+import Vault from "./pages/master/Vault";
 import AgencyUsers from "./pages/agency/AgencyUsers";
 import AgencyWhiteLabel from "./pages/agency/AgencyWhiteLabel";
 import AgencyClients from "./pages/agency/AgencyClients";
@@ -65,6 +66,7 @@ const AppRoutes = () => {
         <Route path="/mestre/analytics" element={<ProductAnalytics />} />
         <Route path="/mestre/metrics" element={<SaasMetrics />} />
         <Route path="/mestre/planos" element={<PlanManager />} />
+        <Route path="/mestre/cofre" element={<Vault />} />
         <Route path="/mestre/whitelabel" element={<WhiteLabelFactory />} />
 
         {/* Growth Engine Routes */}

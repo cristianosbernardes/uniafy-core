@@ -1,28 +1,27 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Badge } from '@/components/ui/badge';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogTrigger, DialogFooter, DialogDescription } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from '@/components/ui/dialog';
 import { Label } from '@/components/ui/label';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import {
     Globe,
     Plus,
     CheckCircle2,
-    AlertTriangle,
     Loader2,
     Copy,
     RefreshCw,
     Palette,
-    Upload,
     Building2
 } from 'lucide-react';
-import { MOCK_DOMAINS } from '@/services/mockSaaS';
+import { masterService } from '@/services/masterService';
 import { CustomDomain } from '@/types/uniafy';
+import { toast } from 'sonner';
 
 export default function WhiteLabelFactory() {
-    const [domains, setDomains] = useState<CustomDomain[]>(MOCK_DOMAINS);
+    const [domains, setDomains] = useState<CustomDomain[]>([]);
+    const [loading, setLoading] = useState(true);
     const [isDialogOpen, setIsDialogOpen] = useState(false);
 
     // Form State
@@ -33,6 +32,23 @@ export default function WhiteLabelFactory() {
 
     const [step, setStep] = useState<'details' | 'dns'>('details');
     const [verifying, setVerifying] = useState(false);
+
+    const fetchTenants = async () => {
+        try {
+            setLoading(true);
+            const data = await masterService.getWhiteLabelTenants();
+            setDomains(data);
+        } catch (error) {
+            console.error("Failed to fetch tenants", error);
+            toast.error("Erro ao carregar lista de agências");
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    useEffect(() => {
+        fetchTenants();
+    }, []);
 
     const generateTenantId = (name: string) => {
         return name.toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9-]/g, '');
@@ -113,67 +129,80 @@ export default function WhiteLabelFactory() {
                 ]}
             />
 
-            <div className="glass-card overflow-hidden">
-                <div className="p-4 border-b border-white/5 bg-white/5 flex justify-between items-center">
-                    <h3 className="text-xs font-black uppercase text-white flex items-center gap-2">
-                        <Globe className="w-4 h-4 text-primary" />
-                        Domínios e Tenants Conectados
-                    </h3>
-                    <span className="text-[10px] text-muted-foreground font-mono bg-white/5 px-2 py-1 rounded">
-                        {domains.length} tenants ativos
-                    </span>
-                </div>
 
-                <div className="divide-y divide-white/5">
-                    {domains.map(domain => (
-                        <div key={domain.id} className="p-6 flex flex-col md:flex-row items-center justify-between gap-4 hover:bg-white/[0.02] transition-colors group">
-                            <div className="flex items-center gap-4">
-                                <div
-                                    className="w-12 h-12 rounded-lg border border-white/10 flex items-center justify-center relative overflow-hidden transition-all group-hover:scale-105"
-                                    style={{ backgroundColor: domain.branding?.primary_color || '#000' }}
-                                >
-                                    {domain.branding?.logo_url ? (
-                                        <img src={domain.branding.logo_url} alt="Logo" className="w-8 h-8 object-contain" />
-                                    ) : (
-                                        <Building2 className="w-6 h-6 text-white/50" />
-                                    )}
-                                </div>
-                                <div>
-                                    <h4 className="text-lg font-bold text-white">{domain.tenant_id}</h4>
-                                    <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                                        <Globe className="w-3 h-3" />
-                                        <span className="font-mono text-zinc-300">{domain.domain}</span>
-                                        <span className="text-zinc-700">•</span>
-                                        <span className="text-[10px]">Criado em {domain.created_at.split('T')[0]}</span>
+
+            {loading ? (
+                <div className="flex items-center justify-center p-12">
+                    <Loader2 className="w-8 h-8 text-primary animate-spin" />
+                </div>
+            ) : (
+                <div className="glass-card overflow-hidden">
+                    <div className="p-4 border-b border-white/5 bg-white/5 flex justify-between items-center">
+                        <h3 className="text-xs font-black uppercase text-white flex items-center gap-2">
+                            <Globe className="w-4 h-4 text-primary" />
+                            Domínios e Tenants Conectados
+                        </h3>
+                        <span className="text-[10px] text-muted-foreground font-mono bg-white/5 px-2 py-1 rounded">
+                            {domains.length} tenants
+                        </span>
+                    </div>
+
+                    <div className="divide-y divide-white/5">
+                        {domains.length === 0 && (
+                            <div className="p-8 text-center text-muted-foreground text-sm">
+                                Nenhuma agência encontrada.
+                            </div>
+                        )}
+                        {domains.map(domain => (
+                            <div key={domain.id} className="p-6 flex flex-col md:flex-row items-center justify-between gap-4 hover:bg-white/[0.02] transition-colors group">
+                                <div className="flex items-center gap-4">
+                                    <div
+                                        className="w-12 h-12 rounded-lg border border-white/10 flex items-center justify-center relative overflow-hidden transition-all group-hover:scale-105"
+                                        style={{ backgroundColor: domain.branding?.primary_color || '#000' }}
+                                    >
+                                        {domain.branding?.logo_url ? (
+                                            <img src={domain.branding.logo_url} alt="Logo" className="w-8 h-8 object-contain" />
+                                        ) : (
+                                            <Building2 className="w-6 h-6 text-white/50" />
+                                        )}
+                                    </div>
+                                    <div>
+                                        <h4 className="text-lg font-bold text-white">{domain.tenant_id}</h4>
+                                        <div className="flex items-center gap-2 text-xs text-muted-foreground">
+                                            <Globe className="w-3 h-3" />
+                                            <span className="font-mono text-zinc-300">{domain.domain}</span>
+                                            <span className="text-zinc-700">•</span>
+                                            <span className="text-[10px]">Criado em {new Date(domain.created_at).toLocaleDateString()}</span>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
 
-                            <div className="flex items-center gap-6">
-                                <div className="flex flex-col items-end gap-1">
-                                    {getStatusBadge(domain.status)}
-                                    {domain.status === 'pending_dns' && (
-                                        <button
-                                            className="text-[10px] text-primary hover:text-primary/80 flex items-center gap-1 font-bold uppercase transition-colors"
-                                            onClick={() => handleVerifyStats(domain.id)}
-                                            disabled={verifying}
-                                        >
-                                            {verifying ? <Loader2 className="w-3 h-3 animate-spin" /> : <RefreshCw className="w-3 h-3" />}
-                                            Verificar DNS
-                                        </button>
-                                    )}
+                                <div className="flex items-center gap-6">
+                                    <div className="flex flex-col items-end gap-1">
+                                        {getStatusBadge(domain.status)}
+                                        {domain.status === 'pending_dns' && (
+                                            <button
+                                                className="text-[10px] text-primary hover:text-primary/80 flex items-center gap-1 font-bold uppercase transition-colors"
+                                                onClick={() => handleVerifyStats(domain.id)}
+                                                disabled={verifying}
+                                            >
+                                                {verifying ? <Loader2 className="w-3 h-3 animate-spin" /> : <RefreshCw className="w-3 h-3" />}
+                                                Verificar DNS
+                                            </button>
+                                        )}
+                                    </div>
+
+                                    <Button variant="outline" size="sm" className="h-8 border-white/10 text-xs font-bold uppercase gap-2">
+                                        <Palette className="w-3 h-3" />
+                                        <div className="w-3 h-3 rounded-full border border-white/20" style={{ backgroundColor: domain.branding?.primary_color || '#fff' }} />
+                                        Configurar
+                                    </Button>
                                 </div>
-
-                                <Button variant="outline" size="sm" className="h-8 border-white/10 text-xs font-bold uppercase gap-2">
-                                    <Palette className="w-3 h-3" />
-                                    <div className="w-3 h-3 rounded-full border border-white/20" style={{ backgroundColor: domain.branding?.primary_color || '#fff' }} />
-                                    Configurar
-                                </Button>
                             </div>
-                        </div>
-                    ))}
+                        ))}
+                    </div>
                 </div>
-            </div>
+            )}
 
             {/* Dialog de Novo Tenant */}
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
