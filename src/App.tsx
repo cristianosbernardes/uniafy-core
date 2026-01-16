@@ -1,4 +1,5 @@
 import { Toaster } from "@/components/ui/toaster";
+import { LoadingScreen } from "@/components/ui/LoadingScreen";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
@@ -35,13 +36,7 @@ const PrivateRoute = ({ children }: { children: React.ReactNode }) => {
   const { user, loading } = useAuth();
 
   if (loading) {
-    return (
-      <div className="min-h-screen bg-[#050505] flex items-center justify-center">
-        <div className="text-primary font-mono uppercase tracking-[0.3em] animate-pulse">
-          Iniciando Uniafy Core...
-        </div>
-      </div>
-    );
+    return <LoadingScreen />;
   }
 
   if (!user) {

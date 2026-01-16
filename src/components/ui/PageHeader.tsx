@@ -53,9 +53,9 @@ export function PageHeader({
               key={index}
               variant={action.variant === 'primary' ? 'default' : 'outline'}
               className={cn(
-                "text-[11px] font-black h-10 px-6 rounded transition-all duration-300",
+                "text-sm font-semibold h-10 px-4 rounded transition-all duration-300",
                 action.variant === 'primary'
-                  ? "bg-primary text-black hover:bg-primary/90 shadow-lg shadow-primary/20"
+                  ? "bg-primary hover:bg-primary/90 shadow-lg shadow-primary/20"
                   : "border-border bg-white/5 text-muted-foreground hover:text-foreground hover:border-foreground"
               )}
               onClick={action.onClick}

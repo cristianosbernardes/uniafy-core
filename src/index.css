@@ -10,7 +10,7 @@
   :root {
     /* Uniafy Primary Orange */
     --primary: 24 100% 52%;
-    --primary-foreground: 0 0% 0%;
+    --primary-foreground: 0 0% 100%;
 
     /* Force Inter Globally */
     font-family: 'Inter', sans-serif;

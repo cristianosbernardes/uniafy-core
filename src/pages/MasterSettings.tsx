@@ -58,9 +58,9 @@ export default function MasterSettings() {
     return (
         <div className="space-y-8">
             <PageHeader
-                title="CONFIGURAÇÕES"
-                titleAccent="GLOBAIS"
-                subtitle="Master Suite • Automação de cobrança e alertas"
+                title="CENTRAL DE"
+                titleAccent="ALERTAS"
+                subtitle="Master Suite • Automação de notificações e réguas de cobrança"
             />
             {isFetching && <div className="text-xs text-muted-foreground animate-pulse absolute top-4 right-8">Sincronizando...</div>}
 

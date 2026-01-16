@@ -87,3 +87,19 @@ export const MOCK_TRANSACTIONS: FinancialTransaction[] = [
     { id: 'tx-002', tenant_id: 'agency-alpha', tenant_name: 'Agência Alpha', date: '2023-12-01', amount: 597, status: 'paid', type: 'subscription' },
     { id: 'tx-003', tenant_id: 'agency-beta', tenant_name: 'Beta Marketing', date: '2023-12-15', amount: 297, status: 'failed', type: 'subscription' },
 ];
+
+export const MOCK_MRR_HISTORY = [
+    { month: 'Jul', value: 12500, customers: 18 },
+    { month: 'Ago', value: 13200, customers: 20 },
+    { month: 'Set', value: 13800, customers: 22 },
+    { month: 'Out', value: 14500, customers: 24 },
+    { month: 'Nov', value: 15100, customers: 25 },
+    { month: 'Dez', value: 16800, customers: 28 },
+    { month: 'Jan', value: 18594, customers: 31 }, // Atual
+];
+
+export const MOCK_REVENUE_BY_PLAN = [
+    { name: 'Growth', value: 12500, color: '#f97316' }, // Primary Orange
+    { name: 'Starter', value: 4500, color: '#3b82f6' }, // Blue
+    { name: 'Black', value: 8900, color: '#10b981' }, // Emerald
+];

@@ -9,16 +9,16 @@ export const NAV_MODULES: NavModule[] = [
     items: [
       {
         id: 'gestao-agencias',
-        title: 'Gestão de Agências',
-        description: 'Controle central de instâncias e clusters',
+        title: 'Assinaturas & Financeiro',
+        description: 'Controle de planos, faturamento e inadimplência',
         icon: 'Building2',
         path: '/mestre/agencias',
         roles: [UserRole.OWNER],
       },
       {
         id: 'config',
-        title: 'Configurações Globais',
-        description: 'Automação de cobrança e alertas',
+        title: 'Central de Alertas',
+        description: 'Automação de notificações e réguas de cobrança',
         icon: 'Settings',
         path: '/mestre/config',
         roles: [UserRole.OWNER],
