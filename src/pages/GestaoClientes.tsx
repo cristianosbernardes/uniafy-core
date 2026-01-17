@@ -22,7 +22,9 @@ import {
   Ban,
   Key,
   Plus,
-  Loader2
+  Loader2,
+  Eye,
+  EyeOff
 } from 'lucide-react';
 import {
   DropdownMenu,
@@ -81,6 +83,7 @@ export default function GestaoClientes() {
     password: '',
     planId: ''
   });
+  const [showPassword, setShowPassword] = useState(false);
 
   // Load subscriptions from API
   useEffect(() => {
@@ -132,12 +135,24 @@ export default function GestaoClientes() {
   // KPIs Calculations
   const totalMRR = subscriptions.reduce((acc, sub) => sub.status === 'active' ? acc + sub.amount : acc, 0);
   const activeClients = subscriptions.filter(s => s.status === 'active').length;
-  // const riskClients = subscriptions.filter(s => s.status === 'past_due').length;
 
-  // Advanced SaaS Metrics (Mocked Logic for now, based on real MRR)
-  const arpu = totalMRR / (activeClients || 1);
-  const churnRate = 1.2; // Still mocked for now
-  const ltv = arpu / (churnRate / 100);
+  // Real Churn Calculation (Approximation: Canceled / Total ever)
+  const canceledClients = subscriptions.filter(s => s.status === 'canceled').length;
+  const totalClients = subscriptions.length;
+  // If no clients, churn is 0. If clients exist, calculate percentage.
+  const churnRate = totalClients > 0 ? (canceledClients / totalClients) * 100 : 0;
+
+  // ARPU
+  const arpu = activeClients > 0 ? totalMRR / activeClients : 0;
+
+  // LTV (Lifetime Value) = ARPU / Churn Rate (decimal). 
+  // If Churn is 0, LTV is theoretically infinite, let's cap or use ARPU * 12 (1 year)
+  let ltv = 0;
+  if (churnRate > 0) {
+    ltv = arpu / (churnRate / 100);
+  } else {
+    ltv = arpu * 12; // Fallback: 1 year LTV if 0 churn
+  }
 
   // We can use the plan_name from the subscription directly if available, or fallback
   const getSubPlanName = (sub: AgencySubscription) => sub.plan_name || 'Plano Desconhecido';
@@ -182,119 +197,210 @@ export default function GestaoClientes() {
 
       {/* Create Client Dialog */}
       <Dialog open={isCreateOpen} onOpenChange={setIsCreateOpen}>
-        <DialogContent className="bg-[#09090b] border-white/10 text-white">
-          <DialogHeader>
-            <DialogTitle>Novo Cliente</DialogTitle>
-            <DialogDescription className="text-zinc-400">
-              Crie uma nova agência e vincule a um plano imediatamente.
-            </DialogDescription>
-          </DialogHeader>
+        <DialogContent className="bg-[#09090b] border-white/10 text-white p-0 overflow-hidden gap-0">
+          <div className="relative bg-zinc-950 p-8 overflow-hidden">
+            {/* Background Architecture */}
+            <div className="absolute inset-0 bg-gradient-to-br from-[#FF6600] to-[#E85D04] opacity-100"></div>
 
-          <div className="space-y-4 py-4">
-            <div className="space-y-2">
-              <Label>Nome da Agência / Empresa</Label>
-              <Input
-                placeholder="Ex: Agência MKT Digital"
-                className="bg-black/40 border-white/10"
-                value={newClient.name}
-                onChange={e => setNewClient({ ...newClient, name: e.target.value })}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>Email do Admin</Label>
-              <Input
-                placeholder="admin@agencia.com"
-                className="bg-black/40 border-white/10"
-                value={newClient.email}
-                onChange={e => setNewClient({ ...newClient, email: e.target.value })}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>Senha Temporária</Label>
-              <Input
-                type="password"
-                placeholder="******"
-                className="bg-black/40 border-white/10"
-                value={newClient.password}
-                onChange={e => setNewClient({ ...newClient, password: e.target.value })}
-              />
-            </div>
-            <div className="space-y-2">
-              <Label>Selecionar Plano</Label>
-              <select
-                className="flex h-10 w-full rounded-md border border-white/10 bg-black/40 px-3 py-2 text-sm text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
-                value={newClient.planId}
-                onChange={e => setNewClient({ ...newClient, planId: e.target.value })}
-              >
-                <option value="" disabled>Selecione um plano...</option>
-                {plans.map(plan => (
-                  <option key={plan.id} value={plan.id}>
-                    {plan.name} - {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(plan.monthly_price_amount)}/mês
-                  </option>
-                ))}
-              </select>
+            {/* Deep Depth Overlay (CapCut Style) */}
+            <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_right,_var(--tw-gradient-stops))] from-white/20 via-transparent to-black/40 mix-blend-overlay"></div>
+
+            {/* Tech Grid Pattern - Subtle & Professional */}
+            <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-20 mix-blend-overlay"></div>
+            <div className="absolute inset-0" style={{ backgroundImage: 'radial-gradient(rgba(255,255,255,0.15) 1px, transparent 1px)', backgroundSize: '24px 24px' }}></div>
+
+            <div className="relative z-10 flex items-start justify-between">
+              <div className="flex items-center gap-6">
+                {/* Icon Container - Floating Glass */}
+                <div className="w-16 h-16 rounded-2xl bg-white/10 backdrop-blur-md border border-white/20 shadow-[0_8px_32px_rgba(0,0,0,0.2)] flex items-center justify-center">
+                  <Building2 className="w-8 h-8 text-white" />
+                </div>
+
+                <div className="space-y-1">
+                  <div className="flex items-center gap-3">
+                    <DialogTitle className="text-3xl font-bold text-white tracking-tight drop-shadow-sm">
+                      Novo Cliente
+                    </DialogTitle>
+                    {/* Badge "Pro" Style */}
+                    <span className="flex items-center gap-1.5 px-2.5 py-1 rounded-full bg-black/20 border border-white/10 backdrop-blur-sm">
+                      <div className="w-1.5 h-1.5 rounded-full bg-green-400 animate-pulse"></div>
+                      <span className="text-[10px] font-bold text-white/90 uppercase tracking-wider">AI Powered</span>
+                    </span>
+                  </div>
+                  <DialogDescription className="text-orange-50 font-medium text-sm">
+                    Expansão da Carteira & Setup Rápido
+                  </DialogDescription>
+                </div>
+              </div>
             </div>
           </div>
 
-          <DialogFooter>
-            <Button variant="ghost" onClick={() => setIsCreateOpen(false)} disabled={isCreating}>Cancelar</Button>
-            <Button onClick={handleCreateClient} disabled={isCreating} className="bg-[#FF6600] hover:bg-[#FF6600]/90 text-white font-bold">
-              {isCreating && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
-              Criar Agência
-            </Button>
-          </DialogFooter>
+          <div className="p-6">
+            <div className="space-y-4">
+              {/* Header descritivo interno */}
+              <div className="flex items-center gap-3 mb-4 p-3 bg-zinc-900/50 border border-white/5 rounded-lg">
+                <div className="w-1 h-8 bg-[#FF6600] rounded-full"></div>
+                <span className="text-xs text-zinc-400">
+                  <strong className="text-white">INFO:</strong> A agência receberá o acesso instantaneamente via email.
+                </span>
+              </div>
+              <div className="space-y-2">
+                <Label>Nome da Agência / Empresa</Label>
+                <Input
+                  placeholder="Ex: Agência MKT Digital"
+                  className="bg-black/40 border-white/10"
+                  value={newClient.name}
+                  onChange={e => setNewClient({ ...newClient, name: e.target.value })}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Email do Admin</Label>
+                <Input
+                  placeholder="admin@agencia.com"
+                  className="bg-black/40 border-white/10"
+                  value={newClient.email}
+                  onChange={e => setNewClient({ ...newClient, email: e.target.value })}
+                />
+              </div>
+              <div className="space-y-2">
+                <Label>Senha Temporária</Label>
+                <div className="relative">
+                  <Input
+                    type={showPassword ? "text" : "password"}
+                    placeholder="******"
+                    className="bg-black/40 border-white/10 pr-10"
+                    value={newClient.password}
+                    onChange={e => setNewClient({ ...newClient, password: e.target.value })}
+                  />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-white"
+                  >
+                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                  </button>
+                </div>
+              </div>
+              <div className="space-y-2">
+                <Label>Selecionar Plano</Label>
+                <select
+                  className="flex h-10 w-full rounded-md border border-white/10 bg-black/40 px-3 py-2 text-sm text-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+                  value={newClient.planId}
+                  onChange={e => setNewClient({ ...newClient, planId: e.target.value })}
+                >
+                  <option value="" disabled>Selecione um plano...</option>
+                  {plans.map(plan => (
+                    <option key={plan.id} value={plan.id}>
+                      {plan.name} - {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(plan.monthly_price_amount)}/mês
+                    </option>
+                  ))}
+                </select>
+              </div>
+            </div>
+
+            <DialogFooter>
+              <Button variant="ghost" onClick={() => setIsCreateOpen(false)} disabled={isCreating}>Cancelar</Button>
+              <Button onClick={handleCreateClient} disabled={isCreating} className="bg-[#FF6600] hover:bg-[#FF6600]/90 text-white font-bold">
+                {isCreating && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                Criar Agência
+              </Button>
+            </DialogFooter>
+          </div>
         </DialogContent>
       </Dialog>
 
-      {/* Primary KPIs Section */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="glass-card p-6 relative overflow-hidden group">
-          <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-            <DollarSign className="w-16 h-16 text-green-500" />
-          </div>
-          <h3 className="text-sm font-medium uppercase text-muted-foreground">MRR (Recorrência)</h3>
-          <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-2xl font-medium tracking-tight text-white">
-              {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(totalMRR)}
-            </span>
-            <Badge className="bg-green-500/10 text-green-500 border-green-500/20 text-xs font-bold">+12%</Badge>
+      {/* Primary KPIs Section - ClickUp/Premium Style */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+
+        {/* MRR Card */}
+        <div className="relative bg-[#09090b] border border-white/5 rounded-xl p-5 overflow-hidden group hover:border-white/10 transition-all duration-300">
+          <div className="absolute inset-0 bg-gradient-to-br from-green-500/5 to-transparent opacity-50 group-hover:opacity-100 transition-opacity"></div>
+          <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10 mix-blend-overlay"></div>
+
+          <div className="relative z-10 flex flex-col justify-between h-full gap-4">
+            <div className="flex items-start justify-between">
+              <div className="p-2.5 bg-green-500/10 rounded-lg border border-green-500/20 text-green-500">
+                <DollarSign className="w-5 h-5" />
+              </div>
+              <span className="flex items-center gap-1.5 text-[10px] font-medium text-green-400 bg-green-900/20 px-2 py-1 rounded-full border border-green-500/10">
+                <TrendingUp className="w-3 h-3" /> +12%
+              </span>
+            </div>
+            <div>
+              <h3 className="text-zinc-500 text-xs font-medium uppercase tracking-wider mb-1">MRR (Recorrência)</h3>
+              <span className="text-2xl font-semibold text-white tracking-tight">
+                {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(totalMRR)}
+              </span>
+            </div>
           </div>
         </div>
 
-        <div className="glass-card p-6 relative overflow-hidden group">
-          <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-            <Wallet className="w-16 h-16 text-blue-500" />
-          </div>
-          <h3 className="text-sm font-medium uppercase text-muted-foreground">ARPU (Médio/Cliente)</h3>
-          <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-2xl font-medium tracking-tight text-white">
-              {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(arpu)}
-            </span>
-            <span className="text-xs text-blue-400 font-medium">Saudável</span>
+        {/* ARPU Card */}
+        <div className="relative bg-[#09090b] border border-white/5 rounded-xl p-5 overflow-hidden group hover:border-white/10 transition-all duration-300">
+          <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-transparent opacity-50 group-hover:opacity-100 transition-opacity"></div>
+          <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10 mix-blend-overlay"></div>
+
+          <div className="relative z-10 flex flex-col justify-between h-full gap-4">
+            <div className="flex items-start justify-between">
+              <div className="p-2.5 bg-blue-500/10 rounded-lg border border-blue-500/20 text-blue-500">
+                <Wallet className="w-5 h-5" />
+              </div>
+              <span className="flex items-center gap-1.5 text-[10px] font-medium text-blue-400 bg-blue-900/20 px-2 py-1 rounded-full border border-blue-500/10">
+                <CheckCircle2 className="w-3 h-3" /> Saudável
+              </span>
+            </div>
+            <div>
+              <h3 className="text-zinc-500 text-xs font-medium uppercase tracking-wider mb-1">ARPU (Médio/Cliente)</h3>
+              <span className="text-2xl font-semibold text-white tracking-tight">
+                {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(arpu)}
+              </span>
+            </div>
           </div>
         </div>
 
-        <div className="glass-card p-6 relative overflow-hidden group">
-          <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-            <Activity className="w-16 h-16 text-purple-500" />
-          </div>
-          <h3 className="text-sm font-medium uppercase text-muted-foreground">LTV (Lifetime Value)</h3>
-          <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-2xl font-medium tracking-tight text-white">
-              {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }).format(ltv)}
-            </span>
-            <span className="text-xs text-muted-foreground">Est.</span>
+        {/* LTV Card */}
+        <div className="relative bg-[#09090b] border border-white/5 rounded-xl p-5 overflow-hidden group hover:border-white/10 transition-all duration-300">
+          <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-transparent opacity-50 group-hover:opacity-100 transition-opacity"></div>
+          <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10 mix-blend-overlay"></div>
+
+          <div className="relative z-10 flex flex-col justify-between h-full gap-4">
+            <div className="flex items-start justify-between">
+              <div className="p-2.5 bg-purple-500/10 rounded-lg border border-purple-500/20 text-purple-500">
+                <Activity className="w-5 h-5" />
+              </div>
+              <span className="text-[10px] font-medium text-purple-400/80 uppercase tracking-widest pl-1">
+                Estimado
+              </span>
+            </div>
+            <div>
+              <h3 className="text-zinc-500 text-xs font-medium uppercase tracking-wider mb-1">LTV (Lifetime Value)</h3>
+              <span className="text-2xl font-semibold text-white tracking-tight">
+                {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }).format(ltv)}
+              </span>
+            </div>
           </div>
         </div>
 
-        <div className="glass-card p-6 relative overflow-hidden group border-red-500/20">
-          <div className="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition-opacity">
-            <UserMinus className="w-16 h-16 text-red-500" />
-          </div>
-          <h3 className="text-sm font-medium uppercase text-red-400">Churn Rate</h3>
-          <div className="mt-2 flex items-baseline gap-2">
-            <span className="text-2xl font-medium tracking-tight text-white">{churnRate}%</span>
-            <span className="text-xs text-red-400 font-bold">Abaixo da média</span>
+        {/* Churn Card */}
+        <div className="relative bg-[#09090b] border border-white/5 rounded-xl p-5 overflow-hidden group hover:border-white/10 transition-all duration-300">
+          <div className="absolute inset-0 bg-gradient-to-br from-red-500/5 to-transparent opacity-50 group-hover:opacity-100 transition-opacity"></div>
+          <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10 mix-blend-overlay"></div>
+
+          <div className="relative z-10 flex flex-col justify-between h-full gap-4">
+            <div className="flex items-start justify-between">
+              <div className="p-2.5 bg-red-500/10 rounded-lg border border-red-500/20 text-red-500">
+                <UserMinus className="w-5 h-5" />
+              </div>
+              <span className="flex items-center gap-1.5 text-[10px] font-medium text-red-400 bg-red-900/20 px-2 py-1 rounded-full border border-red-500/10">
+                <AlertTriangle className="w-3 h-3" /> Abaixo da média
+              </span>
+            </div>
+            <div>
+              <h3 className="text-zinc-500 text-xs font-medium uppercase tracking-wider mb-1">Churn Rate</h3>
+              <span className="text-2xl font-semibold text-white tracking-tight">
+                {churnRate.toFixed(1)}%
+              </span>
+            </div>
           </div>
         </div>
       </div>
@@ -397,26 +503,28 @@ export default function GestaoClientes() {
         </div>
       </div>
 
-      {/* Main Table */}
-      <div className="glass-card overflow-hidden">
+      {/* Main Table - ClickUp/Premium Style */}
+      <div className="relative bg-[#09090b] border border-white/5 rounded-xl overflow-hidden shadow-2xl">
+        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-5 mix-blend-overlay"></div>
+
         {/* Table Toolbar */}
-        <div className="p-4 border-b border-white/5 flex flex-col md:flex-row gap-4 justify-between items-center">
+        <div className="relative z-10 p-4 border-b border-white/5 flex flex-col md:flex-row gap-4 justify-between items-center bg-white/[0.02]">
           <div className="relative w-full md:w-96">
-            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+            <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-zinc-500" />
             <Input
               placeholder="Buscar agência..."
-              className="pl-10 h-10 bg-black/40 border-white/10 text-sm font-bold"
+              className="pl-10 h-10 bg-black/40 border-white/5 text-sm font-medium focus:border-white/10 transition-colors"
               value={searchTerm}
               onChange={(e) => setSearchTerm(e.target.value)}
             />
           </div>
-          <Button variant="outline" className="h-10 border-white/10 bg-white/5 gap-2 text-xs font-black uppercase">
-            <Filter className="w-4 h-4" /> FILTROS
+          <Button variant="outline" className="h-10 border-white/5 bg-white/5 gap-2 text-xs font-bold uppercase hover:bg-white/10 hover:text-white text-zinc-400">
+            <Filter className="w-4 h-4" /> Filtros
           </Button>
         </div>
 
         {/* List Header */}
-        <div className="grid grid-cols-12 gap-4 p-4 bg-white/5 text-xs font-black uppercase text-muted-foreground border-b border-white/5">
+        <div className="relative z-10 grid grid-cols-12 gap-4 px-6 py-3 bg-white/[0.02] text-[10px] font-bold uppercase text-zinc-500 tracking-wider">
           <div className="col-span-4">Agência / Tenant</div>
           <div className="col-span-2">Plano</div>
           <div className="col-span-2 text-center">Status</div>
@@ -425,11 +533,16 @@ export default function GestaoClientes() {
         </div>
 
         {/* List Body */}
-        <div className="divide-y divide-white/5">
+        <div className="relative z-10 divide-y divide-white/5">
           {loading ? (
-            <div className="p-8 text-center text-muted-foreground">Carregando assinaturas...</div>
+            <div className="p-12 text-center text-zinc-500 flex flex-col items-center gap-3">
+              <div className="w-6 h-6 border-2 border-white/10 border-t-orange-500 rounded-full animate-spin"></div>
+              <span className="text-xs uppercase tracking-widest font-medium">Carregando assinaturas...</span>
+            </div>
           ) : subscriptions.length === 0 ? (
-            <div className="p-8 text-center text-muted-foreground">Nenhuma assinatura encontrada.</div>
+            <div className="p-12 text-center text-zinc-500">
+              <span className="text-xs uppercase tracking-widest font-medium">Nenhuma assinatura encontrada.</span>
+            </div>
           ) : (
             subscriptions.filter(s => s.tenant_name.toLowerCase().includes(searchTerm.toLowerCase())).map((sub) => {
               const daysToDue = getDaysUntilDue(sub.next_billing_date);
@@ -437,23 +550,23 @@ export default function GestaoClientes() {
               const isLate = daysToDue < 0;
 
               return (
-                <div key={sub.id} className="grid grid-cols-12 gap-4 p-4 items-center hover:bg-white/[0.02] transition-colors group">
+                <div key={sub.id} className="grid grid-cols-12 gap-4 px-6 py-4 items-center hover:bg-white/[0.02] transition-colors group">
                   {/* Agency Info */}
-                  <div className="col-span-4 flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary font-bold">
+                  <div className="col-span-4 flex items-center gap-4">
+                    <div className="w-10 h-10 rounded-xl bg-orange-500/10 flex items-center justify-center text-orange-500 font-bold border border-orange-500/20 group-hover:border-orange-500/40 transition-colors">
                       {sub.tenant_name.substring(0, 2).toUpperCase()}
                     </div>
                     <div>
-                      <h4 className="text-sm font-bold text-white uppercase">{sub.tenant_name}</h4>
-                      <span className="text-xs text-muted-foreground flex items-center gap-1">
-                        ID: {sub.tenant_id.substring(0, 8)}...
+                      <h4 className="text-sm font-semibold text-white group-hover:text-orange-400 transition-colors">{sub.tenant_name}</h4>
+                      <span className="text-[10px] text-zinc-500 font-mono flex items-center gap-1 uppercase">
+                        ID: {sub.tenant_id.substring(0, 8)}
                       </span>
                     </div>
                   </div>
 
                   {/* Plan */}
                   <div className="col-span-2">
-                    <Badge variant="outline" className="bg-white/5 border-white/10 text-xs font-bold uppercase text-zinc-400">
+                    <Badge variant="outline" className="bg-white/5 border-white/5 text-[10px] font-bold uppercase text-zinc-400">
                       {getSubPlanName(sub)}
                     </Badge>
                   </div>
@@ -461,37 +574,37 @@ export default function GestaoClientes() {
                   {/* Status */}
                   <div className="col-span-2 text-center">
                     {sub.status === 'active' && (
-                      <Badge className="bg-green-500/10 text-green-500 border-none text-xs font-black uppercase">Ativo</Badge>
+                      <Badge className="bg-green-500/10 text-green-500 border border-green-500/20 text-[10px] font-bold uppercase px-2">Ativo</Badge>
                     )}
                     {sub.status === 'past_due' && (
-                      <Badge className="bg-red-500/10 text-red-500 border-none text-xs font-black uppercase">Pendente</Badge>
+                      <Badge className="bg-red-500/10 text-red-500 border border-red-500/20 text-[10px] font-bold uppercase px-2">Pendente</Badge>
                     )}
                     {sub.status === 'trial' && (
-                      <Badge className="bg-blue-500/10 text-blue-500 border-none text-xs font-black uppercase">Trial</Badge>
+                      <Badge className="bg-blue-500/10 text-blue-500 border border-blue-500/20 text-[10px] font-bold uppercase px-2">Trial</Badge>
                     )}
                     {sub.status === 'canceled' && (
-                      <Badge className="bg-zinc-500/10 text-zinc-500 border-none text-xs font-black uppercase">Cancelado</Badge>
+                      <Badge className="bg-zinc-500/10 text-zinc-500 border border-zinc-500/20 text-[10px] font-bold uppercase px-2">Cancelado</Badge>
                     )}
                   </div>
 
                   {/* Billing Info */}
                   <div className="col-span-3 space-y-1">
-                    <div className="flex items-center gap-2 text-xs font-medium text-zinc-300">
-                      <Calendar className="w-3.5 h-3.5 text-muted-foreground" />
-                      <span>{sub.next_billing_date ? format(new Date(sub.next_billing_date), "dd 'de' MMM, yyyy", { locale: ptBR }).toUpperCase() : '-'}</span>
+                    <div className="flex items-center gap-2 text-xs font-medium text-zinc-400">
+                      <Calendar className="w-3.5 h-3.5 opacity-50" />
+                      <span>{sub.next_billing_date ? format(new Date(sub.next_billing_date), "dd MMM, yyyy", { locale: ptBR }).toUpperCase() : '-'}</span>
                     </div>
                     <div className="flex items-center gap-2">
-                      <span className="text-xs font-bold text-muted-foreground uppercase">{sub.payment_method}</span>
-                      <span className="text-xs font-black text-white">
+                      <span className="text-[10px] font-bold text-zinc-600 uppercase border border-white/5 px-1.5 py-0.5 rounded">{sub.payment_method}</span>
+                      <span className="text-xs font-bold text-white">
                         {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(sub.amount)}
                       </span>
 
                       {/* Alerts */}
                       {isNearDue && (
-                        <Badge variant="destructive" className="ml-2 text-[10px] h-5 bg-orange-500/20 text-orange-500 border-none">VENCE EM BREVE</Badge>
+                        <Badge variant="destructive" className="ml-2 text-[9px] h-4 bg-orange-500/20 text-orange-400 border border-orange-500/20 px-1">VENCE HOJE</Badge>
                       )}
                       {isLate && (
-                        <Badge variant="destructive" className="ml-2 text-[10px] h-5 bg-red-900/50 text-red-500 border-red-900">ATRASADO</Badge>
+                        <Badge variant="destructive" className="ml-2 text-[9px] h-4 bg-red-900/40 text-red-400 border border-red-900/60 px-1">ATRASADO</Badge>
                       )}
                     </div>
                   </div>

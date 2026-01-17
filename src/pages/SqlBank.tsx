@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Database, Play, Trash2, List, Code, AlertTriangle, CheckCircle2, XCircle, Clock, Users, Receipt, Shield } from 'lucide-react';
+import { Database, Play, Trash2, List, Code, AlertTriangle, CheckCircle2, XCircle, Clock, Users, Receipt, Shield, Key, ShieldCheck } from 'lucide-react';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -529,6 +529,258 @@ INSERT INTO public.subscriptions (tenant_id, plan_id, status, amount, next_billi
 
 SELECT 'SUCESSO: Schema corrigido, permissoes concedidas e dados inseridos.' as status;`,
         icon: <Users className="w-4 h-4 text-green-500" />,
+        category: 'setup'
+    },
+    {
+        id: 'setup-profiles-v2',
+        title: '[MIGRAÇÃO] Setup Profiles V2 (Trial & WL)',
+        query: `-- setup_profiles_v2.sql
+-- Objetivo: Atualizar tabela profiles para suportar Trial e White Label
+-- Criado em: 2026-01-17
+
+-- 1. Adicionar colunas para Controle de Trial e Assinatura
+ALTER TABLE public.profiles
+ADD COLUMN IF NOT EXISTS trial_start_date TIMESTAMPTZ,
+ADD COLUMN IF NOT EXISTS subscription_status TEXT DEFAULT 'trialing';
+
+-- 2. Adicionar colunas para White Label (Agência)
+ALTER TABLE public.profiles
+ADD COLUMN IF NOT EXISTS custom_domain TEXT UNIQUE,
+ADD COLUMN IF NOT EXISTS branding_logo TEXT,
+ADD COLUMN IF NOT EXISTS branding_colors JSONB DEFAULT '{"primary": "#000000", "secondary": "#ffffff"}'::jsonb;
+
+-- 3. Atualizar a função handle_new_user para inicializar Trial
+CREATE OR REPLACE FUNCTION public.handle_new_user()
+RETURNS trigger
+LANGUAGE plpgsql
+SECURITY DEFINER
+SET search_path TO ''
+AS $function$
+BEGIN
+  INSERT INTO public.profiles (
+    id, 
+    email, 
+    role, 
+    created_at, 
+    updated_at,
+    trial_start_date, -- Inicializa o Trial
+    subscription_status -- Define status inicial
+  )
+  VALUES (
+    new.id, 
+    new.email, 
+    'user', -- Role padrão (pode ser ajustado)
+    NOW(), 
+    NOW(),
+    NOW(), -- Trial começa agora
+    'trialing' -- Status de teste
+  );
+  RETURN new;
+END;
+$function$;
+
+SELECT 'Setup Profiles V2 (Trial & WL) concluído com sucesso!' as status;`,
+        icon: <Users className="w-4 h-4 text-pink-500" />,
+        category: 'setup'
+    },
+    {
+        id: 'setup-multigateway-v1',
+        title: '[SISTEMA] Setup Multi-Gateway (Active Switch)',
+        query: `-- Add 'active_gateway' to master_config
+ALTER TABLE public.master_config 
+ADD COLUMN IF NOT EXISTS active_gateway TEXT DEFAULT 'asaas';
+
+-- Update existing config to have a default if null
+UPDATE public.master_config 
+SET active_gateway = 'asaas' 
+WHERE active_gateway IS NULL;
+
+SELECT 'Suporte a Multi-Gateway ativado com sucesso!' as status;`,
+        icon: <Key className="w-4 h-4 text-cyan-500" />,
+        category: 'setup'
+    },
+    {
+        id: 'setup-checkout-security',
+        title: '[SEGURANÇA] Setup Checkout & CPF',
+        query: `-- Adicionar campos de segurança e pagamento ao Profile
+ALTER TABLE public.profiles
+ADD COLUMN IF NOT EXISTS cpf TEXT,
+ADD COLUMN IF NOT EXISTS gateway_customer_id TEXT,
+ADD COLUMN IF NOT EXISTS payment_method_token TEXT;
+
+-- Garantir unicidade do CPF (evitar duplicatas)
+-- Primeiro, limpa CPFs vazios se existirem para evitar erro de constraint (opcional, segurança)
+UPDATE public.profiles SET cpf = NULL WHERE cpf = '';
+
+-- Adiciona a constraint UNIQUE apenas se não existir
+DO $$
+BEGIN
+    IF NOT EXISTS (SELECT 1 FROM pg_constraint WHERE conname = 'profiles_cpf_key') THEN
+        ALTER TABLE public.profiles ADD CONSTRAINT profiles_cpf_key UNIQUE (cpf);
+    END IF;
+END $$;
+
+SELECT 'Campos de CPF e Pagamento criados com sucesso!' as status;`,
+        icon: <ShieldCheck className="w-4 h-4 text-emerald-500" />,
+        category: 'setup'
+    },
+    {
+        id: 'fix-clients-rls',
+        title: '[FIX] Corrigir Lista de Clientes (RLS)',
+        query: `-- 1. CORREÇÃO DE RLS (Permitir ver clientes)
+ALTER TABLE public.profiles ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Agencies can view attached clients" ON public.profiles;
+
+CREATE POLICY "Agencies can view attached clients"
+ON public.profiles
+FOR SELECT
+USING (
+  auth.uid() = parent_agency_id  -- A agência pode ver quem ela é "pai"
+  OR 
+  auth.uid() = id -- O próprio usuário pode se ver
+);
+
+-- 2. INSERIR CLIENTE DE TESTE (Vinculado a você)
+DO $$
+DECLARE
+  v_master_id uuid;
+BEGIN
+  SELECT id INTO v_master_id FROM auth.users WHERE email = 'cristiano.sbernardes@gmail.com' LIMIT 1;
+
+  IF v_master_id IS NOT NULL THEN
+    INSERT INTO public.profiles (id, email, full_name, role, parent_agency_id, company_name)
+    VALUES (
+      gen_random_uuid(), 
+      'cliente.teste@exemplo.com', 
+      'Cliente Teste',
+      'client',
+      v_master_id, 
+      'Minha Primeira Loja'
+    ) ON CONFLICT DO NOTHING;
+  END IF;
+END $$;
+
+SELECT 'Permissões corrigidas e cliente teste criado!' as status;`,
+        icon: <Shield className="w-4 h-4 text-red-500" />,
+        category: 'utility'
+    },
+    {
+        id: 'util-check-cpf',
+        title: '[UTIL] Função Check CPF Disponível',
+        query: `-- Função segura para frontend verificar se CPF já existe (sem expor dados)
+CREATE OR REPLACE FUNCTION public.check_cpf_available(cpf_check text)
+RETURNS boolean
+LANGUAGE plpgsql
+SECURITY DEFINER -- Roda como admin para poder checar toda a base
+SET search_path = ''
+AS $$
+DECLARE
+  exists_cpf boolean;
+BEGIN
+  SELECT EXISTS (
+    SELECT 1 FROM public.profiles WHERE cpf = cpf_check
+  ) INTO exists_cpf;
+  
+  RETURN NOT exists_cpf; -- Retorna TRUE se estiver disponível (não existe)
+END;
+$$;
+
+-- Liberar acesso para público (anon) e logado (authenticated)
+GRANT EXECUTE ON FUNCTION public.check_cpf_available(text) TO anon, authenticated;
+
+SELECT 'Função check_cpf_available criada com sucesso!' as status;`,
+        icon: <ShieldCheck className="w-4 h-4 text-zinc-500" />,
+        category: 'utility'
+    },
+    {
+        id: 'setup-reports-dashboards-v1',
+        title: '[NOVO] Setup Relatórios & Public Dashboards',
+        query: `-- Tabela para Automações de Relatórios (N8n)
+CREATE TABLE IF NOT EXISTS public.report_automations (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  agency_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+  title TEXT NOT NULL,
+  webhook_url TEXT NOT NULL,
+  frequency TEXT NOT NULL CHECK (frequency IN ('daily', 'weekly', 'monthly', 'manual')),
+  payload_config JSONB DEFAULT '{}'::jsonb,
+  last_run_at TIMESTAMP WITH TIME ZONE,
+  is_active BOOLEAN DEFAULT true,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- Tabela para Dashboards Públicos (Reportei-style)
+CREATE TABLE IF NOT EXISTS public.public_dashboards (
+  id UUID DEFAULT gen_random_uuid() PRIMARY KEY,
+  agency_id UUID NOT NULL REFERENCES public.profiles(id) ON DELETE CASCADE,
+  client_id UUID REFERENCES public.profiles(id) ON DELETE SET NULL, -- Opcional: vincula a um cliente específico (que é um user/profile)
+  share_token TEXT NOT NULL UNIQUE,
+  config_json JSONB DEFAULT '{}'::jsonb, -- Configuração de quais gráficos exibir
+  views_count INTEGER DEFAULT 0,
+  expires_at TIMESTAMP WITH TIME ZONE,
+  created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL
+);
+
+-- RLS: Apenas a própria agência pode ver/editar suas automações
+ALTER TABLE public.report_automations ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Agencies can manage their own report automations" ON public.report_automations;
+CREATE POLICY "Agencies can manage their own report automations"
+ON public.report_automations
+FOR ALL
+USING (auth.uid() = agency_id);
+
+-- RLS: Public Dashboards
+ALTER TABLE public.public_dashboards ENABLE ROW LEVEL SECURITY;
+
+DROP POLICY IF EXISTS "Agencies can manage their own public dashboards" ON public.public_dashboards;
+CREATE POLICY "Agencies can manage their own public dashboards"
+ON public.public_dashboards
+FOR ALL
+USING (auth.uid() = agency_id);
+
+-- Índices e RPC
+CREATE INDEX IF NOT EXISTS idx_report_automations_agency ON public.report_automations(agency_id);
+CREATE INDEX IF NOT EXISTS idx_public_dashboards_token ON public.public_dashboards(share_token);
+
+CREATE OR REPLACE FUNCTION get_public_dashboard_by_token(p_token TEXT)
+RETURNS JSONB
+LANGUAGE plpgsql
+SECURITY DEFINER -- Executa como admin para bypassar RLS
+AS $$
+DECLARE
+  v_dashboard RECORD;
+  v_branding RECORD;
+BEGIN
+  -- Buscar o dashboard
+  SELECT * INTO v_dashboard
+  FROM public.public_dashboards
+  WHERE share_token = p_token
+  AND (expires_at IS NULL OR expires_at > now());
+
+  IF v_dashboard.id IS NULL THEN
+    RETURN NULL;
+  END IF;
+
+  -- Incrementar contador de views
+  UPDATE public.public_dashboards SET views_count = views_count + 1 WHERE id = v_dashboard.id;
+
+  -- Buscar Branding da Agência
+  SELECT company_name, branding_logo, branding_colors 
+  INTO v_branding
+  FROM public.profiles
+  WHERE id = v_dashboard.agency_id;
+
+  -- Retornar combinação
+  RETURN jsonb_build_object(
+    'dashboard', row_to_json(v_dashboard),
+    'agency', row_to_json(v_branding)
+  );
+END;
+$$;
+
+SELECT 'Configuração de Reports e Dashboards concluída com sucesso!' as status;`,
+        icon: <Users className="w-4 h-4 text-cyan-500" />,
         category: 'setup'
     }
 ];

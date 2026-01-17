@@ -27,11 +27,8 @@ export function PageHeader({
   return (
     <div className="flex items-start justify-between">
       <div>
-        <h1 className="text-3xl font-black leading-none uppercase">
-          <span className="text-foreground">{title}</span>
-          {titleAccent && (
-            <span className="text-primary ml-3">{titleAccent}</span>
-          )}
+        <h1 className="text-3xl font-bold leading-none tracking-tight text-white">
+          {title} {titleAccent && <span className="ml-1">{titleAccent}</span>}
         </h1>
         {subtitle && (
           <p className="text-[14px] text-muted-foreground mt-2 font-medium tracking-wide">

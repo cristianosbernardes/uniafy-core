@@ -42,13 +42,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                     .eq('tenant_id', session.user.id)
                     .maybeSingle();
 
-                setUser({
+                const newUser: User = {
                     id: session.user.id,
                     name: session.user.user_metadata.name || session.user.email?.split('@')[0] || 'Usuário',
                     email: session.user.email || '',
                     role: getRoleFromEmail(session.user.email),
                     avatar: session.user.user_metadata.avatar_url,
                     subscription: subData as any,
+                };
+
+                setUser((prev) => {
+                    if (JSON.stringify(prev) === JSON.stringify(newUser)) {
+                        return prev;
+                    }
+                    console.log('[AuthContext] User Start/Update:', newUser.email);
+                    return newUser;
                 });
             } else {
                 setUser(null);

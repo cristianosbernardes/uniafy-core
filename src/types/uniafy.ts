@@ -108,6 +108,7 @@ export interface MasterNotificationConfig {
   message_title: string;
   message_body: string;
   is_active: boolean;
+  active_gateway?: 'asaas' | 'stripe' | 'kiwify' | 'hotmart';
   channels: {
     popup: boolean;
     email: boolean;

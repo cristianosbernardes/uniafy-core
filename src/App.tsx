@@ -5,11 +5,15 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
+import { DomainProvider } from "./contexts/DomainContext";
 import Dashboard from "./pages/Dashboard";
 import GestaoClientes from "./pages/GestaoClientes";
 import MeuPerfil from "./pages/MeuPerfil";
 import NotFound from "./pages/NotFound";
-import Login from "./pages/Login";
+import Login from "@/pages/auth/Login";
+import Register from "@/pages/auth/Register";
+import Checkout from "@/pages/auth/Checkout";
+import SetupPassword from "@/pages/auth/SetupPassword";
 import SqlBank from "./pages/SqlBank";
 import GHunter from "./pages/GHunter";
 import CnpjSniper from "./pages/CnpjSniper";
@@ -28,8 +32,8 @@ import AgencySquads from "./pages/agency/AgencySquads";
 import AgencyFinance from "./pages/agency/AgencyFinance";
 import AgencyContracts from "./pages/agency/AgencyContracts";
 import AgencyChurn from "./pages/agency/AgencyChurn";
+import PublicDashboardView from "@/pages/public/PublicDashboardView";
 import AgencyOnboarding from "./pages/agency/AgencyOnboarding";
-
 import AgencyIntegrations from "@/pages/agency/AgencyIntegrations";
 
 const queryClient = new QueryClient();
@@ -52,6 +56,8 @@ const AppRoutes = () => {
   return (
     <Routes>
       <Route path="/login" element={<Login />} />
+      {/* Rota Pública de Dashboard (Sem Auth) */}
+      <Route path="/shared/:token" element={<PublicDashboardView />} />
 
       {/* Main Layout Wrapping Private Routes */}
       <Route element={<PrivateRoute><DashboardShell /></PrivateRoute>}>
@@ -79,6 +85,7 @@ const AppRoutes = () => {
         {/* Agency OS Routes */}
         <Route path="/agency" element={<Navigate to="/agency/users" replace />} />
         <Route path="/agency/users" element={<AgencyUsers />} />
+        <Route path="/agency/onboarding" element={<AgencyOnboarding />} />
         <Route path="/agency/whitelabel" element={<AgencyWhiteLabel />} />
 
         <Route path="/agency/clients" element={<AgencyClients />} />
@@ -97,6 +104,7 @@ const AppRoutes = () => {
 
         {/* Client Success Routes */}
         <Route path="/success" element={<Navigate to="/success/portal" replace />} />
+        <Route path="/checkout" element={<Checkout />} />
         <Route path="/success/portal" element={<Dashboard />} />
         <Route path="/success/aprovacao" element={<Dashboard />} />
         <Route path="/success/health" element={<Dashboard />} />
@@ -114,15 +122,17 @@ const AppRoutes = () => {
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <AuthProvider>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <BrowserRouter>
-          <AppRoutes />
-        </BrowserRouter>
-      </TooltipProvider>
-    </AuthProvider>
+    <DomainProvider>
+      <AuthProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <BrowserRouter>
+            <AppRoutes />
+          </BrowserRouter>
+        </TooltipProvider>
+      </AuthProvider>
+    </DomainProvider>
   </QueryClientProvider>
 );
 

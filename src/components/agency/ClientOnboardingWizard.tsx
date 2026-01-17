@@ -59,10 +59,12 @@ export function ClientOnboardingWizard({ onComplete, onCancel }: ClientOnboardin
                     const isCurrent = step === s.number;
                     return (
                         <div key={s.number} className="flex flex-col items-center gap-2 bg-zinc-950 px-2">
-                            <div className={`
+                            <div
+                                style={isActive ? { background: 'linear-gradient(90deg, #FF6600 0%, #E85D04 100%)' } : {}}
+                                className={`
                                 w-10 h-10 rounded-full flex items-center justify-center border-2 transition-all duration-300
-                                ${isActive ? 'bg-primary border-primary text-black' : 'bg-zinc-900 border-zinc-700 text-zinc-500'}
-                                ${isCurrent ? 'ring-2 ring-primary/30 ring-offset-2 ring-offset-black' : ''}
+                                ${isActive ? 'border-transparent text-white shadow-[0_0_15px_rgba(255,102,0,0.5)]' : 'bg-zinc-900 border-zinc-700 text-zinc-500'}
+                                ${isCurrent ? 'ring-2 ring-[#FF6600]/30 ring-offset-2 ring-offset-black scale-110' : ''}
                             `}>
                                 <s.icon className="w-5 h-5" />
                             </div>

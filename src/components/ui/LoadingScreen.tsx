@@ -19,7 +19,7 @@ export const LoadingScreen = () => {
     }, []);
 
     return (
-        <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center bg-[#050505] text-white overflow-hidden">
+        <div className="fixed inset-0 z-[50] flex flex-col items-center justify-center bg-[#050505] text-white overflow-hidden">
             {/* Background Ambient Glow */}
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-orange-500/5 blur-[120px] rounded-full animate-pulse pointer-events-none" />
 
