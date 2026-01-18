@@ -5,7 +5,7 @@ export const NAV_MODULES: NavModule[] = [
     id: 'mestre',
     label: 'Master',
     icon: 'Crown',
-    roles: [UserRole.OWNER],
+    roles: [UserRole.MASTER],
     items: [
       {
         id: 'gestao-agencias',
@@ -13,7 +13,7 @@ export const NAV_MODULES: NavModule[] = [
         description: 'Controle de planos, faturamento e inadimplência',
         icon: 'Building2',
         path: '/mestre/agencias',
-        roles: [UserRole.OWNER],
+        roles: [UserRole.MASTER],
       },
       {
         id: 'config',
@@ -21,7 +21,7 @@ export const NAV_MODULES: NavModule[] = [
         description: 'Automação de notificações e réguas de cobrança',
         icon: 'Settings',
         path: '/mestre/config',
-        roles: [UserRole.OWNER],
+        roles: [UserRole.MASTER],
       },
       {
         id: 'cofre',
@@ -29,7 +29,7 @@ export const NAV_MODULES: NavModule[] = [
         description: 'Chaves seguras (Stripe, Asaas)',
         icon: 'Key',
         path: '/mestre/cofre',
-        roles: [UserRole.OWNER],
+        roles: [UserRole.MASTER],
       },
       {
         id: 'banco-sql',
@@ -37,7 +37,7 @@ export const NAV_MODULES: NavModule[] = [
         description: 'Execução direta de comandos no banco de dados',
         icon: 'Database',
         path: '/mestre/sql',
-        roles: [UserRole.OWNER],
+        roles: [UserRole.MASTER],
       },
       // --- SAAS SUITE ---
       {
@@ -46,7 +46,7 @@ export const NAV_MODULES: NavModule[] = [
         description: 'Rastreabilidade e segurança',
         icon: 'ShieldAlert',
         path: '/mestre/audit',
-        roles: [UserRole.OWNER],
+        roles: [UserRole.MASTER],
       },
       {
         id: 'product-analytics',
@@ -54,7 +54,7 @@ export const NAV_MODULES: NavModule[] = [
         description: 'Telemetria de uso e engajamento',
         icon: 'Activity',
         path: '/mestre/analytics',
-        roles: [UserRole.OWNER],
+        roles: [UserRole.MASTER],
       },
       {
         id: 'saas-metrics',
@@ -62,7 +62,7 @@ export const NAV_MODULES: NavModule[] = [
         description: 'Inteligência financeira (MRR, LTV)',
         icon: 'TrendingUp',
         path: '/mestre/metrics',
-        roles: [UserRole.OWNER],
+        roles: [UserRole.MASTER],
       },
       {
         id: 'white-label',
@@ -70,7 +70,7 @@ export const NAV_MODULES: NavModule[] = [
         description: 'Domínios e Branding Personalizado',
         icon: 'Globe',
         path: '/mestre/whitelabel',
-        roles: [UserRole.OWNER],
+        roles: [UserRole.MASTER],
       },
       {
         id: 'gestao-planos',
@@ -78,7 +78,7 @@ export const NAV_MODULES: NavModule[] = [
         description: 'Configuração de planos e preços',
         icon: 'CreditCard',
         path: '/mestre/planos',
-        roles: [UserRole.OWNER],
+        roles: [UserRole.MASTER],
       },
     ],
   },
@@ -86,7 +86,7 @@ export const NAV_MODULES: NavModule[] = [
     id: 'growth',
     label: 'Growth',
     icon: 'Target',
-    roles: [UserRole.OWNER, UserRole.AGENCY],
+    roles: [UserRole.MASTER, UserRole.AGENCY],
     items: [
       {
         id: 'g-hunter',
@@ -94,7 +94,7 @@ export const NAV_MODULES: NavModule[] = [
         description: 'Captação ativa de leads via Google Maps',
         icon: 'Search',
         path: '/growth/hunter',
-        roles: [UserRole.OWNER, UserRole.AGENCY],
+        roles: [UserRole.MASTER, UserRole.AGENCY],
       },
       {
         id: 'cnpj-sniper',
@@ -102,7 +102,7 @@ export const NAV_MODULES: NavModule[] = [
         description: 'Extração industrial de dados da Receita Federal',
         icon: 'FileText',
         path: '/growth/cnpj',
-        roles: [UserRole.OWNER, UserRole.AGENCY],
+        roles: [UserRole.MASTER, UserRole.AGENCY],
       },
       {
         id: 'crm-prospect',
@@ -110,7 +110,7 @@ export const NAV_MODULES: NavModule[] = [
         description: 'CRM Kanban de prospecção estratégica',
         icon: 'Target',
         path: '/growth/crm',
-        roles: [UserRole.OWNER, UserRole.AGENCY],
+        roles: [UserRole.MASTER, UserRole.AGENCY],
       }
     ],
   },
@@ -118,7 +118,7 @@ export const NAV_MODULES: NavModule[] = [
     id: 'agency',
     label: 'Agência',
     icon: 'Building2',
-    roles: [UserRole.OWNER, UserRole.AGENCY],
+    roles: [UserRole.MASTER, UserRole.AGENCY],
     items: [
       {
         id: 'agency-users',
@@ -126,7 +126,7 @@ export const NAV_MODULES: NavModule[] = [
         description: 'Gestão de equipe e permissões',
         icon: 'Users',
         path: '/agency/users',
-        roles: [UserRole.OWNER, UserRole.AGENCY],
+        roles: [UserRole.MASTER, UserRole.AGENCY],
       },
       {
         id: 'agency-whitelabel',
@@ -134,7 +134,7 @@ export const NAV_MODULES: NavModule[] = [
         description: 'Domínio personalizado e branding',
         icon: 'Globe',
         path: '/agency/whitelabel',
-        roles: [UserRole.OWNER, UserRole.AGENCY],
+        roles: [UserRole.MASTER, UserRole.AGENCY],
       },
       {
         id: 'agency-clients',
@@ -142,7 +142,7 @@ export const NAV_MODULES: NavModule[] = [
         description: 'CRM e integração de contas',
         icon: 'Briefcase',
         path: '/agency/clients',
-        roles: [UserRole.OWNER, UserRole.AGENCY],
+        roles: [UserRole.MASTER, UserRole.AGENCY],
       },
       {
         id: 'onboarding-magico',
@@ -150,7 +150,7 @@ export const NAV_MODULES: NavModule[] = [
         description: 'Setup automático de novos clientes',
         icon: 'Zap',
         path: '/agency/onboarding',
-        roles: [UserRole.OWNER, UserRole.AGENCY],
+        roles: [UserRole.MASTER, UserRole.AGENCY],
       },
       {
         id: 'gestao-squads',
@@ -158,7 +158,7 @@ export const NAV_MODULES: NavModule[] = [
         description: 'Distribuição de clientes e tarefas por equipe',
         icon: 'LayoutGrid',
         path: '/agency/squads',
-        roles: [UserRole.OWNER, UserRole.AGENCY],
+        roles: [UserRole.MASTER, UserRole.AGENCY],
       },
       {
         id: 'agency-integrations',
@@ -166,7 +166,7 @@ export const NAV_MODULES: NavModule[] = [
         description: 'Conexão com plataformas (Meta, Google)',
         icon: 'Link',
         path: '/agency/integrations',
-        roles: [UserRole.OWNER, UserRole.AGENCY],
+        roles: [UserRole.MASTER, UserRole.AGENCY],
       },
       {
         id: 'agency-contracts',
@@ -174,7 +174,7 @@ export const NAV_MODULES: NavModule[] = [
         description: 'Gestão de contratos e assinaturas',
         icon: 'FileSignature',
         path: '/agency/contracts',
-        roles: [UserRole.OWNER, UserRole.AGENCY],
+        roles: [UserRole.MASTER, UserRole.AGENCY],
       },
       {
         id: 'agency-finance',
@@ -182,7 +182,7 @@ export const NAV_MODULES: NavModule[] = [
         description: 'Controle de faturamento e dashboards',
         icon: 'CreditCard',
         path: '/agency/finance',
-        roles: [UserRole.OWNER, UserRole.AGENCY],
+        roles: [UserRole.MASTER, UserRole.AGENCY],
       },
       {
         id: 'churn-alert',
@@ -190,7 +190,7 @@ export const NAV_MODULES: NavModule[] = [
         description: 'Alertas preditivos de risco',
         icon: 'Siren',
         path: '/agency/churn-alert',
-        roles: [UserRole.OWNER, UserRole.AGENCY],
+        roles: [UserRole.MASTER, UserRole.AGENCY],
       }
     ],
   },
@@ -198,7 +198,7 @@ export const NAV_MODULES: NavModule[] = [
     id: 'traffic',
     label: 'Tráfego',
     icon: 'Zap',
-    roles: [UserRole.OWNER, UserRole.AGENCY, UserRole.CLIENT],
+    roles: [UserRole.MASTER, UserRole.AGENCY, UserRole.CLIENT],
     items: [
       {
         id: 'funil-analytics',
@@ -206,7 +206,7 @@ export const NAV_MODULES: NavModule[] = [
         description: 'Meta + Google Ads em uma única tela',
         icon: 'BarChart3',
         path: '/traffic/analytics',
-        roles: [UserRole.OWNER, UserRole.AGENCY, UserRole.CLIENT],
+        roles: [UserRole.MASTER, UserRole.AGENCY, UserRole.CLIENT],
       },
       {
         id: 'auditor-campanhas',
@@ -214,7 +214,7 @@ export const NAV_MODULES: NavModule[] = [
         description: 'Verificação automática de pixels e orçamentos',
         icon: 'Activity',
         path: '/traffic/auditor',
-        roles: [UserRole.OWNER, UserRole.AGENCY, UserRole.CLIENT],
+        roles: [UserRole.MASTER, UserRole.AGENCY, UserRole.CLIENT],
       },
       {
         id: 'otimizador-ia',
@@ -222,7 +222,7 @@ export const NAV_MODULES: NavModule[] = [
         description: 'Ações em escala via IA e automação',
         icon: 'Brain',
         path: '/traffic/otimizador',
-        roles: [UserRole.OWNER, UserRole.AGENCY, UserRole.CLIENT],
+        roles: [UserRole.MASTER, UserRole.AGENCY, UserRole.CLIENT],
       }
     ],
   },
@@ -230,7 +230,7 @@ export const NAV_MODULES: NavModule[] = [
     id: 'success',
     label: 'Clientes',
     icon: 'Users',
-    roles: [UserRole.OWNER, UserRole.AGENCY, UserRole.CLIENT],
+    roles: [UserRole.MASTER, UserRole.AGENCY, UserRole.CLIENT],
     items: [
       {
         id: 'portal-cliente',
@@ -238,7 +238,7 @@ export const NAV_MODULES: NavModule[] = [
         description: 'Experiência exclusiva para o cliente final',
         icon: 'Globe',
         path: '/success/portal',
-        roles: [UserRole.OWNER, UserRole.AGENCY, UserRole.CLIENT],
+        roles: [UserRole.MASTER, UserRole.AGENCY, UserRole.CLIENT],
       },
       {
         id: 'aprovacao-criativos',
@@ -246,7 +246,7 @@ export const NAV_MODULES: NavModule[] = [
         description: 'Workflow de aprovação de anúncios',
         icon: 'CheckCircle2',
         path: '/success/aprovacao',
-        roles: [UserRole.OWNER, UserRole.AGENCY, UserRole.CLIENT],
+        roles: [UserRole.MASTER, UserRole.AGENCY, UserRole.CLIENT],
       },
       {
         id: 'health-score',
@@ -254,7 +254,7 @@ export const NAV_MODULES: NavModule[] = [
         description: 'Métrica de satisfação e risco de churn',
         icon: 'HeartPulse',
         path: '/success/health',
-        roles: [UserRole.OWNER, UserRole.AGENCY],
+        roles: [UserRole.MASTER, UserRole.AGENCY],
       }
     ],
   },
@@ -262,7 +262,7 @@ export const NAV_MODULES: NavModule[] = [
     id: 'sistema',
     label: 'Sistema',
     icon: 'Settings',
-    roles: [UserRole.OWNER, UserRole.AGENCY, UserRole.CLIENT],
+    roles: [UserRole.MASTER, UserRole.AGENCY, UserRole.CLIENT],
     items: [
       {
         id: 'meu-perfil',
@@ -270,7 +270,7 @@ export const NAV_MODULES: NavModule[] = [
         description: 'Dados de acesso e segurança',
         icon: 'User',
         path: '/sistema/perfil',
-        roles: [UserRole.OWNER, UserRole.AGENCY, UserRole.CLIENT],
+        roles: [UserRole.MASTER, UserRole.AGENCY, UserRole.CLIENT],
       },
       {
         id: 'conexoes-nuvem',
@@ -278,7 +278,7 @@ export const NAV_MODULES: NavModule[] = [
         description: 'Hub de integrações e webhooks (n8n)',
         icon: 'Share2',
         path: '/sistema/conexoes',
-        roles: [UserRole.OWNER, UserRole.AGENCY],
+        roles: [UserRole.MASTER, UserRole.AGENCY],
       }
     ],
   },

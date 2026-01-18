@@ -17,11 +17,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     const getRoleFromEmail = (email: string | undefined): UserRole => {
         if (!email) return UserRole.CLIENT;
 
-        const ownerEmails = ['cristiano.sbernardes@gmail.com'];
+        const masterEmail = 'cristiano.sbernardes@gmail.com';
         const agencyEmails = ['gestor@uniafy.com'];
 
-        if (ownerEmails.includes(email.toLowerCase())) {
-            return UserRole.OWNER;
+        if (email.toLowerCase() === masterEmail.toLowerCase()) {
+            return UserRole.MASTER;
         }
 
         if (agencyEmails.includes(email.toLowerCase())) {

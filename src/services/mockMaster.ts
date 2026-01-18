@@ -33,12 +33,12 @@ export const MOCK_PLANS: Plan[] = [
     },
     {
         id: 'plan_enterprise',
-        name: 'Enterprise (Master)',
-        price: 0,
+        name: 'Enterprise',
+        price: 0, // Sob Consulta
         period: 'monthly',
         max_users: 9999,
         max_connections: 9999,
-        features: ['God Mode', 'Acesso Irrestrito'],
+        features: ['Infraestrutura Dedicada', 'SLA Garantido', 'Gestor de Conta'],
         is_active: true
     }
 ];

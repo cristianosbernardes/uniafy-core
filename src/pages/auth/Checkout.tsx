@@ -69,13 +69,15 @@ export default function Checkout() {
                 masterService.getGlobalConfig()
             ]);
 
-            setPlans(plansData.map((p: any) => ({
-                id: p.id,
-                name: p.name,
-                price: p.monthly_price_amount || 0,
-                period: 'monthly',
-                features: p.features || []
-            })));
+            setPlans(plansData
+                .filter((p: any) => p.is_visible !== false && p.is_active !== false) // Default true
+                .map((p: any) => ({
+                    id: p.id,
+                    name: p.name,
+                    price: p.monthly_price_amount || 0,
+                    period: 'monthly',
+                    features: p.features || []
+                })));
 
             if (configData?.active_gateway) {
                 setActiveGateway(configData.active_gateway);

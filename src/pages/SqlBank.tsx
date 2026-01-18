@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Database, Play, Trash2, List, Code, AlertTriangle, CheckCircle2, XCircle, Clock, Users, Receipt, Shield, Key, ShieldCheck } from 'lucide-react';
+import { Database, Play, Trash2, List, Code, AlertTriangle, CheckCircle2, XCircle, Clock, Users, Receipt, Shield, Key, ShieldCheck, Zap } from 'lucide-react';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -92,53 +92,64 @@ SELECT 'Permissões corrigidas com sucesso!' as status;`,
         category: 'utility'
     },
     {
-        id: 'setup-vault-v1',
-        title: '[SISTEMA] Setup Cofre de Senhas (Vault)',
+        id: 'setup-vault-v2',
+        title: '[SISTEMA] Setup Cofre de Senhas (Vault V2)',
         query: `-- COFRE DE SENHAS (VAULT)
 -- Tabela para armazenar chaves de API sensíveis (Stripe, Asaas, etc)
 
-CREATE TABLE IF NOT EXISTS vault_secrets (
-    id UUID PRIMARY KEY DEFAULT gen_random_uuid(),
-    provider TEXT NOT NULL, -- 'stripe', 'asaas', 'hotmart', 'openai'
-    key_type TEXT NOT NULL, -- 'secret_key', 'public_key', 'webhook_secret'
-    value TEXT NOT NULL, -- Valor da chave (Idealmente criptografado, MVP plain text)
-    description TEXT,
-    created_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
-    updated_at TIMESTAMP WITH TIME ZONE DEFAULT timezone('utc'::text, now()) NOT NULL,
-    UNIQUE(provider, key_type)
+CREATE TABLE IF NOT EXISTS public.vault_secrets (
+    id uuid default gen_random_uuid() primary key,
+    provider text not null, -- 'asaas', 'stripe', 'kiwify', 'hotmart'
+    key_type text not null, -- 'api_key', 'webhook_secret', etc.
+    value text not null,
+    created_at timestamp with time zone default timezone('utc'::text, now()) not null,
+    updated_at timestamp with time zone default timezone('utc'::text, now()) not null,
+    
+    constraint vault_secrets_provider_key_unique unique (provider, key_type)
 );
 
--- RLS: Apenas MASTER/OWNER pode ver/editar
-ALTER TABLE vault_secrets ENABLE ROW LEVEL SECURITY;
+-- Habilitar RLS
+ALTER TABLE public.vault_secrets ENABLE ROW LEVEL SECURITY;
 
-DROP POLICY IF EXISTS "Master Access Vault" ON vault_secrets;
-CREATE POLICY "Master Access Vault" ON vault_secrets
-    FOR ALL
-    USING (
-        EXISTS (
-            SELECT 1 FROM profiles 
-            WHERE id = auth.uid() 
-            AND (role = 'OWNER' OR role = 'MASTER') -- Ajuste conforme seus roles reais
-        )
-    );
+-- Política de Acesso (Master/Admin)
+-- Permite que usuários autenticados acessem. Em produção, refinar para 'role = master'.
+DROP POLICY IF EXISTS "Enable all access for authenticated users" ON public.vault_secrets;
+CREATE POLICY "Enable all access for authenticated users" 
+ON public.vault_secrets FOR ALL
+TO authenticated
+USING (true)
+WITH CHECK (true);
 
--- Trigger para updated_at
-CREATE OR REPLACE FUNCTION update_updated_at_column()
-RETURNS TRIGGER AS $$
+-- Garantir tabela master_config e coluna active_gateway
+CREATE TABLE IF NOT EXISTS public.master_config (
+    id uuid default gen_random_uuid() primary key,
+    trigger_days_before integer default 3,
+    message_title text default 'Sua assinatura vai vencer',
+    message_body text default 'Regularize para não perder o acesso.',
+    is_active boolean default true,
+    channels jsonb default '{"email": true, "whatsapp": false, "popup": true}'::jsonb,
+    created_at timestamp with time zone default timezone('utc'::text, now()) not null,
+    active_gateway text default 'asaas'
+);
+
+-- Adicionar active_gateway se não existir
+DO $$
 BEGIN
-    NEW.updated_at = now();
-    RETURN NEW;
-END;
-$$ language 'plpgsql';
+    IF NOT EXISTS (SELECT 1 FROM information_schema.columns WHERE table_name = 'master_config' AND column_name = 'active_gateway') THEN
+        ALTER TABLE public.master_config ADD COLUMN active_gateway text DEFAULT 'asaas';
+    END IF;
+END $$;
 
-DROP TRIGGER IF EXISTS update_vault_secrets_modtime ON vault_secrets;
-CREATE TRIGGER update_vault_secrets_modtime
-    BEFORE UPDATE ON vault_secrets
-    FOR EACH ROW
-    EXECUTE PROCEDURE update_updated_at_column();
+-- Habilitar RLS para master_config
+ALTER TABLE public.master_config ENABLE ROW LEVEL SECURITY;
+DROP POLICY IF EXISTS "Public Read Config" ON public.master_config;
+CREATE POLICY "Public Read Config" ON public.master_config FOR SELECT USING (true);
 
-SELECT 'Cofre criado com sucesso! Tabela: vault_secrets' as status;`,
-        icon: <Shield className="w-4 h-4 text-purple-500" />,
+DROP POLICY IF EXISTS "Master Update Config" ON public.master_config;
+CREATE POLICY "Master Update Config" ON public.master_config FOR UPDATE USING (true) WITH CHECK (true);
+
+SELECT 'Cofre (Vault) e Configurações atualizados com sucesso!' as status;`,
+        icon: <ShieldCheck className="w-4 h-4 text-purple-500" />,
         category: 'setup'
     },
     /*{
@@ -392,15 +403,28 @@ INSERT INTO plans (
     ),
     (
         'plan_enterprise',
-        'Enterprise (Master)',
-        'Plano Super-Admin para controle total',
+        'Enterprise',
+        'Soluções customizadas (Sob Consulta)',
         'enterprise_monthly',
         'enterprise_yearly',
         0.00,
         0.00,
-        '["God Mode", "Acesso Irrestrito", "Gestão Global"]'::jsonb,
+        '["Infraestrutura Dedicada", "SLA Garantido", "Gestor de Conta"]'::jsonb,
         9999,
         9999,
+        true
+    ),
+    (
+        'plan_master',
+        'Master System',
+        'Acesso administrativo total',
+        'master_monthly',
+        'master_yearly',
+        0.00,
+        0.00,
+        '["God Mode"]'::jsonb,
+        99999,
+        99999,
         true
     );
 
@@ -781,6 +805,56 @@ $$;
 
 SELECT 'Configuração de Reports e Dashboards concluída com sucesso!' as status;`,
         icon: <Users className="w-4 h-4 text-cyan-500" />,
+        category: 'setup'
+    },
+    {
+        id: 'fix-plans-names-v1',
+        title: '[MIGRAÇÃO] Corrigir Nomes Planos (Master/Enterprise)',
+        query: `-- Fix Plans Names: Separate Master from Enterprise
+        
+-- 1. Create a specific Master Plan (Hidden/System)
+INSERT INTO public.plans (
+    id, name, description, 
+    monthly_price_id, yearly_price_id, 
+    monthly_price_amount, yearly_price_amount, 
+    features, max_users, max_connections, is_active
+) VALUES (
+    'plan_master',
+    'Master System',
+    'Acesso administrativo total',
+    'master_monthly',
+    'master_yearly',
+    0.00,
+    0.00,
+    '["God Mode"]'::jsonb,
+    99999,
+    99999,
+    true
+) ON CONFLICT (id) DO NOTHING;
+
+-- 2. Update Enterprise Plan to be Commercial (Remove Master reference)
+UPDATE public.plans 
+SET 
+    name = 'Enterprise', 
+    description = 'Soluções customizadas (Sob Consulta)'
+WHERE id = 'plan_enterprise';
+
+SELECT 'Planos corrigidos: Master separado do Enterprise!' as status;`,
+        icon: <Zap className="w-4 h-4 text-yellow-500" />,
+        category: 'setup'
+    },
+    {
+        id: 'migration-add-is-visible',
+        title: '[MIGRAÇÃO] Adicionar Coluna Visibilidade',
+        query: `-- Add is_visible column to plans table
+ALTER TABLE public.plans 
+ADD COLUMN IF NOT EXISTS is_visible BOOLEAN DEFAULT true;
+
+-- Update existing plans to be visible by default
+UPDATE public.plans SET is_visible = true WHERE is_visible IS NULL;
+
+SELECT 'Coluna is_visible adicionada com sucesso!' as status;`,
+        icon: <Zap className="w-4 h-4 text-orange-500" />,
         category: 'setup'
     }
 ];

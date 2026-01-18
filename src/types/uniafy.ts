@@ -1,7 +1,7 @@
 // Uniafy v5.9.6 Type Definitions
 
 export enum UserRole {
-  OWNER = 'OWNER',
+  MASTER = 'MASTER',
   AGENCY = 'AGENCY',
   CLIENT = 'CLIENT'
 }
@@ -87,6 +87,7 @@ export interface Plan {
   max_users: number;
   max_connections: number;
   is_active: boolean;
+  is_visible?: boolean;
 }
 
 export interface AgencySubscription {

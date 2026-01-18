@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { masterService } from '@/services/masterService';
 import { useAuth } from '@/contexts/AuthContext';
-import { Check, Shield, Zap, Users, Globe, Database, Star, Loader2, AlertTriangle } from 'lucide-react';
+import { Check, Shield, Zap, Users, Globe, Database, Star, Loader2, AlertTriangle, Eye } from 'lucide-react';
 import { Plan } from '@/types/uniafy';
 import { UpdatePlanDialog } from './UpdatePlanDialog';
 import { toast } from 'sonner';
@@ -117,7 +117,7 @@ export default function PlanManager() {
                     if (plan.id === 'plan_enterprise' && !isSuperAdmin) return null;
 
                     return (
-                        <div key={plan.id} className={`glass-card p-6 flex flex-col relative group overflow-hidden ${plan.id === 'plan_enterprise' ? 'border-red-500/30 bg-red-950/10' : ''}`}>
+                        <div key={plan.id} className="glass-card bg-white/[0.03] border-white/10 rounded-xl p-6 flex flex-col relative group overflow-hidden hover:bg-white/5 hover:border-white/20 transition-all duration-300 cursor-pointer">
 
                             {/* Plan Icon / Header */}
                             <div className="flex justify-between items-start mb-6 z-10 relative">
@@ -128,6 +128,11 @@ export default function PlanManager() {
                                     <Badge className="bg-green-500/10 text-green-500 border-green-500/20">Ativo</Badge>
                                 ) : (
                                     <Badge variant="destructive">Inativo</Badge>
+                                )}
+                                {plan.is_visible === false && (
+                                    <Badge variant="secondary" className="ml-2 bg-zinc-800 text-zinc-400 border-zinc-700">
+                                        <Eye className="w-3 h-3 mr-1" /> Oculto
+                                    </Badge>
                                 )}
                             </div>
 

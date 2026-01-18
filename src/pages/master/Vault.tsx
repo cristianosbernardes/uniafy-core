@@ -1,20 +1,74 @@
 import { useState, useEffect } from 'react';
-import { PageHeader } from '@/components/ui/PageHeader';
-import { Card, CardContent, CardHeader, CardTitle, CardDescription } from '@/components/ui/card';
+import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Label } from '@/components/ui/label';
 import { toast } from 'sonner';
-import { Lock, Eye, EyeOff, Save, Key, AlertTriangle, ShieldCheck, CreditCard, Flame, Link } from 'lucide-react';
+import { Eye, EyeOff, Save, Key, AlertTriangle, ShieldCheck, CreditCard, Flame, ChevronDown, CheckCircle2, Link } from 'lucide-react';
 import { masterService } from '@/services/masterService';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group";
 import { Badge } from '@/components/ui/badge';
+import { Switch } from "@/components/ui/switch";
+import { motion, AnimatePresence } from "framer-motion";
+import { cn } from "@/lib/utils";
+
+// --- TYPES ---
+interface GatewayConfig {
+    id: 'asaas' | 'stripe' | 'kiwify' | 'hotmart';
+    name: string;
+    description: string;
+    icon: any;
+    color: string;
+    gradient: string;
+    secureColor: string;
+}
+
+// --- GATEWAY DEFINITIONS ---
+const GATEWAYS: GatewayConfig[] = [
+    {
+        id: 'asaas',
+        name: 'Asaas',
+        description: 'Processador brasileiro para PIX e Boletos',
+        icon: ShieldCheck,
+        color: 'text-blue-500',
+        gradient: 'from-blue-500/20 to-blue-600/5',
+        secureColor: 'bg-blue-500'
+    },
+    {
+        id: 'stripe',
+        name: 'Stripe',
+        description: 'Líder global em pagamentos por cartão',
+        icon: CreditCard,
+        color: 'text-purple-500',
+        gradient: 'from-purple-500/20 to-purple-600/5',
+        secureColor: 'bg-purple-500'
+    },
+    {
+        id: 'kiwify',
+        name: 'Kiwify',
+        description: 'Plataforma para infoprodutos e cursos',
+        icon: Key,
+        color: 'text-green-500',
+        gradient: 'from-green-500/20 to-green-600/5',
+        secureColor: 'bg-green-500'
+    },
+    {
+        id: 'hotmart',
+        name: 'Hotmart',
+        description: 'Maior plataforma de afiliados da AL',
+        icon: Flame,
+        color: 'text-orange-500',
+        gradient: 'from-orange-500/20 to-orange-600/5',
+        secureColor: 'bg-orange-500'
+    }
+];
 
 export default function Vault() {
     const [loading, setLoading] = useState(true);
     const [activeGateway, setActiveGateway] = useState<string>('asaas');
     const [configId, setConfigId] = useState<string | null>(null);
+
+    // Expansion State (Accordion)
+    const [expandedIds, setExpandedIds] = useState<string[]>([]);
 
     // Form States
     const [asaasKey, setAsaasKey] = useState('');
@@ -38,6 +92,12 @@ export default function Vault() {
         setShowKeys(prev => ({ ...prev, [key]: !prev[key] }));
     };
 
+    const toggleExpanded = (id: string) => {
+        setExpandedIds(prev =>
+            prev.includes(id) ? prev.filter(p => p !== id) : [...prev, id]
+        );
+    };
+
     useEffect(() => {
         loadData();
     }, []);
@@ -53,6 +113,10 @@ export default function Vault() {
             if (config) {
                 setConfigId(config.id);
                 setActiveGateway(config.active_gateway || 'asaas');
+                // Auto expand active gateway initially
+                if (config.active_gateway) {
+                    setExpandedIds([config.active_gateway]);
+                }
             }
 
             // Populate Fields
@@ -125,215 +189,333 @@ export default function Vault() {
         }
     };
 
-    return (
-        <div className="space-y-8 animate-in fade-in duration-500">
-            <PageHeader
-                title="COFRE"
-                titleAccent="MULTI-GATEWAY"
-                subtitle="Gerencie chaves e defina o processador ativo de pagamentos"
-                action={
-                    <Button
-                        onClick={handleSave}
-                        disabled={loading}
-                        className="bg-red-600 hover:bg-red-700 text-white font-bold uppercase tracking-wide shadow-lg shadow-red-900/20"
-                    >
-                        {loading ? 'Salvando...' : (
-                            <>
-                                <Save className="w-4 h-4 mr-2" />
-                                Salvar Tudo
-                            </>
-                        )}
-                    </Button>
-                }
-            />
+    // Helper check if configured
+    const isConfigured = (id: string) => {
+        if (id === 'asaas') return !!asaasKey;
+        if (id === 'stripe') return !!stripeKey;
+        if (id === 'kiwify') return !!kiwifyToken;
+        if (id === 'hotmart') return !!hotmartClientId;
+        return false;
+    };
 
-            {/* Active Gateway Selector */}
-            <Card className="bg-[#111] border-white/10 overflow-hidden">
-                <CardHeader className="border-b border-white/5 pb-4 bg-white/[0.02]">
-                    <div className="flex items-center gap-3">
-                        <div className="p-2 rounded bg-emerald-500/20 text-emerald-400">
-                            <Link className="w-5 h-5" />
+    return (
+        <div className="space-y-8 animate-in fade-in duration-500 pb-20">
+            {/* HER0 - Fixed Context Header */}
+            <div className="relative overflow-hidden rounded-2xl bg-[#0A0A0A] border border-white/5 p-8">
+                {/* Subtle Gradient Background */}
+                <div className="absolute inset-0 bg-gradient-to-r from-orange-500/10 to-transparent pointer-events-none" />
+                <div className="absolute -right-20 -top-20 h-64 w-64 rounded-full bg-orange-500/5 blur-3xl pointer-events-none"></div>
+
+                <div className="relative z-10 flex flex-col md:flex-row items-center justify-between gap-6">
+                    <div className="flex items-center gap-4">
+                        <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-orange-500/10 text-orange-500 ring-1 ring-orange-500/20">
+                            <ShieldCheck className="h-6 w-6" />
                         </div>
                         <div>
-                            <CardTitle className="text-base font-bold text-white uppercase tracking-wide">Gateway Principal (Ativo)</CardTitle>
-                            <CardDescription className="text-zinc-400 text-xs">Escolha qual provedor processará os novos pagamentos.</CardDescription>
+                            <h1 className="text-2xl font-bold tracking-tight text-white uppercase">
+                                Cofre <span className="text-orange-500">Master</span>
+                            </h1>
+                            <p className="text-zinc-400 text-sm font-medium">
+                                Central de Segurança e Pagamentos
+                            </p>
                         </div>
                     </div>
-                </CardHeader>
-                <CardContent className="p-6">
-                    <RadioGroup
-                        value={activeGateway}
-                        onValueChange={setActiveGateway}
-                        className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4"
-                    >
-                        {[
-                            { id: 'asaas', name: 'Asaas', icon: ShieldCheck, color: 'text-blue-500', bg: 'bg-blue-500/10 border-blue-500/50' },
-                            { id: 'stripe', name: 'Stripe', icon: CreditCard, color: 'text-purple-500', bg: 'bg-purple-500/10 border-purple-500/50' },
-                            { id: 'kiwify', name: 'Kiwify', icon: Key, color: 'text-green-500', bg: 'bg-green-500/10 border-green-500/50' },
-                            { id: 'hotmart', name: 'Hotmart', icon: Flame, color: 'text-orange-500', bg: 'bg-orange-500/10 border-orange-500/50' }
-                        ].map((gw) => (
-                            <div key={gw.id}>
-                                <RadioGroupItem value={gw.id} id={gw.id} className="peer sr-only" />
-                                <Label
-                                    htmlFor={gw.id}
-                                    className={`flex flex-col items-center justify-between rounded-md border-2 border-white/5 bg-black/40 p-4 hover:bg-white/5 hover:text-white peer-data-[state=checked]:${gw.bg} [&:has([data-state=checked])]:${gw.bg} cursor-pointer transition-all h-24`}
-                                >
-                                    <gw.icon className={`mb-2 h-6 w-6 ${gw.color}`} />
-                                    <span className="text-sm font-bold uppercase tracking-wider">{gw.name}</span>
-                                </Label>
-                            </div>
-                        ))}
-                    </RadioGroup>
-                </CardContent>
-            </Card>
 
-            <Tabs defaultValue="asaas" className="w-full">
-                <TabsList className="w-full justify-start bg-black/40 border border-white/10 p-1 h-auto mb-6 overflow-x-auto">
-                    <TabsTrigger value="asaas" className="uppercase text-xs font-bold px-6 py-2 data-[state=active]:bg-blue-600/20 data-[state=active]:text-blue-400">Asaas</TabsTrigger>
-                    <TabsTrigger value="stripe" className="uppercase text-xs font-bold px-6 py-2 data-[state=active]:bg-purple-600/20 data-[state=active]:text-purple-400">Stripe</TabsTrigger>
-                    <TabsTrigger value="kiwify" className="uppercase text-xs font-bold px-6 py-2 data-[state=active]:bg-green-600/20 data-[state=active]:text-green-400">Kiwify</TabsTrigger>
-                    <TabsTrigger value="hotmart" className="uppercase text-xs font-bold px-6 py-2 data-[state=active]:bg-orange-600/20 data-[state=active]:text-orange-400">Hotmart</TabsTrigger>
-                </TabsList>
+                    <div className="flex items-center gap-3">
 
-                {/* ASAAS CONTENT */}
-                <TabsContent value="asaas">
-                    <Card className="bg-black/40 border-white/10">
-                        <CardHeader>
-                            <CardTitle className="text-blue-500 flex items-center gap-2"><ShieldCheck className="w-5 h-5" /> Configuração Asaas</CardTitle>
-                        </CardHeader>
-                        <CardContent className="space-y-4">
-                            <div className="space-y-2">
-                                <Label>API Key (Produção)</Label>
-                                <div className="relative">
-                                    <Input
-                                        type={showKeys['asaas_key'] ? "text" : "password"}
-                                        value={asaasKey}
-                                        onChange={e => setAsaasKey(e.target.value)}
-                                        className="bg-black/50 border-white/10 pr-10"
-                                    />
-                                    <button onClick={() => toggleShow('asaas_key')} className="absolute right-3 top-2.5 text-zinc-500">
-                                        {showKeys['asaas_key'] ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                                    </button>
-                                </div>
-                            </div>
-                            <div className="space-y-2">
-                                <Label>Webhook Token</Label>
-                                <Input value={asaasWebhook} onChange={e => setAsaasWebhook(e.target.value)} className="bg-black/50 border-white/10" />
-                            </div>
-                        </CardContent>
-                    </Card>
-                </TabsContent>
+                        <Button
+                            onClick={handleSave}
+                            disabled={loading}
+                            className="bg-orange-600 hover:bg-orange-700 text-white border border-white/10 shadow-lg shadow-orange-900/20 transition-all font-bold uppercase tracking-wide h-10 px-6 rounded-lg"
+                        >
+                            {loading ? (
+                                <span className="flex items-center gap-2">
+                                    <div className="h-4 w-4 animate-spin rounded-full border-2 border-white border-t-transparent" />
+                                    Processando...
+                                </span>
+                            ) : (
+                                <span className="flex items-center gap-2">
+                                    <Save className="w-4 h-4" />
+                                    Salvar Alterações
+                                </span>
+                            )}
+                        </Button>
+                    </div>
+                </div>
+            </div>
 
-                {/* STRIPE CONTENT */}
-                <TabsContent value="stripe">
-                    <Card className="bg-black/40 border-white/10">
-                        <CardHeader>
-                            <CardTitle className="text-purple-500 flex items-center gap-2"><CreditCard className="w-5 h-5" /> Configuração Stripe</CardTitle>
-                        </CardHeader>
-                        <CardContent className="space-y-4">
-                            <div className="space-y-2">
-                                <Label>Secret Key (sk_live)</Label>
-                                <div className="relative">
-                                    <Input
-                                        type={showKeys['stripe_key'] ? "text" : "password"}
-                                        value={stripeKey}
-                                        onChange={e => setStripeKey(e.target.value)}
-                                        className="bg-black/50 border-white/10 pr-10"
-                                    />
-                                    <button onClick={() => toggleShow('stripe_key')} className="absolute right-3 top-2.5 text-zinc-500">
-                                        {showKeys['stripe_key'] ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                                    </button>
-                                </div>
-                            </div>
-                            <div className="space-y-2">
-                                <Label>Webhook Signing Secret (whsec)</Label>
-                                <Input value={stripeWebhook} onChange={e => setStripeWebhook(e.target.value)} className="bg-black/50 border-white/10" />
-                            </div>
-                        </CardContent>
-                    </Card>
-                </TabsContent>
+            {/* GATEWAY LIST */}
+            <div className="grid gap-4">
+                {GATEWAYS.map((gw) => {
+                    const isOpen = expandedIds.includes(gw.id);
+                    const isActive = activeGateway === gw.id;
+                    const configured = isConfigured(gw.id);
 
-                {/* KIWIFY CONTENT */}
-                <TabsContent value="kiwify">
-                    <Card className="bg-black/40 border-white/10">
-                        <CardHeader>
-                            <CardTitle className="text-green-500 flex items-center gap-2"><Key className="w-5 h-5" /> Configuração Kiwify</CardTitle>
-                        </CardHeader>
-                        <CardContent className="space-y-4">
-                            <div className="space-y-2">
-                                <Label>Access Token</Label>
-                                <div className="relative">
-                                    <Input
-                                        type={showKeys['kiwify_key'] ? "text" : "password"}
-                                        value={kiwifyToken}
-                                        onChange={e => setKiwifyToken(e.target.value)}
-                                        className="bg-black/50 border-white/10 pr-10"
-                                        placeholder="Bearer Token..."
-                                    />
-                                    <button onClick={() => toggleShow('kiwify_key')} className="absolute right-3 top-2.5 text-zinc-500">
-                                        {showKeys['kiwify_key'] ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                                    </button>
-                                </div>
-                            </div>
-                            <div className="space-y-2">
-                                <Label>Account ID (Opcional)</Label>
-                                <Input value={kiwifyAccountId} onChange={e => setKiwifyAccountId(e.target.value)} className="bg-black/50 border-white/10" />
-                            </div>
-                            <div className="space-y-2">
-                                <Label>Webhook App Token</Label>
-                                <Input value={kiwifyWebhook} onChange={e => setKiwifyWebhook(e.target.value)} className="bg-black/50 border-white/10" />
-                            </div>
-                        </CardContent>
-                    </Card>
-                </TabsContent>
+                    return (
+                        <motion.div
+                            key={gw.id}
+                            initial={false}
+                            animate={{
+                                backgroundColor: isOpen ? 'rgba(255,255,255,0.02)' : 'rgba(0,0,0,0.4)',
+                                borderColor: isActive ? 'rgba(249, 115, 22, 0.3)' : 'rgba(255,255,255,0.05)'
+                            }}
+                            className={cn(
+                                "group relative rounded-xl border overflow-hidden transition-all duration-300",
+                                isActive && "ring-1 ring-orange-500/20 shadow-[0_0_30px_-10px_rgba(249,115,22,0.15)]"
+                            )}
+                        >
+                            {/* Active Indicator Line */}
+                            {isActive && (
+                                <div className="absolute left-0 top-0 bottom-0 w-1 bg-orange-500 z-20" />
+                            )}
 
-                {/* HOTMART CONTENT */}
-                <TabsContent value="hotmart">
-                    <Card className="bg-black/40 border-white/10">
-                        <CardHeader>
-                            <CardTitle className="text-orange-500 flex items-center gap-2"><Flame className="w-5 h-5" /> Configuração Hotmart</CardTitle>
-                        </CardHeader>
-                        <CardContent className="space-y-4">
-                            <div className="grid grid-cols-2 gap-4">
-                                <div className="space-y-2">
-                                    <Label>Client ID</Label>
-                                    <Input value={hotmartClientId} onChange={e => setHotmartClientId(e.target.value)} className="bg-black/50 border-white/10" />
-                                </div>
-                                <div className="space-y-2">
-                                    <Label>Client Secret</Label>
-                                    <div className="relative">
-                                        <Input
-                                            type={showKeys['hotmart_secret'] ? "text" : "password"}
-                                            value={hotmartClientSecret}
-                                            onChange={e => setHotmartClientSecret(e.target.value)}
-                                            className="bg-black/50 border-white/10 pr-10"
-                                        />
-                                        <button onClick={() => toggleShow('hotmart_secret')} className="absolute right-3 top-2.5 text-zinc-500">
-                                            {showKeys['hotmart_secret'] ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                                        </button>
+                            {/* HEADER - Always Visible */}
+                            <div
+                                className="relative flex items-center justify-between p-6 cursor-pointer hover:bg-white/[0.01]"
+                                onClick={() => toggleExpanded(gw.id)}
+                            >
+                                <div className="flex items-center gap-5">
+                                    <div className={cn(
+                                        "h-12 w-12 rounded-lg flex items-center justify-center border shadow-inner transition-colors",
+                                        isActive ? `bg-white/5 border-white/10 ${gw.color}` : "bg-black/40 border-white/5 text-zinc-600"
+                                    )}>
+                                        <gw.icon className="w-6 h-6" />
+                                    </div>
+
+                                    <div className="space-y-1">
+                                        <div className="flex items-center gap-3">
+                                            <h3 className={cn("text-lg font-bold uppercase tracking-wide", isActive ? "text-white" : "text-zinc-400")}>
+                                                {gw.name}
+                                            </h3>
+                                            {configured && (
+                                                <Badge variant="outline" className="bg-emerald-500/10 text-emerald-500 border-emerald-500/20 text-[10px] px-2 h-5">
+                                                    Configurado
+                                                </Badge>
+                                            )}
+                                            {isActive && (
+                                                <Badge variant="outline" className="bg-orange-500/10 text-orange-500 border-orange-500/20 text-[10px] px-2 h-5">
+                                                    Ativo
+                                                </Badge>
+                                            )}
+                                        </div>
+                                        <p className="text-zinc-500 text-sm font-medium">
+                                            {gw.description}
+                                        </p>
                                     </div>
                                 </div>
-                            </div>
-                            <div className="space-y-2">
-                                <Label>Webhook Token (Hottok)</Label>
-                                <Input value={hotmartToken} onChange={e => setHotmartToken(e.target.value)} className="bg-black/50 border-white/10" />
-                            </div>
-                        </CardContent>
-                    </Card>
-                </TabsContent>
-            </Tabs>
 
-            {/* Security Notice */}
-            <div className="bg-yellow-500/5 border border-yellow-500/10 rounded-lg p-4 flex items-start gap-4">
-                <div className="p-2 bg-yellow-500/10 rounded-full">
-                    <AlertTriangle className="w-4 h-4 text-yellow-500" />
-                </div>
-                <div>
-                    <h4 className="text-yellow-500 font-bold text-xs uppercase tracking-wider mb-1">Área de Altíssima Segurança</h4>
-                    <p className="text-yellow-500/60 text-xs text-balance">
-                        As chaves abaixo concedem acesso financeiro total à sua operação.
-                        Certifique-se de que apenas o MESTRE tem acesso a esta página.
-                        A troca de <strong>Gateway Principal</strong> afeta imediatamente o checkout de novos clientes.
+                                <div className="flex items-center gap-6" onClick={(e) => e.stopPropagation()}>
+                                    <div className="flex flex-col items-end gap-1">
+                                        <Label htmlFor={`switch-${gw.id}`} className="text-[10px] uppercase font-bold text-zinc-500 cursor-pointer">
+                                            {isActive ? 'Ativado' : 'Desativado'}
+                                        </Label>
+                                        <Switch
+                                            id={`switch-${gw.id}`}
+                                            checked={isActive}
+                                            onCheckedChange={(checked) => {
+                                                if (checked) setActiveGateway(gw.id);
+                                            }}
+                                            className={cn(
+                                                "data-[state=checked]:bg-orange-600",
+                                                !isActive && "data-[state=unchecked]:bg-zinc-800"
+                                            )}
+                                        />
+                                    </div>
+
+                                    <div className="h-8 w-[1px] bg-white/5 mx-2" />
+
+                                    <Button
+                                        variant="ghost"
+                                        size="icon"
+                                        onClick={() => toggleExpanded(gw.id)}
+                                        className="h-8 w-8 rounded-full bg-white/5 hover:bg-white/10 text-zinc-400"
+                                    >
+                                        <ChevronDown className={cn("w-4 h-4 transition-transform duration-300", isOpen && "rotate-180")} />
+                                    </Button>
+                                </div>
+                            </div>
+
+                            {/* BODY - Accordion Content */}
+                            <AnimatePresence>
+                                {isOpen && (
+                                    <motion.div
+                                        initial={{ height: 0, opacity: 0 }}
+                                        animate={{ height: "auto", opacity: 1 }}
+                                        exit={{ height: 0, opacity: 0 }}
+                                        transition={{ duration: 0.3, ease: "easeInOut" }}
+                                        className="overflow-hidden"
+                                    >
+                                        <div className="p-6 pt-0 border-t border-white/5 bg-black/20">
+                                            <div className="grid gap-6 pt-6">
+                                                {/* DYNAMIC FIELDS BASED ON ID */}
+
+                                                {/* ASAAS */}
+                                                {gw.id === 'asaas' && (
+                                                    <>
+                                                        <div className="space-y-2">
+                                                            <Label className="text-xs text-zinc-400 uppercase tracking-wider">API Key (Produção)</Label>
+                                                            <div className="relative group">
+                                                                <Input
+                                                                    type={showKeys['asaas_key'] ? "text" : "password"}
+                                                                    value={asaasKey}
+                                                                    onChange={e => setAsaasKey(e.target.value)}
+                                                                    className="bg-[#050505] border-white/10 focus:border-blue-500/50 transition-colors pl-10 h-10 font-mono text-sm"
+                                                                    placeholder="Ex: $aact_..."
+                                                                />
+                                                                <Key className="absolute left-3 top-2.5 w-4 h-4 text-zinc-600 group-focus-within:text-blue-500 transition-colors" />
+                                                                <button onClick={() => toggleShow('asaas_key')} className="absolute right-3 top-2.5 text-zinc-600 hover:text-zinc-400">
+                                                                    {showKeys['asaas_key'] ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                        <div className="space-y-2">
+                                                            <Label className="text-xs text-zinc-400 uppercase tracking-wider">Webhook Token</Label>
+                                                            <div className="relative group">
+                                                                <Input
+                                                                    value={asaasWebhook}
+                                                                    onChange={e => setAsaasWebhook(e.target.value)}
+                                                                    className="bg-[#050505] border-white/10 focus:border-blue-500/50 transition-colors pl-10 h-10 font-mono text-sm"
+                                                                />
+                                                                <Link className="absolute left-3 top-2.5 w-4 h-4 text-zinc-600 group-focus-within:text-blue-500 transition-colors" />
+                                                            </div>
+                                                        </div>
+                                                    </>
+                                                )}
+
+                                                {/* STRIPE */}
+                                                {gw.id === 'stripe' && (
+                                                    <>
+                                                        <div className="space-y-2">
+                                                            <Label className="text-xs text-zinc-400 uppercase tracking-wider">Secret Key (Live)</Label>
+                                                            <div className="relative group">
+                                                                <Input
+                                                                    type={showKeys['stripe_key'] ? "text" : "password"}
+                                                                    value={stripeKey}
+                                                                    onChange={e => setStripeKey(e.target.value)}
+                                                                    className="bg-[#050505] border-white/10 focus:border-purple-500/50 transition-colors pl-10 h-10 font-mono text-sm"
+                                                                    placeholder="Ex: sk_live_..."
+                                                                />
+                                                                <Key className="absolute left-3 top-2.5 w-4 h-4 text-zinc-600 group-focus-within:text-purple-500 transition-colors" />
+                                                                <button onClick={() => toggleShow('stripe_key')} className="absolute right-3 top-2.5 text-zinc-600 hover:text-zinc-400">
+                                                                    {showKeys['stripe_key'] ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                        <div className="space-y-2">
+                                                            <Label className="text-xs text-zinc-400 uppercase tracking-wider">Webhook Signing Secret</Label>
+                                                            <div className="relative group">
+                                                                <Input
+                                                                    value={stripeWebhook}
+                                                                    onChange={e => setStripeWebhook(e.target.value)}
+                                                                    className="bg-[#050505] border-white/10 focus:border-purple-500/50 transition-colors pl-10 h-10 font-mono text-sm"
+                                                                    placeholder="Ex: whsec_..."
+                                                                />
+                                                                <Link className="absolute left-3 top-2.5 w-4 h-4 text-zinc-600 group-focus-within:text-purple-500 transition-colors" />
+                                                            </div>
+                                                        </div>
+                                                    </>
+                                                )}
+
+                                                {/* KIWIFY */}
+                                                {gw.id === 'kiwify' && (
+                                                    <>
+                                                        <div className="space-y-2">
+                                                            <Label className="text-xs text-zinc-400 uppercase tracking-wider">Access Token</Label>
+                                                            <div className="relative group">
+                                                                <Input
+                                                                    type={showKeys['kiwify_key'] ? "text" : "password"}
+                                                                    value={kiwifyToken}
+                                                                    onChange={e => setKiwifyToken(e.target.value)}
+                                                                    className="bg-[#050505] border-white/10 focus:border-green-500/50 transition-colors pl-10 h-10 font-mono text-sm"
+                                                                />
+                                                                <Key className="absolute left-3 top-2.5 w-4 h-4 text-zinc-600 group-focus-within:text-green-500 transition-colors" />
+                                                                <button onClick={() => toggleShow('kiwify_key')} className="absolute right-3 top-2.5 text-zinc-600 hover:text-zinc-400">
+                                                                    {showKeys['kiwify_key'] ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                                                                </button>
+                                                            </div>
+                                                        </div>
+                                                        <div className="grid grid-cols-2 gap-4">
+                                                            <div className="space-y-2">
+                                                                <Label className="text-xs text-zinc-400 uppercase tracking-wider">Account ID</Label>
+                                                                <Input
+                                                                    value={kiwifyAccountId}
+                                                                    onChange={e => setKiwifyAccountId(e.target.value)}
+                                                                    className="bg-[#050505] border-white/10 focus:border-green-500/50 transition-colors pl-3 h-10 font-mono text-sm"
+                                                                />
+                                                            </div>
+                                                            <div className="space-y-2">
+                                                                <Label className="text-xs text-zinc-400 uppercase tracking-wider">Webhook Secret</Label>
+                                                                <Input
+                                                                    value={kiwifyWebhook}
+                                                                    onChange={e => setKiwifyWebhook(e.target.value)}
+                                                                    className="bg-[#050505] border-white/10 focus:border-green-500/50 transition-colors pl-3 h-10 font-mono text-sm"
+                                                                />
+                                                            </div>
+                                                        </div>
+                                                    </>
+                                                )}
+
+                                                {/* HOTMART */}
+                                                {gw.id === 'hotmart' && (
+                                                    <>
+                                                        <div className="grid grid-cols-2 gap-4">
+                                                            <div className="space-y-2">
+                                                                <Label className="text-xs text-zinc-400 uppercase tracking-wider">Client ID</Label>
+                                                                <Input
+                                                                    value={hotmartClientId}
+                                                                    onChange={e => setHotmartClientId(e.target.value)}
+                                                                    className="bg-[#050505] border-white/10 focus:border-orange-500/50 transition-colors pl-3 h-10 font-mono text-sm"
+                                                                />
+                                                            </div>
+                                                            <div className="space-y-2">
+                                                                <Label className="text-xs text-zinc-400 uppercase tracking-wider">Client Secret</Label>
+                                                                <div className="relative group">
+                                                                    <Input
+                                                                        type={showKeys['hotmart_secret'] ? "text" : "password"}
+                                                                        value={hotmartClientSecret}
+                                                                        onChange={e => setHotmartClientSecret(e.target.value)}
+                                                                        className="bg-[#050505] border-white/10 focus:border-orange-500/50 transition-colors pl-10 h-10 font-mono text-sm"
+                                                                    />
+                                                                    <Key className="absolute left-3 top-2.5 w-4 h-4 text-zinc-600 group-focus-within:text-orange-500 transition-colors" />
+                                                                    <button onClick={() => toggleShow('hotmart_secret')} className="absolute right-3 top-2.5 text-zinc-600 hover:text-zinc-400">
+                                                                        {showKeys['hotmart_secret'] ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                                                                    </button>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                        <div className="space-y-2">
+                                                            <Label className="text-xs text-zinc-400 uppercase tracking-wider">Webhook Token (Hottok)</Label>
+                                                            <div className="relative group">
+                                                                <Input
+                                                                    value={hotmartToken}
+                                                                    onChange={e => setHotmartToken(e.target.value)}
+                                                                    className="bg-[#050505] border-white/10 focus:border-orange-500/50 transition-colors pl-10 h-10 font-mono text-sm"
+                                                                />
+                                                                <Link className="absolute left-3 top-2.5 w-4 h-4 text-zinc-600 group-focus-within:text-orange-500 transition-colors" />
+                                                            </div>
+                                                        </div>
+                                                    </>
+                                                )}
+
+                                            </div>
+                                        </div>
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+                        </motion.div>
+                    );
+                })}
+            </div>
+
+
+            {/* Security Footer */}
+            <div className="flex items-start gap-4 p-4 rounded-lg bg-yellow-500/5 border border-yellow-500/10">
+                <AlertTriangle className="w-5 h-5 text-yellow-600/50 mt-0.5" />
+                <div className="space-y-1">
+                    <h4 className="text-xs font-bold text-yellow-600 uppercase tracking-wider">Área de Segurança Máxima</h4>
+                    <p className="text-xs text-zinc-500 max-w-3xl">
+                        Estas credenciais dão acesso direto a transações financeiras. Nunca compartilhe sua tela com este módulo aberto se houver pessoas não autorizadas por perto.
+                        A mudança de Gateway Principal interrompe imediatamente o processamento no provedor anterior para novas vendas.
                     </p>
                 </div>
             </div>
