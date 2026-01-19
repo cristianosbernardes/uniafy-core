@@ -80,6 +80,14 @@ export const NAV_MODULES: NavModule[] = [
         path: '/mestre/planos',
         roles: [UserRole.MASTER],
       },
+      {
+        id: 'branding',
+        title: 'Identidade Visual',
+        description: 'Personalização global de cores e logo',
+        icon: 'Palette',
+        path: '/mestre/branding',
+        roles: [UserRole.MASTER],
+      },
     ],
   },
   {

@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { Database, Play, Trash2, List, Code, AlertTriangle, CheckCircle2, XCircle, Clock, Users, Receipt, Shield, Key, ShieldCheck, Zap } from 'lucide-react';
+import { Database, Play, Trash2, List, Code, AlertTriangle, CheckCircle2, XCircle, Clock, Users, Receipt, Shield, Key, ShieldCheck, Zap, Palette, Search } from 'lucide-react';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { Button } from '@/components/ui/button';
 import { Textarea } from '@/components/ui/textarea';
@@ -649,6 +649,133 @@ SELECT 'Campos de CPF e Pagamento criados com sucesso!' as status;`,
         category: 'setup'
     },
     {
+        id: 'sync-kiwify-plans',
+        title: '[PRODUTOS] Sincronizar Planos Reais (Kiwify)',
+        query: `-- SYNC PLANOS KIWIFY & UNIAFY
+-- Objetivo: Garantir que a tabela plans reflita exatamente os produtos cadastrados na Kiwify
+
+-- 1. Garantir Colunas de ID Externo
+ALTER TABLE public.plans ADD COLUMN IF NOT EXISTS gateway_id_monthly TEXT;
+ALTER TABLE public.plans ADD COLUMN IF NOT EXISTS gateway_id_yearly TEXT;
+
+-- 2. Atualizar Planos (Upsert)
+INSERT INTO public.plans (
+    id, name, description, 
+    monthly_price_amount, yearly_price_amount, 
+    monthly_price_id, yearly_price_id,
+    features, max_users, max_connections, is_active
+) VALUES
+    (
+        'plan_essential',
+        'Uniafy Essential',
+        'Para Gestores Solo iniciando a jornada',
+        297.00,
+        2970.00,
+        'essential_monthly',
+        'essential_yearly',
+        '["Gestão de Leads", "CRM Básico", "Até 3 Usuários", "Sem White Label"]'::jsonb,
+        3,
+        1,
+        true
+    ),
+    (
+        'plan_scale',
+        'Uniafy Scale',
+        'Para Agências em crescimento',
+        597.00,
+        5970.00,
+        'scale_monthly',
+        'scale_yearly',
+        '["White Label", "Até 10 Usuários", "Squads", "G-Hunter", "Automação N8N"]'::jsonb,
+        10,
+        5,
+        true
+    ),
+    (
+        'plan_black',
+        'Uniafy Black',
+        'Para Grandes Operações',
+        997.00,
+        9970.00,
+        'black_monthly',
+        'black_yearly',
+        '["Tudo Ilimitado", "IA Avançada", "Suporte Dedicado", "N8N Integrado", "Prioridade"]'::jsonb,
+        999,
+        999,
+        true
+    )
+ON CONFLICT (id) DO UPDATE SET
+    name = EXCLUDED.name,
+    monthly_price_amount = EXCLUDED.monthly_price_amount,
+    yearly_price_amount = EXCLUDED.yearly_price_amount,
+    features = EXCLUDED.features,
+    max_users = EXCLUDED.max_users,
+    updated_at = now();
+
+SELECT 'Planos sincronizados com os preços da Kiwify com sucesso!' as status;`,
+        icon: <Zap className="w-4 h-4 text-yellow-500" />,
+        category: 'setup'
+    },
+    {
+        id: 'setup-multi-gateway-columns',
+        title: '[ESTRUTURA] Criar Colunas Multi-Gateway',
+        query: `-- Adicionar colunas específicas para cada Gateway (Mensal e Anual)
+ALTER TABLE public.plans
+ADD COLUMN IF NOT EXISTS kiwify_id_monthly TEXT,
+ADD COLUMN IF NOT EXISTS kiwify_id_yearly TEXT,
+
+ADD COLUMN IF NOT EXISTS stripe_id_monthly TEXT,
+ADD COLUMN IF NOT EXISTS stripe_id_yearly TEXT,
+
+ADD COLUMN IF NOT EXISTS asaas_id_monthly TEXT,
+ADD COLUMN IF NOT EXISTS asaas_id_yearly TEXT,
+
+ADD COLUMN IF NOT EXISTS hotmart_id_monthly TEXT,
+ADD COLUMN IF NOT EXISTS hotmart_id_yearly TEXT;
+
+-- Migrar dados antigos (se houver) para Kiwify (Assumindo Kiwify como padrão anterior)
+UPDATE public.plans 
+SET 
+    kiwify_id_monthly = gateway_id_monthly, 
+    kiwify_id_yearly = gateway_id_yearly
+WHERE 
+    kiwify_id_monthly IS NULL 
+    AND gateway_id_monthly IS NOT NULL;
+
+SELECT 'Estrutura Multi-Gateway criada com sucesso!' as status;`,
+        icon: <Database className="w-4 h-4 text-blue-500" />,
+        category: 'setup'
+    },
+    {
+        id: 'setup-visual-customization',
+        title: '[ESTRUTURA] Colunas Visuais (Ícone/Cor)',
+        query: `-- Adicionar colunas de customização visual
+ALTER TABLE public.plans
+ADD COLUMN IF NOT EXISTS icon_key TEXT DEFAULT 'Zap',
+ADD COLUMN IF NOT EXISTS accent_color TEXT DEFAULT '#FF6600';
+
+-- Definir padrões iniciais baseados nos planos existentes
+UPDATE public.plans SET icon_key = 'Zap', accent_color = '#3B82F6' WHERE id LIKE '%essential%'; -- Azul
+UPDATE public.plans SET icon_key = 'Globe', accent_color = '#F97316' WHERE id LIKE '%scale%'; -- Laranja
+UPDATE public.plans SET icon_key = 'Star', accent_color = '#A855F7' WHERE id LIKE '%black%'; -- Roxo
+UPDATE public.plans SET icon_key = 'Shield', accent_color = '#EF4444' WHERE id LIKE '%enterprise%'; -- Vermelho
+
+SELECT 'Colunas visuais criadas e configuradas com sucesso!' as status;`,
+        icon: <Zap className="w-4 h-4 text-purple-500" />,
+        category: 'setup'
+    },
+    {
+        id: 'setup-branding-v1',
+        title: '[ESTRUTURA] Setup Identidade Visual (Branding)',
+        query: `-- Adicionar coluna JSONB para Branding Global
+ALTER TABLE public.master_config
+ADD COLUMN IF NOT EXISTS branding JSONB DEFAULT '{"colors": {"primary": "24 100% 52%", "background": "240 10% 2%", "sidebar": "0 0% 2%"}, "logo_url": ""}'::jsonb;
+
+SELECT 'Coluna de Branding criada com sucesso em master_config!' as status;`,
+        icon: <Palette className="w-4 h-4 text-pink-500" />,
+        category: 'setup'
+    },
+    {
         id: 'fix-clients-rls',
         title: '[FIX] Corrigir Lista de Clientes (RLS)',
         query: `-- 1. CORREÇÃO DE RLS (Permitir ver clientes)
@@ -871,7 +998,7 @@ import {
 } from "@/components/ui/dialog";
 import { Badge } from "@/components/ui/badge";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { RefreshCw, Archive, Search } from 'lucide-react';
+import { RefreshCw, Archive } from 'lucide-react';
 
 export default function SqlBank() {
     const [query, setQuery] = useState('');
@@ -881,6 +1008,7 @@ export default function SqlBank() {
     const [error, setError] = useState<string | null>(null);
     const [lastExecuted, setLastExecuted] = useState<Date | null>(null);
     const [isManageModalOpen, setIsManageModalOpen] = useState(false);
+    const [searchTerm, setSearchTerm] = useState('');
 
     // Persist hidden presets
     const [hiddenPresets, setHiddenPresets] = useState<string[]>(() => {
@@ -891,6 +1019,13 @@ export default function SqlBank() {
             return [];
         }
     });
+
+    const filteredPresets = PRESETS.filter(p =>
+        (!searchTerm ||
+            p.title.toLowerCase().includes(searchTerm.toLowerCase()) ||
+            p.query.toLowerCase().includes(searchTerm.toLowerCase())) &&
+        !hiddenPresets.includes(p.id)
+    );
 
     const hidePreset = (id: string, e?: React.MouseEvent) => {
         e?.stopPropagation();
@@ -1093,100 +1228,114 @@ export default function SqlBank() {
                 {/* Lateral of Presets */}
                 <div className="lg:col-span-4 gap-6">
                     <div className="card-industrial p-6 sticky top-8 max-h-[calc(100vh-100px)] flex flex-col">
-                        <div className="flex items-center justify-between mb-4 flex-shrink-0">
-                            <h3 className="text-xs font-bold uppercase tracking-widest text-primary flex items-center gap-2">
-                                <List className="w-4 h-4" />
-                                Presets Disponíveis
-                            </h3>
-                            <div className="flex gap-2">
-                                <Button
-                                    variant="ghost"
-                                    size="sm"
-                                    onClick={archiveSetupPresets}
-                                    className="h-6 px-2 text-[10px] text-orange-500 hover:text-orange-400 hover:bg-orange-500/10 border border-orange-500/20"
-                                    title="Auto-Ocultar todos os scripts de Setup/Migração já instalados"
-                                >
-                                    <Archive className="w-3 h-3 mr-1" />
-                                    Limpar Setups
-                                </Button>
+                        <div className="space-y-4 mb-4 flex-shrink-0">
+                            <div className="flex items-center justify-between">
+                                <h3 className="text-xs font-bold uppercase tracking-widest text-primary flex items-center gap-2">
+                                    <List className="w-4 h-4" />
+                                    Presets Disponíveis
+                                </h3>
+                                <div className="flex gap-2">
+                                    <Button
+                                        variant="ghost"
+                                        size="sm"
+                                        onClick={archiveSetupPresets}
+                                        className="h-6 px-2 text-[10px] text-orange-500 hover:text-orange-400 hover:bg-orange-500/10 border border-orange-500/20"
+                                        title="Auto-Ocultar todos os scripts de Setup/Migração já instalados"
+                                    >
+                                        <Archive className="w-3 h-3 mr-1" />
+                                        Limpar Setups
+                                    </Button>
 
-                                <Dialog open={isManageModalOpen} onOpenChange={setIsManageModalOpen}>
-                                    <DialogTrigger asChild>
-                                        <Button
-                                            variant="ghost"
-                                            size="sm"
-                                            className={`h-6 px-2 text-[10px] text-muted-foreground hover:text-white border border-white/10 hover:bg-white/5 ${hiddenPresets.length === 0 ? 'opacity-50 pointer-events-none' : ''}`}
-                                        >
-                                            Arquivados ({hiddenPresets.length})
-                                        </Button>
-                                    </DialogTrigger>
-                                    <DialogContent className="bg-[#0A0A0A] border-white/10 text-white sm:max-w-md">
-                                        <DialogHeader>
-                                            <DialogTitle className="text-lg font-bold flex items-center gap-2">
-                                                <Archive className="w-5 h-5 text-primary" />
-                                                Gerenciar Arquivados
-                                            </DialogTitle>
-                                            <DialogDescription className="text-muted-foreground">
-                                                Estes scripts foram ocultados da sua lista principal. Restaure-os se precisar executá-los novamente.
-                                            </DialogDescription>
-                                        </DialogHeader>
+                                    <Dialog open={isManageModalOpen} onOpenChange={setIsManageModalOpen}>
+                                        <DialogTrigger asChild>
+                                            <Button
+                                                variant="ghost"
+                                                size="sm"
+                                                className={`h-6 px-2 text-[10px] text-muted-foreground hover:text-white border border-white/10 hover:bg-white/5 ${hiddenPresets.length === 0 ? 'opacity-50 pointer-events-none' : ''}`}
+                                            >
+                                                Arquivados ({hiddenPresets.length})
+                                            </Button>
+                                        </DialogTrigger>
+                                        <DialogContent className="bg-[#0A0A0A] border-white/10 text-white sm:max-w-md">
+                                            <DialogHeader>
+                                                <DialogTitle className="text-lg font-bold flex items-center gap-2">
+                                                    <Archive className="w-5 h-5 text-primary" />
+                                                    Gerenciar Arquivados
+                                                </DialogTitle>
+                                                <DialogDescription className="text-muted-foreground">
+                                                    Estes scripts foram ocultados da sua lista principal. Restaure-os se precisar executá-los novamente.
+                                                </DialogDescription>
+                                            </DialogHeader>
 
-                                        <ScrollArea className="max-h-[300px] mt-4 pr-4">
-                                            {hiddenPresets.length === 0 ? (
-                                                <div className="text-center py-8 text-muted-foreground text-sm italic">
-                                                    Nenhum preset arquivado.
-                                                </div>
-                                            ) : (
-                                                <div className="space-y-3">
-                                                    {PRESETS.filter(p => hiddenPresets.includes(p.id)).map(preset => (
-                                                        <div key={preset.id} className="flex items-center justify-between p-3 rounded-lg bg-white/5 border border-white/5">
-                                                            <div className="flex items-start gap-3 overflow-hidden">
-                                                                <div className="mt-1 p-1.5 rounded bg-background/50 border border-white/5 text-muted-foreground">
-                                                                    {preset.icon}
-                                                                </div>
-                                                                <div className="min-w-0">
-                                                                    <p className="text-sm font-medium text-white truncate">{preset.title}</p>
-                                                                    <div className="flex items-center gap-2 mt-1">
-                                                                        <Badge variant="outline" className="text-[10px] h-4 border-white/10 text-muted-foreground uppercase">
-                                                                            {preset.category === 'setup' ? 'Instalação' : 'Utilidade'}
-                                                                        </Badge>
-                                                                        <span className="text-[10px] text-muted-foreground truncate opacity-50 font-mono">
-                                                                            {preset.id}
-                                                                        </span>
+                                            <ScrollArea className="max-h-[300px] mt-4 pr-4">
+                                                {hiddenPresets.length === 0 ? (
+                                                    <div className="text-center py-8 text-muted-foreground text-sm italic">
+                                                        Nenhum preset arquivado.
+                                                    </div>
+                                                ) : (
+                                                    <div className="space-y-3">
+                                                        {PRESETS.filter(p => hiddenPresets.includes(p.id)).map(preset => (
+                                                            <div key={preset.id} className="flex items-center justify-between p-3 rounded-lg bg-white/5 border border-white/5">
+                                                                <div className="flex items-start gap-3 overflow-hidden">
+                                                                    <div className="mt-1 p-1.5 rounded bg-background/50 border border-white/5 text-muted-foreground">
+                                                                        {preset.icon}
+                                                                    </div>
+                                                                    <div className="min-w-0">
+                                                                        <p className="text-sm font-medium text-white truncate">{preset.title}</p>
+                                                                        <div className="flex items-center gap-2 mt-1">
+                                                                            <Badge variant="outline" className="text-[10px] h-4 border-white/10 text-muted-foreground uppercase">
+                                                                                {preset.category === 'setup' ? 'Instalação' : 'Utilidade'}
+                                                                            </Badge>
+                                                                            <span className="text-[10px] text-muted-foreground truncate opacity-50 font-mono">
+                                                                                {preset.id}
+                                                                            </span>
+                                                                        </div>
                                                                     </div>
                                                                 </div>
+                                                                <Button
+                                                                    size="sm"
+                                                                    variant="ghost"
+                                                                    onClick={() => restorePreset(preset.id)}
+                                                                    className="h-8 w-8 p-0 text-primary hover:text-primary hover:bg-primary/10"
+                                                                    title="Restaurar para a lista"
+                                                                >
+                                                                    <RefreshCw className="w-4 h-4" />
+                                                                </Button>
                                                             </div>
-                                                            <Button
-                                                                size="sm"
-                                                                variant="ghost"
-                                                                onClick={() => restorePreset(preset.id)}
-                                                                className="h-8 w-8 p-0 text-primary hover:text-primary hover:bg-primary/10"
-                                                                title="Restaurar para a lista"
-                                                            >
-                                                                <RefreshCw className="w-4 h-4" />
-                                                            </Button>
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            )}
-                                        </ScrollArea>
+                                                        ))}
+                                                    </div>
+                                                )}
+                                            </ScrollArea>
 
-                                        <DialogFooter className="mt-4 border-t border-white/5 pt-4">
-                                            <Button
-                                                variant="secondary"
-                                                className="w-full bg-white/5 hover:bg-white/10 text-muted-foreground hover:text-white"
-                                                onClick={() => setIsManageModalOpen(false)}
-                                            >
-                                                Fechar
-                                            </Button>
-                                        </DialogFooter>
-                                    </DialogContent>
-                                </Dialog>
+                                            <DialogFooter className="mt-4 border-t border-white/5 pt-4">
+                                                <Button
+                                                    variant="secondary"
+                                                    className="w-full bg-white/5 hover:bg-white/10 text-muted-foreground hover:text-white"
+                                                    onClick={() => setIsManageModalOpen(false)}
+                                                >
+                                                    Fechar
+                                                </Button>
+                                            </DialogFooter>
+                                        </DialogContent>
+                                    </Dialog>
+                                </div>
+                            </div>
+
+                            {/* SEARCH INPUT */}
+                            <div className="relative">
+                                <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+                                <input
+                                    type="text"
+                                    placeholder="Buscar preset (nome ou sql)..."
+                                    value={searchTerm}
+                                    onChange={(e) => setSearchTerm(e.target.value)}
+                                    className="w-full bg-black/40 border border-white/10 rounded-lg py-2 pl-9 pr-4 text-xs text-white focus:outline-none focus:border-primary/50 transition-colors placeholder:text-muted-foreground/50 font-mono"
+                                />
                             </div>
                         </div>
 
                         <div className="space-y-3 font-medium overflow-y-auto pr-2 custom-scrollbar flex-1 -mr-2">
-                            {PRESETS.filter(p => !hiddenPresets.includes(p.id)).map((preset) => (
+                            {filteredPresets.map((preset) => (
                                 <div key={preset.id} className="relative group/item">
                                     <button
                                         onClick={() => {

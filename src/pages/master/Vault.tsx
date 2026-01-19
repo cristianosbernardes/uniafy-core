@@ -193,8 +193,8 @@ export default function Vault() {
     const isConfigured = (id: string) => {
         if (id === 'asaas') return !!asaasKey;
         if (id === 'stripe') return !!stripeKey;
-        if (id === 'kiwify') return !!kiwifyToken;
-        if (id === 'hotmart') return !!hotmartClientId;
+        if (id === 'kiwify') return !!kiwifyToken && !!kiwifyAccountId;
+        if (id === 'hotmart') return !!hotmartClientId && !!hotmartClientSecret && !!hotmartToken;
         return false;
     };
 

@@ -6,6 +6,7 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { AuthProvider, useAuth } from "./contexts/AuthContext";
 import { DomainProvider } from "./contexts/DomainContext";
+import { BrandingProvider } from "./contexts/BrandingContext";
 import Dashboard from "./pages/Dashboard";
 import GestaoClientes from "./pages/GestaoClientes";
 import MeuPerfil from "./pages/MeuPerfil";
@@ -22,6 +23,7 @@ import { DashboardShell } from "./components/layout/DashboardShell";
 import AuditLogs from "./pages/master/AuditLogs";
 import ProductAnalytics from "./pages/master/ProductAnalytics";
 import SaasMetrics from "./pages/master/SaasMetrics";
+import SystemBranding from "./pages/master/SystemBranding";
 import WhiteLabelFactory from "./pages/master/WhiteLabelFactory";
 import PlanManager from "./pages/master/PlanManager";
 import Vault from "./pages/master/Vault";
@@ -74,6 +76,7 @@ const AppRoutes = () => {
         <Route path="/mestre/planos" element={<PlanManager />} />
         <Route path="/mestre/cofre" element={<Vault />} />
         <Route path="/mestre/whitelabel" element={<WhiteLabelFactory />} />
+        <Route path="/mestre/branding" element={<SystemBranding />} />
 
         {/* Growth Engine Routes */}
         <Route path="/growth" element={<Navigate to="/growth/hunter" replace />} />
@@ -122,17 +125,19 @@ const AppRoutes = () => {
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
-    <DomainProvider>
-      <AuthProvider>
-        <TooltipProvider>
-          <Toaster />
-          <Sonner />
-          <BrowserRouter>
-            <AppRoutes />
-          </BrowserRouter>
-        </TooltipProvider>
-      </AuthProvider>
-    </DomainProvider>
+    <BrandingProvider>
+      <DomainProvider>
+        <AuthProvider>
+          <TooltipProvider>
+            <Toaster />
+            <Sonner />
+            <BrowserRouter>
+              <AppRoutes />
+            </BrowserRouter>
+          </TooltipProvider>
+        </AuthProvider>
+      </DomainProvider>
+    </BrandingProvider>
   </QueryClientProvider>
 );
 

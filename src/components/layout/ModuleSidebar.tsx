@@ -9,7 +9,8 @@ import {
   Users,
   Timer,
   RefreshCw,
-  FolderOpen
+  FolderOpen,
+  Palette
 } from 'lucide-react';
 import { NAV_MODULES } from '@/config/navigation';
 import { UserRole } from '@/types/uniafy';
@@ -37,6 +38,7 @@ const iconMap: Record<string, React.ReactNode> = {
   RefreshCw: <RefreshCw className="w-5 h-5" />,
   LayoutDashboard: <LayoutDashboard className="w-5 h-5" />,
   FolderOpen: <FolderOpen className="w-5 h-5" />,
+  Palette: <Palette className="w-5 h-5" />,
 };
 
 export function ModuleSidebar({

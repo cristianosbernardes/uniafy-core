@@ -4,7 +4,7 @@ import { Badge } from '@/components/ui/badge';
 import { Button } from '@/components/ui/button';
 import { masterService } from '@/services/masterService';
 import { useAuth } from '@/contexts/AuthContext';
-import { Check, Shield, Zap, Users, Globe, Database, Star, Loader2, AlertTriangle, Eye } from 'lucide-react';
+import { Check, Shield, Zap, Users, Globe, Database, Star, Loader2, AlertTriangle, Eye, Layout } from 'lucide-react';
 import { Plan } from '@/types/uniafy';
 import { UpdatePlanDialog } from './UpdatePlanDialog';
 import { toast } from 'sonner';
@@ -24,11 +24,17 @@ export default function PlanManager() {
             setLoading(true);
             const data = await masterService.getPlans();
 
-            // Map DB fields to Frontend Interface (if differences exist)
-            // Our SQL setup used 'monthly_price_amount' but type might expect 'price'
+            if (!data || !Array.isArray(data)) {
+                console.error("Formato de dados inválido recebido:", data);
+                throw new Error("Formato de dados inválido");
+            }
+
+            // Map DB fields and ensure numbers for currency formatting
             const mappedPlans: Plan[] = data.map((p: any) => ({
                 ...p,
-                price: p.monthly_price_amount || p.price || 0
+                monthly_price_amount: Number(p.monthly_price_amount || 0),
+                yearly_price_amount: Number(p.yearly_price_amount || 0),
+                price: Number(p.monthly_price_amount || p.price || 0)
             }));
 
             setPlans(mappedPlans);
@@ -54,12 +60,19 @@ export default function PlanManager() {
         return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(value);
     };
 
-    const getPlanIcon = (planId: string) => {
-        if (planId.includes('essential')) return <Zap className="w-8 h-8 text-blue-500" />;
-        if (planId.includes('scale')) return <Globe className="w-8 h-8 text-orange-500" />;
-        if (planId.includes('black')) return <Star className="w-8 h-8 text-purple-500" />;
-        if (planId.includes('enterprise')) return <Shield className="w-8 h-8 text-red-500" />;
-        return <Database className="w-8 h-8 text-gray-500" />;
+    // Icon Map
+    const ICON_MAP: Record<string, any> = {
+        'Zap': Zap,
+        'Star': Star,
+        'Globe': Globe,
+        'Shield': Shield,
+        'Database': Database,
+        'LayoutTemplate': Layout
+    };
+
+    const getPlanIcon = (iconKey?: string, color?: string) => {
+        const IconComponent = ICON_MAP[iconKey || 'Zap'] || Zap;
+        return <IconComponent className="w-8 h-8" style={{ color: color || '#FF6600' }} />;
     };
 
     if (loading) {
@@ -122,7 +135,7 @@ export default function PlanManager() {
                             {/* Plan Icon / Header */}
                             <div className="flex justify-between items-start mb-6 z-10 relative">
                                 <div className="bg-white/5 p-3 rounded-xl border border-white/10">
-                                    {getPlanIcon(plan.id)}
+                                    {getPlanIcon(plan.icon_key, plan.accent_color)}
                                 </div>
                                 {plan.is_active ? (
                                     <Badge className="bg-green-500/10 text-green-500 border-green-500/20">Ativo</Badge>

@@ -82,10 +82,28 @@ export interface Plan {
   price: number;
   monthly_price_amount?: number; // DB Field
   yearly_price_amount?: number; // DB Field
+  // Multi-Gateway IDs
+  kiwify_id_monthly?: string;
+  kiwify_id_yearly?: string;
+  stripe_id_monthly?: string;
+  stripe_id_yearly?: string;
+  asaas_id_monthly?: string;
+  asaas_id_yearly?: string;
+  hotmart_id_monthly?: string;
+  hotmart_id_yearly?: string;
+
+  // Legacy (Deprecated but kept for type safety mid-migration)
+  gateway_id_monthly?: string;
+  gateway_id_yearly?: string;
+
   period: BillingPeriod;
   features: string[];
   max_users: number;
   max_connections: number;
+  // Visual Customization
+  icon_key?: string;
+  accent_color?: string;
+
   is_active: boolean;
   is_visible?: boolean;
 }

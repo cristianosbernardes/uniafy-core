@@ -2,18 +2,21 @@ import { cn } from '@/lib/utils';
 import { Button } from './button';
 import { LucideIcon } from 'lucide-react';
 
+export interface PageHeaderAction {
+  label: string;
+  icon?: LucideIcon;
+  variant?: 'primary' | 'outline' | 'ghost';
+  onClick?: () => void;
+  isLoading?: boolean;
+}
+
 interface PageHeaderProps {
   title: string;
   titleAccent?: string;
   subtitle?: string;
   badge?: string;
   action?: React.ReactNode;
-  actions?: {
-    label: string;
-    icon?: LucideIcon;
-    variant?: 'primary' | 'outline';
-    onClick?: () => void;
-  }[];
+  actions?: PageHeaderAction[];
 }
 
 export function PageHeader({
@@ -60,9 +63,19 @@ export function PageHeader({
                   : "border-border bg-white/5 text-muted-foreground hover:text-foreground hover:border-foreground"
               )}
               onClick={actionItem.onClick}
+              disabled={actionItem.isLoading}
             >
-              {Icon && <Icon className="w-4 h-4 mr-2" />}
-              {actionItem.label}
+              {actionItem.isLoading ? (
+                <>
+                  <div className="h-4 w-4 border-2 border-white/20 border-t-white rounded-full animate-spin mr-2" />
+                  <span>Salvando...</span>
+                </>
+              ) : (
+                <>
+                  {Icon && <Icon className="w-4 h-4 mr-2" />}
+                  {actionItem.label}
+                </>
+              )}
             </Button>
           );
         })}

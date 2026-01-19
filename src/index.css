@@ -12,8 +12,8 @@
     --primary: 24 100% 52%;
     --primary-foreground: 0 0% 100%;
 
-    /* Force Inter Globally */
-    font-family: 'Inter', sans-serif;
+    /* Force Inter Globally (Default) or Custom */
+    font-family: var(--font-sans, 'Inter', sans-serif);
 
     /* Dark Industrial Backgrounds */
     --background: 240 10% 2%;
@@ -98,7 +98,7 @@
 
   body {
     @apply bg-background text-foreground font-sans antialiased;
-    font-family: 'Inter', sans-serif;
+    font-family: var(--font-sans, 'Inter', sans-serif);
   }
 
   /* Industrial Typography - REFINED */
@@ -108,6 +108,38 @@
 
   .text-industrial-italic {
     @apply italic text-zinc-400;
+  }
+
+  /* Dynamic Size Classes */
+  .text-2xl,
+  .text-3xl {
+    font-size: var(--fs-title);
+  }
+
+  .text-stats {
+    font-size: var(--fs-stats, 32px);
+  }
+
+  .text-card-title {
+    font-size: var(--fs-card-title, 18px);
+  }
+
+  .text-subtitle {
+    font-size: var(--fs-subtitle, 14px);
+  }
+
+  .nav-module span,
+  .nav-module div {
+    font-size: var(--fs-menu) !important;
+  }
+
+  a,
+  p,
+  span,
+  div,
+  li {
+    /* This is risky global override, let's limit it to specific contexts or just set root size? 
+         Setting root overrides rem usage. */
   }
 }
 
