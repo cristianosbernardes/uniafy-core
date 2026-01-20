@@ -19,6 +19,7 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
 
 export default function SystemBranding() {
     const { branding, refreshBranding } = useBranding();
@@ -47,6 +48,13 @@ export default function SystemBranding() {
     const [loginLogoUrl, setLoginLogoUrl] = useState("");
     const [loginLayout, setLoginLayout] = useState<'center' | 'split'>('center');
     const [previewMode, setPreviewMode] = useState<'desktop' | 'mobile'>('desktop');
+
+    // Background Type State
+    const [loginBgType, setLoginBgType] = useState<'image' | 'color' | 'gradient'>('image');
+    const [loginBgColor, setLoginBgColor] = useState('#000000');
+    const [loginGradientStart, setLoginGradientStart] = useState('#1a1a1a');
+    const [loginGradientEnd, setLoginGradientEnd] = useState('#000000');
+    const [loginGradientDirection, setLoginGradientDirection] = useState('to bottom right');
 
     // UI/Typography State
     const [radius, setRadius] = useState(8); // Default 8px (0.5rem)
@@ -79,10 +87,16 @@ export default function SystemBranding() {
             setLoginOverlayOpacity(branding.login?.overlay_opacity ?? 0.8);
             setLoginTitle(branding.login?.title || "");
             setLoginMessage(branding.login?.message || "");
-            setLoginTitle(branding.login?.title || "");
-            setLoginMessage(branding.login?.message || "");
             setLoginLogoUrl(branding.login?.logo_url || "");
             setLoginLayout(branding.login?.layout || 'center');
+
+            if (branding.login) {
+                setLoginBgType(branding.login.bg_type || 'image');
+                setLoginBgColor(branding.login.bg_color || '#000000');
+                setLoginGradientStart(branding.login.gradient_start || '#1a1a1a');
+                setLoginGradientEnd(branding.login.gradient_end || '#000000');
+                setLoginGradientDirection(branding.login.gradient_direction || 'to bottom right');
+            }
 
             if (branding.ui) {
                 // Determine Radius: if stored in rem (<= 2 usually), convert to px. If > 2, assume px (legacy or future proof)
@@ -125,10 +139,15 @@ export default function SystemBranding() {
                     overlay_opacity: loginOverlayOpacity,
                     title: loginTitle,
                     message: loginMessage,
-                    title: loginTitle,
-                    message: loginMessage,
                     logo_url: loginLogoUrl,
-                    layout: loginLayout
+                    layout: loginLayout,
+
+                    // New BG Props
+                    bg_type: loginBgType,
+                    bg_color: loginBgColor,
+                    gradient_start: loginGradientStart,
+                    gradient_end: loginGradientEnd,
+                    gradient_direction: loginGradientDirection,
                 },
                 ui: {
                     radius: radius / 16, // Convert PX back to REM for storage
@@ -145,18 +164,31 @@ export default function SystemBranding() {
                 }
             };
 
-            const { error } = await supabase
+            // 1. Get the current config to find the correct ID
+            const { data: currentConfig, error: fetchError } = await supabase
+                .from('master_config')
+                .select('id')
+                .limit(1)
+                .single();
+
+            if (fetchError || !currentConfig) {
+                console.error('Configuração não encontrada:', fetchError);
+                throw new Error('Não foi possível localizar o registro de configuração no banco.');
+            }
+
+            // 2. Update with the correct ID
+            const { error: updateError } = await supabase
                 .from('master_config')
                 .update({ branding: updatedBranding })
-                .eq('id', 1);
+                .eq('id', currentConfig.id);
 
-            if (error) throw error;
+            if (updateError) throw updateError;
 
             await refreshBranding();
             toast.success('Identidade Visual atualizada com sucesso!');
         } catch (error: any) {
             console.error('Erro ao salvar branding:', error);
-            toast.error('Erro ao salvar configurações.');
+            toast.error(error.message || 'Erro ao salvar configurações.');
         } finally {
             setLoading(false);
         }
@@ -171,7 +203,20 @@ export default function SystemBranding() {
                 colors: { primary: "24 100% 52%", background: "240 10% 2%", sidebar: "0 0% 2%", sidebar_active: "24 100% 52%", border: "0 0% 100% / 0.1", card: "0 0% 100% / 0.05", hover: "24 100% 52% / 0.1" },
                 logo_url: "",
                 favicon_url: "",
-                login: { bg_url: "", overlay_color: "#000000", overlay_opacity: 0.8, title: "", message: "", logo_url: "", layout: "center" as const },
+                login: {
+                    bg_url: "",
+                    overlay_color: "#000000",
+                    overlay_opacity: 0.8,
+                    title: "",
+                    message: "",
+                    logo_url: "",
+                    layout: "center" as const,
+                    bg_type: "image",
+                    bg_color: "#000000",
+                    gradient_start: "#1a1a1a",
+                    gradient_end: "#000000",
+                    gradient_direction: "to bottom right"
+                },
                 ui: { radius: 0.5, fontFamily: "Inter", fontSizes: { base: 14, titles: 24, cardTitles: 18, menu: 13, small: 12, stats: 32, subtitles: 14 } }
             };
 
@@ -242,9 +287,9 @@ export default function SystemBranding() {
                 </TabsList>
 
                 <TabsContent value="identity">
-                    <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">
+                    <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 items-start relative">
                         {/* LEFT: CONTROLS */}
-                        <div className="xl:col-span-4 space-y-6">
+                        <div className="xl:col-span-4 h-[calc(100vh-140px)] overflow-y-auto pr-2 pb-10 custom-scrollbar space-y-6">
 
                             {/* METADADOS / FAVICON */}
                             <div className="card-industrial p-6 space-y-6">
@@ -353,41 +398,95 @@ export default function SystemBranding() {
                                     <h3 className="text-xs font-bold uppercase tracking-widest text-zinc-100">Estilo do Login</h3>
                                 </div>
                                 <div className="space-y-4">
-                                    <UiAssetUploader
-                                        label="Background do Login"
-                                        value={loginBgUrl}
-                                        onChange={setLoginBgUrl}
-                                    />
                                     <div className="space-y-2">
-                                        <Label className="text-[10px] uppercase text-zinc-500">Overlay (Máscara)</Label>
-                                        <div className="flex gap-2">
-                                            <div className="w-full">
-                                                <ColorPicker
-                                                    label="Cor da Máscara"
-                                                    value={loginOverlayColor}
-                                                    onChange={setLoginOverlayColor}
+                                        <Label className="text-[10px] uppercase text-zinc-500">Tipo de Fundo</Label>
+                                        <ToggleGroup type="single" value={loginBgType} onValueChange={(v) => v && setLoginBgType(v as any)} className="justify-start bg-black/20 p-1 rounded-lg border border-white/10">
+                                            <ToggleGroupItem value="image" className="data-[state=on]:bg-white/10 data-[state=on]:text-white text-zinc-500 text-xs px-3">Imagem</ToggleGroupItem>
+                                            <ToggleGroupItem value="color" className="data-[state=on]:bg-white/10 data-[state=on]:text-white text-zinc-500 text-xs px-3">Cor Sólida</ToggleGroupItem>
+                                            <ToggleGroupItem value="gradient" className="data-[state=on]:bg-white/10 data-[state=on]:text-white text-zinc-500 text-xs px-3">Degradê</ToggleGroupItem>
+                                        </ToggleGroup>
+                                    </div>
+
+                                    {loginBgType === 'image' && (
+                                        <div className="space-y-4 animate-in fade-in slide-in-from-top-2">
+                                            <UiAssetUploader
+                                                label="Background do Login"
+                                                value={loginBgUrl}
+                                                onChange={setLoginBgUrl}
+                                            />
+                                            <div className="space-y-2">
+                                                <Label className="text-[10px] uppercase text-zinc-500">Overlay (Máscara)</Label>
+                                                <div className="flex gap-2">
+                                                    <div className="w-full">
+                                                        <ColorPicker
+                                                            label="Cor da Máscara"
+                                                            value={loginOverlayColor}
+                                                            onChange={setLoginOverlayColor}
+                                                        />
+                                                    </div>
+                                                </div>
+                                            </div>
+                                            <div className="space-y-2">
+                                                <div className="flex justify-between">
+                                                    <Label className="text-[10px] uppercase text-zinc-500">Opacidade: {Math.round(loginOverlayOpacity * 100)}%</Label>
+                                                </div>
+                                                <Slider
+                                                    min={0} max={1} step={0.05}
+                                                    value={[loginOverlayOpacity]}
+                                                    onValueChange={(v) => setLoginOverlayOpacity(v[0])}
+                                                    className="py-1"
                                                 />
                                             </div>
                                         </div>
-                                    </div>
-                                    <div className="space-y-2">
-                                        <div className="flex justify-between">
-                                            <Label className="text-[10px] uppercase text-zinc-500">Opacidade: {Math.round(loginOverlayOpacity * 100)}%</Label>
-                                        </div>
-                                        <Slider
-                                            min={0} max={1} step={0.05}
-                                            value={[loginOverlayOpacity]}
-                                            onValueChange={(v) => setLoginOverlayOpacity(v[0])}
-                                            className="py-1"
-                                        />
-                                    </div>
-                                </div>
-                            </div>
+                                    )}
 
+                                    {loginBgType === 'color' && (
+                                        <div className="space-y-4 animate-in fade-in slide-in-from-top-2">
+                                            <ColorPicker
+                                                label="Cor do Fundo"
+                                                value={loginBgColor}
+                                                onChange={setLoginBgColor}
+                                            />
+                                        </div>
+                                    )}
+
+                                    {loginBgType === 'gradient' && (
+                                        <div className="space-y-4 animate-in fade-in slide-in-from-top-2">
+                                            <div className="grid grid-cols-2 gap-4">
+                                                <ColorPicker
+                                                    label="Cor Inicial"
+                                                    value={loginGradientStart}
+                                                    onChange={setLoginGradientStart}
+                                                />
+                                                <ColorPicker
+                                                    label="Cor Final"
+                                                    value={loginGradientEnd}
+                                                    onChange={setLoginGradientEnd}
+                                                />
+                                            </div>
+                                            <div className="space-y-2">
+                                                <Label className="text-[10px] uppercase text-zinc-500">Direção</Label>
+                                                <Select value={loginGradientDirection} onValueChange={setLoginGradientDirection}>
+                                                    <SelectTrigger className="bg-black/20 border-white/10 text-xs">
+                                                        <SelectValue />
+                                                    </SelectTrigger>
+                                                    <SelectContent>
+                                                        <SelectItem value="to right">Para Direita →</SelectItem>
+                                                        <SelectItem value="to bottom">Para Baixo ↓</SelectItem>
+                                                        <SelectItem value="to bottom right">Diagonal ↘</SelectItem>
+                                                        <SelectItem value="to top right">Diagonal ↗</SelectItem>
+                                                    </SelectContent>
+                                                </Select>
+                                            </div>
+                                        </div>
+                                    )}
+                                </div>
+
+                            </div>
                         </div>
 
                         {/* RIGHT: IDENTITY PREVIEW */}
-                        <div className="xl:col-span-8 space-y-4">
+                        <div className="xl:col-span-8 space-y-4 sticky top-0">
                             <div className="flex justify-end gap-2">
                                 <div className="bg-zinc-900 p-1 rounded-lg border border-white/10 flex">
                                     <button
@@ -435,12 +534,16 @@ export default function SystemBranding() {
                                 <div className="flex-1 relative flex items-center justify-center p-12 bg-zinc-900/50 overflow-hidden">
                                     <div className="absolute inset-0 bg-cover bg-center z-0 transition-all duration-500"
                                         style={{
-                                            backgroundImage: loginBgUrl ? `url(${loginBgUrl})` : undefined,
+                                            backgroundImage: loginBgType === 'image' && loginBgUrl ? `url(${loginBgUrl})` :
+                                                loginBgType === 'gradient' ? `linear-gradient(${loginGradientDirection}, ${loginGradientStart}, ${loginGradientEnd})` : undefined,
+                                            backgroundColor: loginBgType === 'color' ? loginBgColor : undefined,
                                             // Live Preview of Split vs Center Layout logic (mock)
                                             width: loginLayout === 'split' && previewMode === 'desktop' ? '50%' : '100%'
                                         }}
                                     >
-                                        <div className="absolute inset-0" style={{ backgroundColor: loginOverlayColor, opacity: loginOverlayOpacity }}></div>
+                                        {loginBgType === 'image' && (
+                                            <div className="absolute inset-0" style={{ backgroundColor: loginOverlayColor, opacity: loginOverlayOpacity }}></div>
+                                        )}
                                     </div>
 
                                     {/* Additional BG for Split Mode Right Side (Dark Default) */}
@@ -485,13 +588,12 @@ export default function SystemBranding() {
                             </div>
                         </div>
                     </div>
-
                 </TabsContent>
 
                 <TabsContent value="styles">
-                    <div className="grid grid-cols-1 xl:grid-cols-12 gap-8">
+                    <div className="grid grid-cols-1 xl:grid-cols-12 gap-8 items-start relative">
                         {/* LEFT: STYLE CONTROLS */}
-                        <div className="xl:col-span-4 space-y-6">
+                        <div className="xl:col-span-4 h-[calc(100vh-140px)] overflow-y-auto pr-2 pb-10 custom-scrollbar space-y-6">
 
                             {/* PRESETS PANEL */}
                             <div className="card-industrial p-6 space-y-6">
@@ -702,12 +804,12 @@ export default function SystemBranding() {
                         </div>
 
                         {/* RIGHT COLUMN: PREVIEW */}
-                        <div className="xl:col-span-8">
+                        <div className="xl:col-span-8 sticky top-6">
                             {/* LIVE PREVIEW CONTAINER */}
                             <div
                                 className={cn(
                                     "border border-white/10 rounded-xl overflow-hidden shadow-2xl transition-all duration-300 relative bg-[#09090b] flex flex-col mx-auto",
-                                    previewMode === 'mobile' ? "w-[375px] h-[667px]" : "w-full h-[calc(100vh-90px)]"
+                                    previewMode === 'mobile' ? "w-[375px] h-[667px]" : "w-full h-[calc(100vh-80px)]"
                                 )}
                             >
                                 {/* Browser Mock Header */}
@@ -744,11 +846,16 @@ export default function SystemBranding() {
                                     <div className="flex border border-white/5 rounded-lg overflow-hidden h-[800px] shadow-2xl relative">
                                         <style>{`
                                             .preview-sandbox {
-                                                --background: ${bgColor};
-                                                --sidebar: ${sidebarColor};
-                                                --primary: ${primaryColor};
+                                                --background: hsl(${bgColor});
+                                                --sidebar: hsl(${sidebarColor});
+                                                --primary: hsl(${primaryColor});
+                                                --border: ${borderColor};
+                                                --card: ${cardColor};
+                                                --hover: ${hoverColor};
                                                 --radius: ${radius}px;
-                                                --font-sans: '${fontFamily}', sans-serif;
+                                                --font-family: '${fontFamily}', sans-serif;
+                                                
+                                                /* Font Sizes */
                                                 --fs-base: ${fsBase}px;
                                                 --fs-title: ${fsTitle}px;
                                                 --fs-card-title: ${fsCardTitle}px;
@@ -757,16 +864,33 @@ export default function SystemBranding() {
                                                 --fs-stats: ${fsStats}px;
                                                 --fs-small: ${fsSmall}px;
                                             }
+
+                                            .preview-sandbox {
+                                                font-family: var(--font-family) !important;
+                                            }
+
+                                            .preview-sandbox .text-preview-title { font-size: var(--fs-title) !important; }
+                                            .preview-sandbox .text-preview-subtitle { font-size: var(--fs-subtitle) !important; }
+                                            .preview-sandbox .text-preview-stats { font-size: var(--fs-stats) !important; }
+                                            .preview-sandbox .text-preview-card-title { font-size: var(--fs-card-title) !important; }
+                                            .preview-sandbox .text-preview-menu { font-size: var(--fs-menu) !important; }
+                                            .preview-sandbox .text-preview-base { font-size: var(--fs-base) !important; }
+                                            .preview-sandbox .text-preview-small { font-size: var(--fs-small) !important; }
+                                            
+                                            .preview-sandbox .rounded-preview { border-radius: var(--radius) !important; }
+                                            .preview-sandbox .border-preview { border-color: var(--border) !important; }
+                                            .preview-sandbox .card-preview { background-color: var(--card) !important; }
+                                            .preview-sandbox .hover-preview:hover { background-color: var(--hover) !important; }
                                         `}</style>
 
                                         {/* SIDEBAR MOCK */}
-                                        <div className="w-64 bg-[var(--sidebar)] border-r border-white/5 p-4 flex flex-col gap-6 preview-sandbox">
+                                        <div className="w-64 bg-[var(--sidebar)] border-r border-preview p-4 flex flex-col gap-6 preview-sandbox">
                                             <div className="h-12 flex items-center px-2">
                                                 {logoUrl ? (
                                                     <img src={logoUrl} alt="Logo" className="h-8 object-contain opacity-90" />
                                                 ) : (
                                                     <div className="flex items-center gap-2">
-                                                        <div className="w-8 h-8 rounded bg-[var(--primary)] flex items-center justify-center">
+                                                        <div className="w-8 h-8 rounded-preview bg-[var(--primary)] flex items-center justify-center">
                                                             <span className="font-bold text-white text-lg">U</span>
                                                         </div>
                                                         <span className="text-white font-bold text-lg tracking-tight">UNIAFY</span>
@@ -774,17 +898,17 @@ export default function SystemBranding() {
                                                 )}
                                             </div>
                                             <div className="space-y-1">
-                                                <div className="h-8 rounded-[var(--radius)] flex items-center px-3 gap-3 bg-[var(--sidebar)] text-zinc-400">
+                                                <div className="h-8 rounded-preview flex items-center px-3 gap-3 bg-transparent text-zinc-400 hover-preview transition-colors cursor-pointer">
                                                     <div className="w-4 h-4 rounded-full bg-white/10" />
-                                                    <span className="text-[var(--fs-menu)] font-medium">Dashboard</span>
+                                                    <span className="text-preview-menu font-medium text-zinc-400">Dashboard</span>
                                                 </div>
-                                                <div className="h-8 rounded-[var(--radius)] flex items-center px-3 gap-3 bg-[var(--primary)] text-white shadow-[0_0_20px_-5px_var(--primary)]">
+                                                <div className="h-8 rounded-preview flex items-center px-3 gap-3 bg-[var(--primary)] text-white shadow-[0_0_20px_-5px_var(--primary)]">
                                                     <div className="w-4 h-4 rounded-full bg-white/20" />
-                                                    <span className="text-[var(--fs-menu)] font-medium">Analytics</span>
+                                                    <span className="text-preview-menu font-medium text-white">Analytics</span>
                                                 </div>
-                                                <div className="h-8 rounded-[var(--radius)] flex items-center px-3 gap-3 bg-[var(--sidebar)] text-zinc-400">
+                                                <div className="h-8 rounded-preview flex items-center px-3 gap-3 bg-transparent text-zinc-400 hover-preview transition-colors cursor-pointer">
                                                     <div className="w-4 h-4 rounded-full bg-white/10" />
-                                                    <span className="text-[var(--fs-menu)] font-medium">Clientes</span>
+                                                    <span className="text-preview-menu font-medium text-zinc-400">Clientes</span>
                                                 </div>
                                             </div>
                                         </div>
@@ -793,34 +917,34 @@ export default function SystemBranding() {
                                         <div className="flex-1 bg-[var(--background)] p-8 preview-sandbox">
                                             <div className="flex justify-between items-center mb-8">
                                                 <div>
-                                                    <h1 className="text-[var(--fs-title)] font-bold text-white mb-2">Dashboard Overview</h1>
-                                                    <p className="text-[var(--fs-subtitle)] text-zinc-400">Bem-vindo ao novo painel de controle</p>
+                                                    <h1 className="text-preview-title font-bold text-white mb-2 leading-none">Dashboard Overview</h1>
+                                                    <p className="text-preview-subtitle text-zinc-400">Bem-vindo ao novo painel de controle</p>
                                                 </div>
-                                                <div className="w-10 h-10 rounded-full bg-zinc-900 border border-white/5 flex items-center justify-center text-zinc-400">
+                                                <div className="w-10 h-10 rounded-full bg-zinc-900 border-preview flex items-center justify-center text-zinc-400 border">
                                                     U
                                                 </div>
                                             </div>
                                             <div className="grid grid-cols-3 gap-6 mb-8">
                                                 {[1, 2, 3].map(i => (
-                                                    <div key={i} className="bg-white/[0.03] border border-white/5 p-6 rounded-[var(--radius)]">
-                                                        <div className="w-10 h-10 rounded-[var(--radius)] bg-[var(--primary)]/10 flex items-center justify-center mb-4">
+                                                    <div key={i} className="card-preview border-preview border p-6 rounded-preview">
+                                                        <div className="w-10 h-10 rounded-preview bg-[var(--primary)]/10 flex items-center justify-center mb-4">
                                                             <div className="w-5 h-5 bg-[var(--primary)] rounded text-primary" />
                                                         </div>
-                                                        <h2 className="text-[var(--fs-stats)] font-bold text-white mb-2 leading-none">R$ 12.450</h2>
-                                                        <p className="text-[var(--fs-small)] text-zinc-400 font-semibold">+15% vs mês anterior</p>
+                                                        <h2 className="text-preview-stats font-bold text-white mb-2 leading-none">R$ 12.450</h2>
+                                                        <p className="text-preview-small text-zinc-400 font-semibold">+15% vs mês anterior</p>
                                                     </div>
                                                 ))}
                                             </div>
-                                            <div className="bg-white/[0.03] border border-white/5 p-6 rounded-[var(--radius)]">
+                                            <div className="card-preview border-preview border p-6 rounded-preview">
                                                 <div className="flex justify-between items-center mb-6">
-                                                    <h3 className="text-[var(--fs-card-title)] font-bold text-white">Atividade Recente</h3>
-                                                    <Button className="bg-[var(--primary)] hover:bg-[var(--primary)]/80 text-white border-none rounded-[var(--radius)] text-[var(--fs-base)]">
+                                                    <h3 className="text-preview-card-title font-bold text-white uppercase tracking-tight">Atividade Recente</h3>
+                                                    <Button className="bg-[var(--primary)] hover:bg-[var(--primary)]/80 text-white border-none rounded-preview text-preview-base">
                                                         Botão Principal
                                                     </Button>
                                                 </div>
                                                 <div className="space-y-4">
                                                     {[1, 2].map(i => (
-                                                        <div key={i} className="flex items-center justify-between p-3 border-b border-white/5">
+                                                        <div key={i} className="flex items-center justify-between p-3 border-b border-preview">
                                                             <div className="flex items-center gap-3">
                                                                 <div className="w-8 h-8 rounded-full bg-zinc-800" />
                                                                 <div className="h-3 w-32 bg-zinc-800 rounded" />
@@ -840,4 +964,3 @@ export default function SystemBranding() {
         </div>
     );
 }
-

@@ -18,6 +18,57 @@ export function UiAssetUploader({ label, value, onChange, bucketName = "Identida
     const [uploading, setUploading] = useState(false);
     const [tab, setTab] = useState<'upload' | 'url'>('upload');
 
+    const convertToWebp = async (file: File): Promise<Blob> => {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.onload = (event) => {
+                const img = new Image();
+                img.onload = () => {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = img.width;
+                    canvas.height = img.height;
+                    const ctx = canvas.getContext('2d');
+                    if (!ctx) {
+                        reject(new Error("Não foi possível obter o contexto do canvas"));
+                        return;
+                    }
+                    ctx.drawImage(img, 0, 0);
+                    canvas.toBlob((blob) => {
+                        if (blob) resolve(blob);
+                        else reject(new Error("Falha na conversão para WebP"));
+                    }, 'image/webp', 0.85); // 85% quality for good balance
+                };
+                img.onerror = () => reject(new Error("Falha ao carregar imagem"));
+                img.src = event.target?.result as string;
+            };
+            reader.onerror = () => reject(new Error("Falha ao ler o arquivo"));
+            reader.readAsDataURL(file);
+        });
+    };
+
+    const deleteOldFile = async (currentUrl: string) => {
+        if (!currentUrl || !currentUrl.includes(bucketName)) return;
+
+        try {
+            // Extrair o nome do arquivo da URL (considerando espaços e caracteres especiais)
+            const parts = currentUrl.split('/');
+            const fileNameWithParams = parts[parts.length - 1];
+            const fileName = decodeURIComponent(fileNameWithParams.split('?')[0]);
+
+            const { error } = await supabase.storage
+                .from(bucketName)
+                .remove([fileName]);
+
+            if (error) {
+                console.warn("Aviso ao deletar arquivo antigo:", error.message);
+            } else {
+                console.log("Arquivo antigo deletado com sucesso:", fileName);
+            }
+        } catch (error) {
+            console.error("Erro ao deletar arquivo antigo:", error);
+        }
+    };
+
     const handleUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
         try {
             setUploading(true);
@@ -26,14 +77,27 @@ export function UiAssetUploader({ label, value, onChange, bucketName = "Identida
                 return;
             }
 
-            const file = event.target.files[0];
-            const fileExt = file.name.split('.').pop();
-            const fileName = `${Math.random().toString(36).substring(2)}.${fileExt}`;
+            const sourceFile = event.target.files[0];
+
+            // 1. Converter para WebP (a menos que já seja um formato que não queremos mexer, mas o user pediu todos)
+            const webpBlob = await convertToWebp(sourceFile);
+
+            // 2. Definir nome do arquivo (sempre .webp agora)
+            const fileName = `${Math.random().toString(36).substring(2)}.webp`;
             const filePath = `${fileName}`;
 
+            // 3. Deletar imagem anterior se existir
+            if (value) {
+                await deleteOldFile(value);
+            }
+
+            // 4. Upload do novo arquivo WebP
             const { error: uploadError } = await supabase.storage
                 .from(bucketName)
-                .upload(filePath, file);
+                .upload(filePath, webpBlob, {
+                    contentType: 'image/webp',
+                    upsert: true
+                });
 
             if (uploadError) {
                 throw uploadError;
@@ -44,8 +108,9 @@ export function UiAssetUploader({ label, value, onChange, bucketName = "Identida
                 .getPublicUrl(filePath);
 
             onChange(data.publicUrl);
-            toast.success("Imagem enviada com sucesso!");
+            toast.success("Imagem otimizada e enviada com sucesso!");
         } catch (error: any) {
+            console.error('Erro no upload:', error);
             toast.error('Erro no upload: ' + error.message);
         } finally {
             setUploading(false);

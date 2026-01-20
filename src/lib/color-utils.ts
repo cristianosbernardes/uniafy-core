@@ -27,7 +27,7 @@ export function hexToHsl(hex: string): { h: number; s: number; l: number; a: num
         }
     } else {
         // Standard Hex
-        let result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
+        const result = /^#?([a-f\d]{2})([a-f\d]{2})([a-f\d]{2})$/i.exec(hex);
         if (!result) return { h: 0, s: 0, l: 0, a: 1 };
         r = parseInt(result[1], 16);
         g = parseInt(result[2], 16);
@@ -38,11 +38,12 @@ export function hexToHsl(hex: string): { h: number; s: number; l: number; a: num
     g /= 255;
     b /= 255;
 
-    let max = Math.max(r, g, b), min = Math.min(r, g, b);
-    let h = 0, s = 0, l = (max + min) / 2;
+    const max = Math.max(r, g, b), min = Math.min(r, g, b);
+    let h = 0, s = 0;
+    const l = (max + min) / 2;
 
     if (max !== min) {
-        let d = max - min;
+        const d = max - min;
         s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
         switch (max) {
             case r: h = (g - b) / d + (g < b ? 6 : 0); break;

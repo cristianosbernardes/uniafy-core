@@ -47,7 +47,8 @@ export default function Login() {
                 {/* LEFT: IMAGE & BRANDING */}
                 <div className="relative hidden lg:block h-full overflow-hidden" style={getLoginStyles()}>
                     {/* Branding Overlay */}
-                    {branding?.login?.overlay_color && (
+                    {/* Branding Overlay (Visual: Only for image) */}
+                    {branding?.login?.bg_type === 'image' && branding?.login?.overlay_color && (
                         <div
                             className="absolute inset-0 pointer-events-none"
                             style={{
@@ -64,8 +65,14 @@ export default function Login() {
 
                     {/* Logo/Content on Image Side (Optional) */}
                     <div className="absolute bottom-12 left-12 z-10 p-8 max-w-lg">
-                        <div className="h-12 w-12 bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg flex items-center justify-center shadow-lg shadow-orange-500/20 mb-6">
-                            <span className="font-bold text-xl text-white">U</span>
+                        <div className="z-10 mb-6">
+                            {branding?.login?.logo_url ? (
+                                <img src={branding.login.logo_url} alt="Logo" className="h-10 object-contain" />
+                            ) : (
+                                <div className="h-12 w-12 bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg flex items-center justify-center shadow-lg shadow-orange-500/20">
+                                    <span className="font-bold text-xl text-white">U</span>
+                                </div>
+                            )}
                         </div>
                         <h2 className="text-4xl font-bold tracking-tight text-white mb-4">
                             {branding?.login?.title || "Bem-vindo de volta"}
@@ -167,7 +174,8 @@ export default function Login() {
         <div className="min-h-screen w-full bg-[#0a0a0a] flex flex-col items-center justify-center p-4 relative font-sans text-slate-100" style={getLoginStyles()}>
 
             {/* Branding Overlay */}
-            {branding?.login?.overlay_color && (
+            {/* Branding Overlay (Visual: Only for image) */}
+            {branding?.login?.bg_type === 'image' && branding?.login?.overlay_color && (
                 <div
                     className="absolute inset-0 pointer-events-none"
                     style={{
@@ -192,9 +200,13 @@ export default function Login() {
                 {/* Header */}
                 <div className="text-center space-y-2">
                     <div className="flex justify-center mb-6">
-                        <div className="h-12 w-12 bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg flex items-center justify-center shadow-lg shadow-orange-500/20">
-                            <span className="font-bold text-xl text-white">U</span>
-                        </div>
+                        {branding?.login?.logo_url ? (
+                            <img src={branding.login.logo_url} alt="Logo" className="h-10 object-contain" />
+                        ) : (
+                            <div className="h-12 w-12 bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg flex items-center justify-center shadow-lg shadow-orange-500/20">
+                                <span className="font-bold text-xl text-white">U</span>
+                            </div>
+                        )}
                     </div>
                     <h1 className="text-3xl font-bold tracking-tight text-white">
                         Bem-vindo de volta

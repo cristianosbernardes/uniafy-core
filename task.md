@@ -26,6 +26,13 @@
     - [x] Listagem e Status
     - [x] Onboarding Manual/Link
 
+## Módulo: Master & System Branding
+- [x] **Configuração de Branding Global** <!-- id: 9 -->
+    - [x] Live Preview sincronizado (Cores, Fontes, Radius)
+    - [x] Otimização de Imagens (Conversão WebP Automática)
+    - [x] Limpeza de Storage (Auto-delete de arquivos antigos)
+    - [x] Persistência em Banco e Reatividade Global (Header e Workspaces)
+
 ## Módulo: Assinaturas & Gateway (Card Upfront)
 - [x] **Expansão Multi-Gateway (Vault)** <!-- id: 6 -->
     - [x] Adicionar Kiwify e Hotmart no Vault

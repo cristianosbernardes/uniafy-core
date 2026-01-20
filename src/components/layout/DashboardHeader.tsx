@@ -6,6 +6,7 @@ import { cn } from '@/lib/utils';
 import { Search } from 'lucide-react';
 import { masterService } from '@/services/masterService';
 import { supabase } from '@/integrations/supabase/client';
+import { useBranding } from '@/contexts/BrandingContext';
 
 interface DashboardHeaderProps {
   user: User | null;
@@ -13,6 +14,7 @@ interface DashboardHeaderProps {
 }
 
 export function DashboardHeader({ user, isContextOpen }: DashboardHeaderProps) {
+  const { branding } = useBranding();
   const [config, setConfig] = useState<MasterNotificationConfig | null>(null);
 
   useEffect(() => {
@@ -61,13 +63,23 @@ export function DashboardHeader({ user, isContextOpen }: DashboardHeaderProps) {
     <header className="h-[48px] w-full flex items-center justify-between px-2 shrink-0 rounded-xl bg-[var(--bg-layout-base)] border border-transparent relative z-50">
 
       {/* LEFT: LOGO */}
-      <div className="flex items-center gap-3">
-        <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-black font-extrabold shadow-lg shadow-orange-900/20">
-          U
-        </div>
-        <span className="font-bold text-lg text-white tracking-tight">
-          UNIAFY
-        </span>
+      <div className="flex items-center gap-3 px-1">
+        {branding?.logo_url ? (
+          <img
+            src={branding.logo_url}
+            alt="Logo"
+            className="h-8 w-auto object-contain transition-opacity duration-300"
+          />
+        ) : (
+          <div className="flex items-center gap-3 animate-in fade-in duration-500">
+            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-black font-extrabold shadow-lg shadow-orange-900/20">
+              U
+            </div>
+            <span className="font-bold text-lg text-white tracking-tight">
+              UNIAFY
+            </span>
+          </div>
+        )}
       </div>
 
       {/* CENTER: DYNAMIC CONTENT (Search OR Trial Timer) */}

@@ -56,3 +56,12 @@ Este padrão define a sensação de amplitude e organização "high-ticket" da p
 *   **Imports:** Utilize aliases (`@/components`, `@/hooks`) em vez de caminhos relativos longos (`../../`).
 *   **Componentes:** Sempre prefira componentes funcionais e Hooks.
 *   **Placeholders:** Ao criar rotas futuras, use o padrão `PlaceholderPage` para dar feedback visual imediato ("Em Desenvolvimento").
+
+## 4. Ambiente de Desenvolvimento (Windows/PowerShell)
+
+Para garantir agilidade e evitar interrupções ("travamentos") causadas por políticas de segurança do Windows:
+
+*   **Execução de Scripts:** Em ambientes onde o PowerShell bloqueia scripts `.ps1` (erro `UnauthorizedAccess`), utilize sempre o sufixo `.cmd` para comandos npm.
+    *   **Correto:** `npm.cmd run dev`, `npm.cmd install`.
+    *   **Fallback:** Se o `.cmd` falhar, execute o binário diretamente via Node: `node node_modules/vite/bin/vite.js`.
+*   **Gerenciador de Pacotes:** O projeto suporta `bun`. Em caso de problemas com `npm`, tente `bun run dev` para uma inicialização mais rápida e estável em Windows.

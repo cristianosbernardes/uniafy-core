@@ -24,6 +24,11 @@ interface BrandingConfig {
         message?: string; // Subtitle/Welcome message
         logo_url?: string; // Specific logo for login if different
         layout?: 'center' | 'split';
+        bg_type?: 'image' | 'color' | 'gradient';
+        bg_color?: string;
+        gradient_start?: string;
+        gradient_end?: string;
+        gradient_direction?: string;
     };
     ui?: {
         radius?: number;
@@ -72,14 +77,42 @@ export const BrandingProvider: React.FC<{ children: React.ReactNode }> = ({ chil
     }, [branding?.favicon_url]);
 
     const getLoginStyles = (): React.CSSProperties => {
-        if (!branding?.login?.bg_url) return {};
+        if (!branding?.login) return {};
 
-        return {
-            backgroundImage: `url(${branding.login.bg_url})`,
-            backgroundSize: 'cover',
-            backgroundPosition: 'center',
-            backgroundRepeat: 'no-repeat',
-        };
+        const { bg_type, bg_url, bg_color, gradient_start, gradient_end, gradient_direction } = branding.login;
+
+        if (bg_type === 'image' && bg_url) {
+            return {
+                backgroundImage: `url(${bg_url})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                backgroundRepeat: 'no-repeat',
+            };
+        }
+
+        if (bg_type === 'color' && bg_color) {
+            return {
+                backgroundColor: bg_color
+            };
+        }
+
+        if (bg_type === 'gradient' && gradient_start && gradient_end) {
+            return {
+                backgroundImage: `linear-gradient(${gradient_direction || 'to bottom right'}, ${gradient_start}, ${gradient_end})`
+            };
+        }
+
+        // Fallback to old behavior
+        if (bg_url) {
+            return {
+                backgroundImage: `url(${bg_url})`,
+                backgroundSize: 'cover',
+                backgroundPosition: 'center',
+                backgroundRepeat: 'no-repeat',
+            };
+        }
+
+        return {};
     };
 
     const applyTheme = (config: BrandingConfig) => {
@@ -87,14 +120,27 @@ export const BrandingProvider: React.FC<{ children: React.ReactNode }> = ({ chil
 
         // 1. COLORS
         if (config.colors) {
+            // Raw numbers for Tailwind hsl(var(--primary)) format
             if (config.colors.primary) root.style.setProperty('--primary', config.colors.primary);
             if (config.colors.background) root.style.setProperty('--background', config.colors.background);
-            if (config.colors.sidebar) root.style.setProperty('--bg-layout-menu', config.colors.sidebar);
+            if (config.colors.border) root.style.setProperty('--border', config.colors.border);
+            if (config.colors.card) root.style.setProperty('--card', config.colors.card);
+            if (config.colors.hover) root.style.setProperty('--hover', config.colors.hover);
 
-            // Advanced UI Colors
-            if (config.colors.border) root.style.setProperty('--border-color', config.colors.border);
-            if (config.colors.card) root.style.setProperty('--card-bg', config.colors.card);
-            if (config.colors.hover) root.style.setProperty('--hover-bg', config.colors.hover);
+            // Full color values for direct use in CSS or bg-[var(--name)]
+            if (config.colors.sidebar) {
+                const sidebarHsl = `hsl(${config.colors.sidebar})`;
+                root.style.setProperty('--bg-layout-menu', sidebarHsl);
+                root.style.setProperty('--bg-layout-submenu', sidebarHsl);
+            }
+            if (config.colors.background) {
+                const bgHsl = `hsl(${config.colors.background})`;
+                root.style.setProperty('--bg-layout-workspace', bgHsl);
+                root.style.setProperty('--bg-layout-base', bgHsl);
+            }
+            if (config.colors.border) {
+                root.style.setProperty('--border-subtle', config.colors.border.includes('/') ? `hsl(${config.colors.border})` : `hsl(${config.colors.border})`);
+            }
         }
 
         // 2. UI SHAPE (Radius)
