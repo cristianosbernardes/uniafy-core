@@ -54,25 +54,25 @@ export default function SaasMetrics() {
             {/* Main Stats Grid */}
             <div className="grid grid-cols-1 md:grid-cols-5 gap-4">
                 {MOCK_SAAS_METRICS.map((metric, index) => (
-                    <div key={index} className="glass-card p-4 flex flex-col justify-between h-32 relative overflow-hidden group">
+                    <div key={index} className="glass-dynamic p-4 flex flex-col justify-between h-32 relative overflow-hidden group rounded-[var(--radius)]">
                         <div className={`absolute top-0 right-0 p-4 opacity-5 group-hover:opacity-10 transition-opacity`}>
                             <DollarSign className="w-16 h-16" />
                         </div>
 
                         <div className="flex justify-between items-start">
-                            <span className="text-[10px] font-medium uppercase text-muted-foreground">{metric.label}</span>
-                            <Badge variant="outline" className={`text-[9px] font-bold border-none ${metric.trend === 'up' ? 'text-green-500 bg-green-500/10' : 'text-red-500 bg-red-500/10'}`}>
+                            <span className="text-[10px] font-black uppercase text-muted-foreground tracking-widest">{metric.label}</span>
+                            <Badge variant="outline" className={`text-[9px] font-black uppercase px-2 h-5 flex items-center justify-center ${metric.trend === 'up' ? 'status-success' : 'status-error'}`}>
                                 {metric.change > 0 ? '+' : ''}{metric.change}%
                             </Badge>
                         </div>
 
                         <div>
-                            <div className="text-2xl font-medium tracking-tight text-white">
+                            <div className="text-2xl font-black tracking-tight text-white leading-none mb-1">
                                 {typeof metric.value === 'number' && metric.value > 100
                                     ? formatCurrency(metric.value)
                                     : metric.value}
                             </div>
-                            <span className="text-[9px] text-muted-foreground uppercase opacity-60">{metric.period}</span>
+                            <span className="text-[9px] text-muted-foreground uppercase font-bold opacity-60">{metric.period}</span>
                         </div>
                     </div>
                 ))}
@@ -81,9 +81,9 @@ export default function SaasMetrics() {
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
 
                 {/* Gráfico MRR */}
-                <div className="lg:col-span-2 glass-card p-6">
-                    <h3 className="text-sm font-bold uppercase text-white mb-6 flex items-center gap-2">
-                        <span className="w-1 h-4 bg-green-500 rounded-full" />
+                <div className="lg:col-span-2 glass-dynamic p-6 rounded-[var(--radius)]">
+                    <h3 className="text-sm font-black uppercase text-white mb-6 flex items-center gap-2">
+                        <span className="w-1 h-4 bg-[var(--success)] rounded-full" />
                         Evolução do MRR (Receita Recorrente Mensal)
                     </h3>
                     <div className="h-[350px] w-full">
@@ -129,9 +129,9 @@ export default function SaasMetrics() {
 
                 {/* Churn Radar & Transações */}
                 <div className="space-y-6">
-                    <div className="glass-card p-6 h-[250px]">
-                        <h3 className="text-sm font-bold uppercase text-white mb-2 flex items-center gap-2">
-                            <span className="w-1 h-4 bg-red-500 rounded-full" />
+                    <div className="glass-dynamic p-6 h-[250px] rounded-[var(--radius)]">
+                        <h3 className="text-sm font-black uppercase text-white mb-2 flex items-center gap-2">
+                            <span className="w-1 h-4 bg-[var(--error)] rounded-full" />
                             Saúde da Base (Churn)
                         </h3>
                         <div className="h-full flex items-center justify-center relative">
@@ -164,10 +164,10 @@ export default function SaasMetrics() {
                         </div>
                     </div>
 
-                    <div className="glass-card p-0 overflow-hidden">
+                    <div className="glass-dynamic p-0 overflow-hidden rounded-[var(--radius)]">
                         <div className="p-4 border-b border-white/5 bg-white/5">
-                            <h3 className="text-[10px] font-bold uppercase text-white flex items-center gap-2">
-                                <CreditCard className="w-3 h-3 text-primary" />
+                            <h3 className="text-[10px] font-black uppercase text-white flex items-center gap-2">
+                                <CreditCard className="w-3 h-3 text-[var(--primary)]" />
                                 Últimas Transações
                             </h3>
                         </div>
@@ -179,8 +179,8 @@ export default function SaasMetrics() {
                                         <div className="text-[9px] text-muted-foreground">{tx.date}</div>
                                     </div>
                                     <div className="text-right">
-                                        <div className="text-[10px] font-bold text-white uppercase">{formatCurrency(tx.amount)}</div>
-                                        <Badge variant="outline" className={`text-[8px] h-4 px-1 border-none ${tx.status === 'paid' ? 'text-green-500 bg-green-500/10' : 'text-red-500 bg-red-500/10'}`}>
+                                        <div className="text-[10px] font-black text-white uppercase">{formatCurrency(tx.amount)}</div>
+                                        <Badge variant="outline" className={`text-[8px] h-4 px-1 flex items-center justify-center font-black uppercase ${tx.status === 'paid' ? 'status-success' : 'status-error'}`}>
                                             {tx.status}
                                         </Badge>
                                     </div>

@@ -47,10 +47,19 @@ export default function GHunter() {
                 .select('*')
                 .order('created_at', { ascending: false });
 
-            if (error) throw error;
+            if (error) {
+                if (error.code === 'PGRST116' || error.message.includes('not found')) {
+                    console.warn('Tabela leads_prospect não encontrada. Usando lista vazia.');
+                    setLeads([]);
+                    return;
+                }
+                throw error;
+            }
             setLeads(data || []);
         } catch (error: any) {
             console.error('Erro ao buscar leads:', error.message);
+            // Non-blocking error for UI
+            setLeads([]);
         } finally {
             setLoadingLeads(false);
         }

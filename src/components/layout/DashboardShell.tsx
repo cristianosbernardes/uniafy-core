@@ -42,7 +42,7 @@ export function DashboardShell() {
       <div className="flex-1 flex overflow-hidden gap-[6px]">
 
         {/* BLOCK A: MODULE SIDEBAR (Independent Card) */}
-        <div className="w-[64px] h-full rounded-[9px] bg-[var(--bg-layout-menu)] flex flex-col shrink-0 z-30 overflow-hidden shadow-xl">
+        <div className="w-[64px] h-full rounded-[var(--radius)] bg-[var(--bg-layout-menu)] flex flex-col shrink-0 z-30 overflow-hidden shadow-xl">
           <ModuleSidebar
             activeModule={activeModule}
             onModuleChange={(moduleId) => navigate(`/${moduleId}`)}
@@ -53,7 +53,7 @@ export function DashboardShell() {
         </div>
 
         {/* BLOCK B: CONTENT AREA (Submenu + Workspace) */}
-        <div className="flex-1 flex overflow-hidden rounded-[9px] border border-[var(--border-subtle)] bg-[var(--bg-layout-workspace)] relative shadow-2xl">
+        <div className="flex-1 flex overflow-hidden rounded-[var(--radius)] border border-[var(--border-subtle)] bg-[var(--bg-layout-workspace)] relative shadow-2xl">
 
           {/* COLUMN 2: CONTEXT SIDEBAR (Submenu) */}
           <div

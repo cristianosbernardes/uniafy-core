@@ -69,7 +69,13 @@ export default function Login() {
                             {branding?.login?.logo_url ? (
                                 <img src={branding.login.logo_url} alt="Logo" className="h-10 object-contain" />
                             ) : (
-                                <div className="h-12 w-12 bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg flex items-center justify-center shadow-lg shadow-orange-500/20">
+                                <div
+                                    className="h-12 w-12 rounded-lg flex items-center justify-center shadow-lg"
+                                    style={{
+                                        background: 'linear-gradient(to bottom right, hsl(var(--primary)), hsl(var(--primary) / 0.8))',
+                                        boxShadow: '0 10px 15px -3px hsla(var(--primary), 0.2)'
+                                    }}
+                                >
                                     <span className="font-bold text-xl text-white">U</span>
                                 </div>
                             )}
@@ -134,14 +140,23 @@ export default function Login() {
                                         placeholder="••••••••"
                                         value={password}
                                         onChange={(e) => setPassword(e.target.value)}
-                                        className="h-11 bg-[#0a0a0a] border-white/10 rounded-lg focus:border-orange-500/50 focus:ring-1 focus:ring-orange-500/20 text-slate-200 placeholder:text-slate-600 transition-all font-sans"
+                                        className="h-11 bg-[#0a0a0a] border-white/10 rounded-lg focus:ring-1 text-slate-200 placeholder:text-slate-600 transition-all font-sans"
+                                        style={{
+                                            // @ts-ignore
+                                            '--tw-ring-color': 'hsla(var(--primary), 0.2)',
+                                            borderColor: 'hsla(var(--primary), 0.5)'
+                                        }}
                                         required
                                     />
                                 </div>
 
                                 <Button
                                     type="submit"
-                                    className="w-full h-11 bg-orange-600 hover:bg-orange-500 text-white font-semibold rounded-lg transition-all duration-200 shadow-lg shadow-orange-900/20"
+                                    className="w-full h-11 text-white font-semibold rounded-lg transition-all duration-200 shadow-lg"
+                                    style={{
+                                        backgroundColor: 'hsl(var(--primary))',
+                                        boxShadow: '0 10px 15px -3px hsla(var(--primary), 0.2)'
+                                    }}
                                     disabled={loading}
                                 >
                                     {loading ? (
@@ -203,7 +218,13 @@ export default function Login() {
                         {branding?.login?.logo_url ? (
                             <img src={branding.login.logo_url} alt="Logo" className="h-10 object-contain" />
                         ) : (
-                            <div className="h-12 w-12 bg-gradient-to-br from-orange-500 to-orange-600 rounded-lg flex items-center justify-center shadow-lg shadow-orange-500/20">
+                            <div
+                                className="h-12 w-12 rounded-lg flex items-center justify-center shadow-lg"
+                                style={{
+                                    background: 'linear-gradient(to bottom right, hsl(var(--primary)), hsl(var(--primary) / 0.8))',
+                                    boxShadow: '0 10px 15px -3px hsla(var(--primary), 0.2)'
+                                }}
+                            >
                                 <span className="font-bold text-xl text-white">U</span>
                             </div>
                         )}
@@ -250,7 +271,11 @@ export default function Login() {
 
                         <Button
                             type="submit"
-                            className="w-full h-11 bg-orange-600 hover:bg-orange-500 text-white font-semibold rounded-lg transition-all duration-200 shadow-lg shadow-orange-900/20"
+                            className="w-full h-11 text-white font-semibold rounded-lg transition-all duration-200 shadow-lg"
+                            style={{
+                                backgroundColor: 'hsl(var(--primary))',
+                                boxShadow: '0 10px 15px -3px hsla(var(--primary), 0.2)'
+                            }}
                             disabled={loading}
                         >
                             {loading ? (

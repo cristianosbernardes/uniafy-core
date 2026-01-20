@@ -40,22 +40,22 @@ export function CountdownTimer({ targetDate }: CountdownTimerProps) {
     const pad = (num: number) => num.toString().padStart(2, '0');
 
     return (
-        <div className="flex items-center gap-3 text-sm tracking-wide text-orange-100">
+        <div className="flex items-center gap-3 text-sm tracking-wide" style={{ color: 'hsl(var(--primary) / 0.9)' }}>
             <div className="flex items-baseline gap-0.5">
                 <span className="font-bold text-lg">{timeLeft.days}</span>
-                <span className="text-xs font-bold text-orange-300/80">d</span>
+                <span className="text-xs font-bold opacity-70" style={{ color: 'hsl(var(--primary))' }}>d</span>
             </div>
             <div className="flex items-baseline gap-0.5">
                 <span className="font-bold text-lg">{pad(timeLeft.hours)}</span>
-                <span className="text-xs font-bold text-orange-300/80">h</span>
+                <span className="text-xs font-bold opacity-70" style={{ color: 'hsl(var(--primary))' }}>h</span>
             </div>
             <div className="flex items-baseline gap-0.5">
                 <span className="font-bold text-lg">{pad(timeLeft.minutes)}</span>
-                <span className="text-xs font-bold text-orange-300/80">m</span>
+                <span className="text-xs font-bold opacity-70" style={{ color: 'hsl(var(--primary))' }}>m</span>
             </div>
             <div className="flex items-baseline gap-0.5">
                 <span className="font-bold text-lg min-w-[24px] text-center">{pad(timeLeft.seconds)}</span>
-                <span className="text-xs font-bold text-orange-300/80">s</span>
+                <span className="text-xs font-bold opacity-70" style={{ color: 'hsl(var(--primary))' }}>s</span>
             </div>
         </div>
     );

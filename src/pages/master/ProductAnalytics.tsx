@@ -52,38 +52,38 @@ export default function ProductAnalytics() {
 
             {/* KPI Cards */}
             <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
-                <div className="glass-card p-6 relative overflow-hidden group">
-                    <Activity className="absolute top-4 right-4 text-primary/20 w-8 h-8" />
+                <div className="glass-dynamic p-6 relative overflow-hidden group rounded-[var(--radius)]">
+                    <Activity className="absolute top-4 right-4 text-[var(--primary)]/20 w-8 h-8" />
                     <h3 className="text-[10px] font-black uppercase text-muted-foreground">Eventos Hoje</h3>
                     <div className="mt-2 text-3xl font-black text-white">{MOCK_TELEMETRY.length}</div>
-                    <span className="text-[9px] text-primary uppercase font-bold">+12% vs ontem</span>
+                    <span className="text-[9px] status-info uppercase font-bold px-2 py-0.5 rounded-full inline-block">+12% vs ontem</span>
                 </div>
-                <div className="glass-card p-6 relative overflow-hidden group">
-                    <Users className="absolute top-4 right-4 text-blue-500/20 w-8 h-8" />
+                <div className="glass-dynamic p-6 relative overflow-hidden group rounded-[var(--radius)]">
+                    <Users className="absolute top-4 right-4 text-[var(--info)]/20 w-8 h-8" />
                     <h3 className="text-[10px] font-black uppercase text-muted-foreground">Usuários Ativos</h3>
                     <div className="mt-2 text-3xl font-black text-white">84</div>
-                    <span className="text-[9px] text-blue-500 uppercase font-bold">42 online agora</span>
+                    <span className="text-[9px] status-info uppercase font-bold px-2 py-0.5 rounded-full inline-block">42 online agora</span>
                 </div>
-                <div className="glass-card p-6 relative overflow-hidden group">
-                    <MousePointerClick className="absolute top-4 right-4 text-green-500/20 w-8 h-8" />
+                <div className="glass-dynamic p-6 relative overflow-hidden group rounded-[var(--radius)]">
+                    <MousePointerClick className="absolute top-4 right-4 text-[var(--success)]/20 w-8 h-8" />
                     <h3 className="text-[10px] font-black uppercase text-muted-foreground">Taxa de Cliques</h3>
                     <div className="mt-2 text-3xl font-black text-white">4.2%</div>
-                    <span className="text-[9px] text-green-500 uppercase font-bold">Alta engajamento</span>
+                    <span className="text-[9px] status-success uppercase font-bold px-2 py-0.5 rounded-full inline-block">Alta engajamento</span>
                 </div>
-                <div className="glass-card p-6 relative overflow-hidden group">
-                    <Clock className="absolute top-4 right-4 text-purple-500/20 w-8 h-8" />
+                <div className="glass-dynamic p-6 relative overflow-hidden group rounded-[var(--radius)]">
+                    <Clock className="absolute top-4 right-4 text-[var(--warning)]/20 w-8 h-8" />
                     <h3 className="text-[10px] font-black uppercase text-muted-foreground">Tempo Médio</h3>
                     <div className="mt-2 text-3xl font-black text-white">18m</div>
-                    <span className="text-[9px] text-purple-500 uppercase font-bold">Sessão por usuário</span>
+                    <span className="text-[9px] status-warning uppercase font-bold px-2 py-0.5 rounded-full inline-block">Sessão por usuário</span>
                 </div>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
 
                 {/* Gráfico de Barras - Módulos Mais Usados */}
-                <div className="glass-card p-6">
+                <div className="glass-dynamic p-6 rounded-[var(--radius)]">
                     <h3 className="text-sm font-black uppercase text-white mb-6 flex items-center gap-2">
-                        <span className="w-1 h-4 bg-primary rounded-full" />
+                        <span className="w-1 h-4 bg-[var(--primary)] rounded-full" />
                         Funcionalidades Mais Acessadas
                     </h3>
                     <div className="h-[300px] w-full">
@@ -115,9 +115,9 @@ export default function ProductAnalytics() {
                 </div>
 
                 {/* Gráfico de Linha - Tráfego */}
-                <div className="glass-card p-6">
+                <div className="glass-dynamic p-6 rounded-[var(--radius)]">
                     <h3 className="text-sm font-black uppercase text-white mb-6 flex items-center gap-2">
-                        <span className="w-1 h-4 bg-blue-500 rounded-full" />
+                        <span className="w-1 h-4 bg-[var(--info)] rounded-full" />
                         Tráfego em Tempo Real (Hoje)
                     </h3>
                     <div className="h-[300px] w-full">

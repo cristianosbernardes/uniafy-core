@@ -108,10 +108,10 @@ export default function PlanManager() {
 
             {/* Warning for Non-God Mode Users */}
             {!isSuperAdmin && (
-                <div className="bg-yellow-500/10 border border-yellow-500/20 p-4 rounded-lg flex items-center gap-3">
-                    <Shield className="w-5 h-5 text-yellow-500" />
-                    <p className="text-sm text-yellow-200">
-                        Você está visualizando os planos em modo <strong>Leitura</strong>. Apenas o Super Admin tem permissão de escrita crítica.
+                <div className="status-warning p-4 rounded-[var(--radius)] flex items-center gap-3">
+                    <Shield className="w-5 h-5" />
+                    <p className="text-sm font-bold uppercase">
+                        Modo de Visualização: <span className="opacity-70">Apenas o Super Admin tem permissão de escrita.</span>
                     </p>
                 </div>
             )}
@@ -130,7 +130,7 @@ export default function PlanManager() {
                     if (plan.id === 'plan_enterprise' && !isSuperAdmin) return null;
 
                     return (
-                        <div key={plan.id} className="glass-card bg-white/[0.03] border-white/10 rounded-xl p-6 flex flex-col relative group overflow-hidden hover:bg-white/5 hover:border-white/20 transition-all duration-300 cursor-pointer">
+                        <div key={plan.id} className="glass-dynamic p-6 flex flex-col relative group overflow-hidden transition-all duration-300 cursor-pointer rounded-[var(--radius)]">
 
                             {/* Plan Icon / Header */}
                             <div className="flex justify-between items-start mb-6 z-10 relative">
@@ -138,12 +138,12 @@ export default function PlanManager() {
                                     {getPlanIcon(plan.icon_key, plan.accent_color)}
                                 </div>
                                 {plan.is_active ? (
-                                    <Badge className="bg-green-500/10 text-green-500 border-green-500/20">Ativo</Badge>
+                                    <Badge variant="outline" className="status-success">Ativo</Badge>
                                 ) : (
-                                    <Badge variant="destructive">Inativo</Badge>
+                                    <Badge variant="outline" className="status-error">Inativo</Badge>
                                 )}
                                 {plan.is_visible === false && (
-                                    <Badge variant="secondary" className="ml-2 bg-zinc-800 text-zinc-400 border-zinc-700">
+                                    <Badge variant="outline" className="ml-2 status-info opacity-70">
                                         <Eye className="w-3 h-3 mr-1" /> Oculto
                                     </Badge>
                                 )}
@@ -172,7 +172,7 @@ export default function PlanManager() {
                                         </div>
 
                                         {(plan.monthly_price_amount || 0) > 0 && (
-                                            <Badge className="h-5 px-1.5 bg-green-500/10 text-green-400 border-green-500/20 text-[10px] hover:bg-green-500/20">
+                                            <Badge variant="outline" className="h-5 px-1.5 status-success text-[10px] font-black">
                                                 {Math.round((((plan.monthly_price_amount || 0) * 12 - (plan.yearly_price_amount || 0)) / ((plan.monthly_price_amount || 0) * 12)) * 100)}% OFF
                                             </Badge>
                                         )}

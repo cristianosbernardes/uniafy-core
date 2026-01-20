@@ -4,10 +4,8 @@ import { supabase } from "@/integrations/supabase/client";
 export interface AgencySettings {
     custom_domain?: string | null;
     branding_logo?: string | null;
-    branding_colors?: {
-        primary: string;
-        secondary: string;
-    };
+    branding_colors?: any; // Will store the full BrandingColors object
+    branding_ui?: any; // Will store UI shape and typography
 }
 
 export const agencyService = {
@@ -15,7 +13,7 @@ export const agencyService = {
     async getSettings(userId: string) {
         const { data, error } = await supabase
             .from('profiles')
-            .select('custom_domain, branding_logo, branding_colors')
+            .select('custom_domain, branding_logo, branding_colors, branding_ui')
             .eq('id', userId)
             .single();
 
@@ -30,7 +28,8 @@ export const agencyService = {
             .update({
                 custom_domain: settings.custom_domain,
                 branding_logo: settings.branding_logo,
-                branding_colors: settings.branding_colors
+                branding_colors: settings.branding_colors,
+                branding_ui: settings.branding_ui
             })
             .eq('id', userId)
             .select()

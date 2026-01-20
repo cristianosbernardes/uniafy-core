@@ -22,13 +22,13 @@ export default function AuditLogs() {
     // Helper para cores das ações
     const getActionColor = (action: AuditAction) => {
         switch (action) {
-            case 'LOGIN': return 'text-blue-400 bg-blue-500/10 border-blue-500/20';
-            case 'CREATE': return 'text-green-400 bg-green-500/10 border-green-500/20';
-            case 'UPDATE': return 'text-yellow-400 bg-yellow-500/10 border-yellow-500/20';
-            case 'DELETE': return 'text-red-400 bg-red-500/10 border-red-500/20';
-            case 'EXPORT': return 'text-purple-400 bg-purple-500/10 border-purple-500/20';
-            case 'IMPERSONATE': return 'text-orange-400 bg-orange-500/10 border-orange-500/20';
-            default: return 'text-zinc-400 bg-zinc-500/10 border-zinc-500/20';
+            case 'LOGIN': return 'status-info';
+            case 'CREATE': return 'status-success';
+            case 'UPDATE': return 'status-warning';
+            case 'DELETE': return 'status-error';
+            case 'EXPORT': return 'status-info';
+            case 'IMPERSONATE': return 'status-error';
+            default: return 'status-info opacity-50';
         }
     };
 
@@ -54,7 +54,7 @@ export default function AuditLogs() {
             />
 
             {/* Main Table */}
-            <div className="glass-card overflow-hidden">
+            <div className="glass-dynamic overflow-hidden rounded-[var(--radius)]">
                 {/* Table Toolbar */}
                 <div className="p-4 border-b border-white/5 flex flex-col md:flex-row gap-4 justify-between items-center">
                     <div className="relative w-full md:w-96">
@@ -77,7 +77,7 @@ export default function AuditLogs() {
                 </div>
 
                 {/* List Header */}
-                <div className="grid grid-cols-12 gap-4 p-4 bg-white/5 text-[10px] font-black uppercase text-muted-foreground border-b border-white/5">
+                <div className="grid grid-cols-12 gap-4 p-4 bg-white/5 text-[var(--fs-small)] font-black uppercase text-muted-foreground border-b border-white/5">
                     <div className="col-span-2">Data & Hora</div>
                     <div className="col-span-3">Ator (Quem fez)</div>
                     <div className="col-span-2 text-center">Ação</div>
@@ -113,7 +113,7 @@ export default function AuditLogs() {
 
                             {/* Ação */}
                             <div className="col-span-2 flex justify-center">
-                                <Badge variant="outline" className={`text-[9px] font-black uppercase border h-6 px-3 ${getActionColor(log.action)}`}>
+                                <Badge variant="outline" className={`text-[var(--fs-small)] font-black uppercase border h-7 px-3 flex items-center justify-center ${getActionColor(log.action)}`}>
                                     {log.action}
                                 </Badge>
                             </div>

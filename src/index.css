@@ -58,7 +58,7 @@
 
     /* Industrial Borders */
     --border: 240 5% 12%;
-    --border-industrial: 0 0% 100% / 0.08;
+    --border-industrial: hsl(0 0% 100% / 0.08);
     --border-subtle: #272727;
     /* User Spec */
     --input: 240 5% 12%;
@@ -88,6 +88,34 @@
     --zinc-600: 240 5% 34%;
     --zinc-700: 240 4% 16%;
     --zinc-800: 240 6% 10%;
+
+    /* Glass Effect Defaults */
+    --glass-blur: 12px;
+    --glass-opacity: 0.05;
+
+    /* Global Status Colors (HSL Components without hsl() wrapper) */
+    --status-success: 142 71% 45%;
+    --status-warning: 48 96% 53%;
+    --status-error: 0 84% 60%;
+    --status-info: 217 91% 60%;
+
+    /* Semantic Aliases for easy access */
+    --success: var(--status-success);
+    --warning: var(--status-warning);
+    --error: var(--status-error);
+    --info: var(--status-info);
+
+    /* Industrial Design Tokens */
+    --header-icon-color: hsl(var(--foreground) / 0.8);
+    --hover-industrial: hsl(0 0% 100% / 0.05);
+    --card-industrial: hsl(0 0% 100% / 0.03);
+
+    /* Text & Border Dynamics */
+    --text-primary: hsl(var(--foreground));
+    --text-secondary: hsl(var(--muted-foreground));
+    --border-strong: hsl(var(--border));
+    --border-subtle: #272727;
+    --scroll-thumb: hsl(var(--zinc-600));
   }
 }
 
@@ -130,7 +158,11 @@
 
   .nav-module span,
   .nav-module div {
-    font-size: var(--fs-menu) !important;
+    font-size: var(--fs-menu, 10px) !important;
+  }
+
+  .nav-item-submenu {
+    font-size: var(--fs-submenu, 14px) !important;
   }
 
   a,
@@ -152,7 +184,10 @@
   }
 
   .glass-card {
-    @apply bg-white/[0.02] backdrop-blur-md border border-white/[0.05] shadow-xl;
+    background-color: hsla(0, 0%, 100%, var(--glass-opacity, 0.05));
+    backdrop-filter: blur(var(--glass-blur, 12px));
+    border: 1px solid var(--border-industrial, rgba(255, 255, 255, 0.05));
+    @apply shadow-xl;
   }
 
   .border-metal {
@@ -164,11 +199,16 @@
   }
 
   .card-industrial {
-    @apply bg-card border border-border shadow-2xl transition-all duration-300;
+    background-color: var(--card, hsla(0, 0%, 100%, var(--glass-opacity, 0.03)));
+    backdrop-filter: blur(var(--glass-blur, 12px));
+    border: 1px solid var(--border-industrial, rgba(255, 255, 255, 0.08));
+    @apply shadow-2xl transition-all duration-300;
   }
 
   .card-industrial:hover {
-    @apply border-primary/20 shadow-primary/5 bg-white/[0.03];
+    background-color: var(--hover, hsla(0, 0%, 100%, calc(var(--glass-opacity, 0.03) + 0.02)));
+    border-color: var(--primary);
+    @apply shadow-primary/5;
   }
 
   /* Glowing accent border */
@@ -217,9 +257,6 @@
   .glow-orange {
     box-shadow: 0 0 20px hsl(24 100% 52% / 0.3);
   }
-}
-
-@layer utilities {
 
   /* Scrollbar Industrial (ClickUp Standard: 8px) */
   .custom-scrollbar::-webkit-scrollbar {
@@ -232,12 +269,53 @@
   }
 
   .custom-scrollbar::-webkit-scrollbar-thumb {
-    @apply bg-zinc-600 rounded-lg;
+    background-color: var(--scroll-thumb) !important;
+    @apply rounded-lg;
     border: 1px solid transparent;
     background-clip: content-box;
   }
 
   .custom-scrollbar::-webkit-scrollbar-thumb:hover {
     @apply bg-zinc-500;
+  }
+
+  /* Status Badge Utility */
+  .status-badge {
+    @apply text-[9px] font-black uppercase border h-6 px-3 flex items-center justify-center rounded-full transition-all duration-300;
+  }
+
+  .status-success {
+    background-color: hsla(var(--success), 0.1) !important;
+    color: hsl(var(--success)) !important;
+    border: 1px solid hsla(var(--success), 0.2) !important;
+  }
+
+  .status-warning {
+    background-color: hsla(var(--warning), 0.1) !important;
+    color: hsl(var(--warning)) !important;
+    border: 1px solid hsla(var(--warning), 0.2) !important;
+  }
+
+  .status-error {
+    background-color: hsla(var(--error), 0.1) !important;
+    color: hsl(var(--error)) !important;
+    border: 1px solid hsla(var(--error), 0.2) !important;
+  }
+
+  .status-info {
+    background-color: hsla(var(--info), 0.1) !important;
+    color: hsl(var(--info)) !important;
+    border: 1px solid hsla(var(--info), 0.2) !important;
+  }
+
+  .glass-dynamic {
+    background-color: hsla(0, 0%, 100%, var(--glass-opacity)) !important;
+    backdrop-filter: blur(var(--glass-blur)) !important;
+    border: 1px solid rgba(255, 255, 255, 0.05) !important;
+  }
+
+  .glass-dynamic-hover:hover {
+    background-color: hsla(0, 0%, 100%, calc(var(--glass-opacity) + 0.05)) !important;
+    transition: all 0.3s ease;
   }
 }

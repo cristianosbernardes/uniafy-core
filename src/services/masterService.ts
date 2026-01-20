@@ -167,22 +167,31 @@ END $$;
 
     // --- WHITE LABEL FACTORY ---
     async getWhiteLabelTenants() {
-        // Fetch profiles that are Agencies (potential tenants)
-        // We filter by role 'AGENCY' or if they have a custom domain set
-        const { data, error } = await supabase
-            .from('profiles')
-            .select('*')
-            .or('role.eq.AGENCY,custom_domain.neq.null')
-            .order('created_at', { ascending: false });
+        // Use RPC to avoid RLS issues when listing potentially sensitive profile data
+        const sql = `
+            SELECT 
+                id, email, company_name, role, custom_domain, branding_colors, branding_logo, created_at
+            FROM profiles 
+            WHERE role = 'AGENCY' OR custom_domain IS NOT NULL
+            ORDER BY created_at DESC;
+        `;
 
-        if (error) throw error;
+        const { data, error } = await supabase.rpc('admin_exec_sql', {
+            sql_query: sql
+        });
+
+        if (error) {
+            console.error("Failed to fetch white label tenants via RPC", error);
+            throw error;
+        }
+
+        const rows = Array.isArray(data) ? data : [];
 
         // Map to CustomDomain interface expected by UI
-        return data.map((profile: any) => ({
+        return rows.map((profile: any) => ({
             id: profile.id,
             domain: profile.custom_domain || 'Não configurado',
             tenant_id: profile.company_name || profile.email?.split('@')[0] || 'Desconhecido',
-            // Simple logic for status: if has domain -> pending (mock), else -> active (just for list)
             status: (profile.custom_domain ? 'pending_dns' : 'active') as 'pending_dns' | 'active',
             dns_record_type: 'CNAME' as const,
             dns_record_value: 'cname.uniafy.com',

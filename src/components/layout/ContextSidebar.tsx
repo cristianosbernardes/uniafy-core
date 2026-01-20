@@ -162,27 +162,33 @@ export function ContextSidebar({ activeModule, userRole, isOpen = true, onToggle
               {/* Active State: Rounded Background */}
               <div
                 className={cn(
-                  "absolute inset-0 mx-2 rounded-md transition-all duration-200",
-                  isActive ? "bg-[#292929]" : "bg-transparent group-hover:bg-[#191919]"
+                  "absolute inset-0 mx-2 rounded-[var(--radius)] transition-all duration-200",
+                  isActive ? "bg-white/10" : "bg-transparent group-hover:bg-white/5"
                 )}
               />
 
               <div className="relative flex items-center z-10 w-full px-2">
-                <div className={cn("transition-colors shrink-0 mr-3", isActive ? "text-primary" : "text-zinc-500 group-hover:text-zinc-300")}>
+                <div
+                  className={cn("transition-colors shrink-0 mr-3", isActive ? "text-[var(--primary)]" : "text-[var(--primary)]/60 group-hover:text-[var(--primary)]")}
+                  style={{ color: 'hsl(var(--primary))' }}
+                >
                   {Icon}
                 </div>
-                <span className={cn(
-                  "text-[14px] font-medium transition-colors truncate leading-none pt-0.5", // 14px Font
-                  isActive ? "text-white" : "text-zinc-400 group-hover:text-zinc-200"
-                )}>
+                <span
+                  className={cn(
+                    "font-medium transition-colors truncate leading-none pt-0.5 nav-item-submenu",
+                    isActive ? "text-white" : "text-zinc-400 group-hover:text-zinc-200"
+                  )}
+                  style={{ fontSize: 'var(--fs-submenu, 14px)' }}
+                >
                   {item.title}
                 </span>
 
                 {item.badge && (
                   <span
                     className={cn(
-                      "ml-auto text-[10px] px-1.5 py-0.5 rounded-full font-bold",
-                      isActive ? "bg-primary/20 text-primary" : "bg-white/10 text-zinc-400"
+                      "ml-auto text-[var(--fs-small)] px-1.5 py-0.5 rounded-full font-black uppercase",
+                      isActive ? "status-success" : "bg-white/10 text-zinc-400"
                     )}
                   >
                     {item.badge}

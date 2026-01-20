@@ -72,11 +72,11 @@ export function DashboardHeader({ user, isContextOpen }: DashboardHeaderProps) {
           />
         ) : (
           <div className="flex items-center gap-3 animate-in fade-in duration-500">
-            <div className="w-8 h-8 rounded-lg bg-primary flex items-center justify-center text-black font-extrabold shadow-lg shadow-orange-900/20">
+            <div className="w-8 h-8 rounded-lg bg-[var(--primary)] flex items-center justify-center text-black font-extrabold shadow-lg shadow-[var(--primary)]/20">
               U
             </div>
             <span className="font-bold text-lg text-white tracking-tight">
-              UNIAFY
+              Uniafy
             </span>
           </div>
         )}
@@ -90,7 +90,12 @@ export function DashboardHeader({ user, isContextOpen }: DashboardHeaderProps) {
             {/* Container "Display Digital" */}
             <div className="relative group overflow-hidden rounded-full bg-black/40 border border-white/5 shadow-inner px-6 py-1.5 flex items-center gap-4 select-none">
               {/* Glow Effect Background */}
-              <div className="absolute inset-0 bg-gradient-to-r from-orange-500/0 via-orange-500/5 to-orange-500/0 opacity-50 group-hover:opacity-100 transition-opacity duration-1000" />
+              <div
+                className="absolute inset-0 opacity-50 group-hover:opacity-100 transition-opacity duration-1000"
+                style={{
+                  background: 'linear-gradient(to right, transparent, hsl(var(--primary) / 0.1), transparent)'
+                }}
+              />
 
               {/* Label discreta - Ajustada */}
               <span className="text-xs text-white/50 font-semibold mr-2 hidden xl:inline-block pt-[1px]">
@@ -104,7 +109,7 @@ export function DashboardHeader({ user, isContextOpen }: DashboardHeaderProps) {
             </div>
 
             {/* Call to Action Button - REDUZIDO */}
-            <button className="h-7 px-4 rounded-full bg-orange-500 hover:bg-orange-400 text-white text-[10px] font-bold uppercase tracking-wider shadow-lg shadow-orange-900/40 transition-all hover:scale-105 active:scale-95 flex items-center gap-2">
+            <button className="h-7 px-4 rounded-full bg-[var(--primary)] hover:opacity-90 text-white text-[10px] font-bold uppercase tracking-wider shadow-lg shadow-[var(--primary)]/40 transition-all hover:scale-105 active:scale-95 flex items-center gap-2">
               <span>Renovar</span>
               <div className="w-1 h-1 rounded-full bg-white animate-pulse" />
             </button>

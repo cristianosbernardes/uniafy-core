@@ -300,7 +300,7 @@ export default function GestaoClientes() {
 
             <DialogFooter>
               <Button variant="ghost" onClick={() => setIsCreateOpen(false)} disabled={isCreating}>Cancelar</Button>
-              <Button onClick={handleCreateClient} disabled={isCreating} className="bg-[#FF6600] hover:bg-[#FF6600]/90 text-white font-bold">
+              <Button onClick={handleCreateClient} disabled={isCreating} className="bg-primary hover:bg-primary/90 text-white font-bold">
                 {isCreating && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
                 Criar Agência
               </Button>
@@ -313,22 +313,19 @@ export default function GestaoClientes() {
       <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
 
         {/* MRR Card */}
-        <div className="relative bg-[#09090b] border border-white/5 rounded-xl p-5 overflow-hidden group hover:border-white/10 transition-all duration-300">
-          <div className="absolute inset-0 bg-gradient-to-br from-green-500/5 to-transparent opacity-50 group-hover:opacity-100 transition-opacity"></div>
-          <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10 mix-blend-overlay"></div>
-
+        <div className="glass-dynamic p-5 overflow-hidden group transition-all duration-300 rounded-[var(--radius)]">
           <div className="relative z-10 flex flex-col justify-between h-full gap-4">
             <div className="flex items-start justify-between">
               <div className="p-2.5 bg-green-500/10 rounded-lg border border-green-500/20 text-green-500">
                 <DollarSign className="w-5 h-5" />
               </div>
-              <span className="flex items-center gap-1.5 text-[10px] font-medium text-green-400 bg-green-900/20 px-2 py-1 rounded-full border border-green-500/10">
-                <TrendingUp className="w-3 h-3" /> +12%
+              <span className="status-success px-2 py-1 rounded-full text-[9px] font-black uppercase">
+                <TrendingUp className="w-3 h-3 inline mr-1" /> +12%
               </span>
             </div>
             <div>
-              <h3 className="text-zinc-500 text-xs font-medium uppercase tracking-wider mb-1">MRR (Recorrência)</h3>
-              <span className="text-2xl font-semibold text-white tracking-tight">
+              <h3 className="text-zinc-500 text-[10px] font-black uppercase tracking-widest mb-1">MRR (Recorrência)</h3>
+              <span className="text-2xl font-black text-white tracking-tight leading-none">
                 {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(totalMRR)}
               </span>
             </div>
@@ -336,22 +333,19 @@ export default function GestaoClientes() {
         </div>
 
         {/* ARPU Card */}
-        <div className="relative bg-[#09090b] border border-white/5 rounded-xl p-5 overflow-hidden group hover:border-white/10 transition-all duration-300">
-          <div className="absolute inset-0 bg-gradient-to-br from-blue-500/5 to-transparent opacity-50 group-hover:opacity-100 transition-opacity"></div>
-          <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10 mix-blend-overlay"></div>
-
+        <div className="glass-dynamic p-5 overflow-hidden group transition-all duration-300 rounded-[var(--radius)]">
           <div className="relative z-10 flex flex-col justify-between h-full gap-4">
             <div className="flex items-start justify-between">
               <div className="p-2.5 bg-blue-500/10 rounded-lg border border-blue-500/20 text-blue-500">
                 <Wallet className="w-5 h-5" />
               </div>
-              <span className="flex items-center gap-1.5 text-[10px] font-medium text-blue-400 bg-blue-900/20 px-2 py-1 rounded-full border border-blue-500/10">
-                <CheckCircle2 className="w-3 h-3" /> Saudável
+              <span className="status-info px-2 py-1 rounded-full text-[9px] font-black uppercase">
+                Saudável
               </span>
             </div>
             <div>
-              <h3 className="text-zinc-500 text-xs font-medium uppercase tracking-wider mb-1">ARPU (Médio/Cliente)</h3>
-              <span className="text-2xl font-semibold text-white tracking-tight">
+              <h3 className="text-zinc-500 text-[10px] font-black uppercase tracking-widest mb-1">ARPU Cliente</h3>
+              <span className="text-2xl font-black text-white tracking-tight leading-none">
                 {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(arpu)}
               </span>
             </div>
@@ -359,22 +353,17 @@ export default function GestaoClientes() {
         </div>
 
         {/* LTV Card */}
-        <div className="relative bg-[#09090b] border border-white/5 rounded-xl p-5 overflow-hidden group hover:border-white/10 transition-all duration-300">
-          <div className="absolute inset-0 bg-gradient-to-br from-purple-500/5 to-transparent opacity-50 group-hover:opacity-100 transition-opacity"></div>
-          <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10 mix-blend-overlay"></div>
-
+        <div className="glass-dynamic p-5 overflow-hidden group transition-all duration-300 rounded-[var(--radius)]">
           <div className="relative z-10 flex flex-col justify-between h-full gap-4">
             <div className="flex items-start justify-between">
               <div className="p-2.5 bg-purple-500/10 rounded-lg border border-purple-500/20 text-purple-500">
                 <Activity className="w-5 h-5" />
               </div>
-              <span className="text-[10px] font-medium text-purple-400/80 uppercase tracking-widest pl-1">
-                Estimado
-              </span>
+              <span className="status-info px-2 py-1 rounded-full text-[9px] font-black uppercase opacity-60">Estimado</span>
             </div>
             <div>
-              <h3 className="text-zinc-500 text-xs font-medium uppercase tracking-wider mb-1">LTV (Lifetime Value)</h3>
-              <span className="text-2xl font-semibold text-white tracking-tight">
+              <h3 className="text-zinc-500 text-[10px] font-black uppercase tracking-widest mb-1">LTV Vitalício</h3>
+              <span className="text-2xl font-black text-white tracking-tight leading-none">
                 {new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL', maximumFractionDigits: 0 }).format(ltv)}
               </span>
             </div>
@@ -382,22 +371,17 @@ export default function GestaoClientes() {
         </div>
 
         {/* Churn Card */}
-        <div className="relative bg-[#09090b] border border-white/5 rounded-xl p-5 overflow-hidden group hover:border-white/10 transition-all duration-300">
-          <div className="absolute inset-0 bg-gradient-to-br from-red-500/5 to-transparent opacity-50 group-hover:opacity-100 transition-opacity"></div>
-          <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-10 mix-blend-overlay"></div>
-
+        <div className="glass-dynamic p-5 overflow-hidden group transition-all duration-300 rounded-[var(--radius)]">
           <div className="relative z-10 flex flex-col justify-between h-full gap-4">
             <div className="flex items-start justify-between">
               <div className="p-2.5 bg-red-500/10 rounded-lg border border-red-500/20 text-red-500">
                 <UserMinus className="w-5 h-5" />
               </div>
-              <span className="flex items-center gap-1.5 text-[10px] font-medium text-red-400 bg-red-900/20 px-2 py-1 rounded-full border border-red-500/10">
-                <AlertTriangle className="w-3 h-3" /> Abaixo da média
-              </span>
+              <span className="status-warning px-2 py-1 rounded-full text-[9px] font-black uppercase">Seguro</span>
             </div>
             <div>
-              <h3 className="text-zinc-500 text-xs font-medium uppercase tracking-wider mb-1">Churn Rate</h3>
-              <span className="text-2xl font-semibold text-white tracking-tight">
+              <h3 className="text-zinc-500 text-[10px] font-black uppercase tracking-widest mb-1">Churn Rate</h3>
+              <span className="text-2xl font-black text-white tracking-tight leading-none">
                 {churnRate.toFixed(1)}%
               </span>
             </div>
@@ -408,7 +392,7 @@ export default function GestaoClientes() {
       {/* Analytics Lists & Charts */}
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
         {/* MRR Evolution Chart */}
-        <div className="lg:col-span-2 glass-card p-6 flex flex-col h-[400px]">
+        <div className="lg:col-span-2 glass-dynamic p-6 flex flex-col h-[400px] rounded-[var(--radius)]">
           <div className="flex items-center justify-between mb-6">
             <div>
               <h3 className="text-sm font-bold uppercase text-white">Evolução de MRR</h3>
@@ -424,8 +408,8 @@ export default function GestaoClientes() {
               <AreaChart data={MOCK_MRR_HISTORY}>
                 <defs>
                   <linearGradient id="colorMrr" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor="hsl(24 100% 52%)" stopOpacity={0.3} />
-                    <stop offset="95%" stopColor="hsl(24 100% 52%)" stopOpacity={0} />
+                    <stop offset="5%" stopColor="hsl(var(--primary))" stopOpacity={0.3} />
+                    <stop offset="95%" stopColor="hsl(var(--primary))" stopOpacity={0} />
                   </linearGradient>
                 </defs>
                 <CartesianGrid strokeDasharray="3 3" stroke="#ffffff10" vertical={false} />
@@ -447,7 +431,7 @@ export default function GestaoClientes() {
                 <Area
                   type="monotone"
                   dataKey="value"
-                  stroke="hsl(24 100% 52%)"
+                  stroke="hsl(var(--primary))"
                   strokeWidth={3}
                   fillOpacity={1}
                   fill="url(#colorMrr)"
@@ -458,7 +442,7 @@ export default function GestaoClientes() {
         </div>
 
         {/* Plan Distribution Chart */}
-        <div className="glass-card p-6 flex flex-col h-[400px]">
+        <div className="glass-dynamic p-6 flex flex-col h-[400px] rounded-[var(--radius)]">
           <div className="mb-4">
             <h3 className="text-sm font-bold uppercase text-white">Receita por Plano</h3>
             <p className="text-xs text-muted-foreground">Distribuição do faturamento mensal</p>
@@ -504,8 +488,7 @@ export default function GestaoClientes() {
       </div>
 
       {/* Main Table - ClickUp/Premium Style */}
-      <div className="relative bg-[#09090b] border border-white/5 rounded-xl overflow-hidden shadow-2xl">
-        <div className="absolute inset-0 bg-[url('https://grainy-gradients.vercel.app/noise.svg')] opacity-5 mix-blend-overlay"></div>
+      <div className="relative glass-dynamic overflow-hidden shadow-2xl rounded-[var(--radius)]">
 
         {/* Table Toolbar */}
         <div className="relative z-10 p-4 border-b border-white/5 flex flex-col md:flex-row gap-4 justify-between items-center bg-white/[0.02]">
@@ -536,7 +519,7 @@ export default function GestaoClientes() {
         <div className="relative z-10 divide-y divide-white/5">
           {loading ? (
             <div className="p-12 text-center text-zinc-500 flex flex-col items-center gap-3">
-              <div className="w-6 h-6 border-2 border-white/10 border-t-orange-500 rounded-full animate-spin"></div>
+              <div className="w-6 h-6 border-2 border-white/10 border-t-primary rounded-full animate-spin"></div>
               <span className="text-xs uppercase tracking-widest font-medium">Carregando assinaturas...</span>
             </div>
           ) : subscriptions.length === 0 ? (
@@ -553,11 +536,11 @@ export default function GestaoClientes() {
                 <div key={sub.id} className="grid grid-cols-12 gap-4 px-6 py-4 items-center hover:bg-white/[0.02] transition-colors group">
                   {/* Agency Info */}
                   <div className="col-span-4 flex items-center gap-4">
-                    <div className="w-10 h-10 rounded-xl bg-orange-500/10 flex items-center justify-center text-orange-500 font-bold border border-orange-500/20 group-hover:border-orange-500/40 transition-colors">
+                    <div className="w-10 h-10 rounded-xl bg-primary/10 flex items-center justify-center text-primary font-bold border border-primary/20 group-hover:border-primary/40 transition-colors">
                       {sub.tenant_name.substring(0, 2).toUpperCase()}
                     </div>
                     <div>
-                      <h4 className="text-sm font-semibold text-white group-hover:text-orange-400 transition-colors">{sub.tenant_name}</h4>
+                      <h4 className="text-sm font-semibold text-white group-hover:text-primary transition-colors">{sub.tenant_name}</h4>
                       <span className="text-[10px] text-zinc-500 font-mono flex items-center gap-1 uppercase">
                         ID: {sub.tenant_id.substring(0, 8)}
                       </span>
@@ -574,16 +557,16 @@ export default function GestaoClientes() {
                   {/* Status */}
                   <div className="col-span-2 text-center">
                     {sub.status === 'active' && (
-                      <Badge className="bg-green-500/10 text-green-500 border border-green-500/20 text-[10px] font-bold uppercase px-2">Ativo</Badge>
+                      <Badge variant="outline" className="status-success px-2 h-6 flex items-center justify-center font-black uppercase text-[10px]">Ativo</Badge>
                     )}
                     {sub.status === 'past_due' && (
-                      <Badge className="bg-red-500/10 text-red-500 border border-red-500/20 text-[10px] font-bold uppercase px-2">Pendente</Badge>
+                      <Badge variant="outline" className="status-warning px-2 h-6 flex items-center justify-center font-black uppercase text-[10px]">Pendente</Badge>
                     )}
                     {sub.status === 'trial' && (
-                      <Badge className="bg-blue-500/10 text-blue-500 border border-blue-500/20 text-[10px] font-bold uppercase px-2">Trial</Badge>
+                      <Badge variant="outline" className="status-info px-2 h-6 flex items-center justify-center font-black uppercase text-[10px]">Trial</Badge>
                     )}
                     {sub.status === 'canceled' && (
-                      <Badge className="bg-zinc-500/10 text-zinc-500 border border-zinc-500/20 text-[10px] font-bold uppercase px-2">Cancelado</Badge>
+                      <Badge variant="outline" className="status-error px-2 h-6 flex items-center justify-center font-black uppercase text-[10px]">Bloqueado</Badge>
                     )}
                   </div>
 
@@ -601,10 +584,10 @@ export default function GestaoClientes() {
 
                       {/* Alerts */}
                       {isNearDue && (
-                        <Badge variant="destructive" className="ml-2 text-[9px] h-4 bg-orange-500/20 text-orange-400 border border-orange-500/20 px-1">VENCE HOJE</Badge>
+                        <Badge variant="outline" className="ml-2 text-[9px] h-5 status-warning px-2 font-black">VENCE HOJE</Badge>
                       )}
                       {isLate && (
-                        <Badge variant="destructive" className="ml-2 text-[9px] h-4 bg-red-900/40 text-red-400 border border-red-900/60 px-1">ATRASADO</Badge>
+                        <Badge variant="outline" className="ml-2 text-[9px] h-5 status-error px-2 font-black">ATRASADO</Badge>
                       )}
                     </div>
                   </div>

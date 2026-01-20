@@ -100,16 +100,19 @@ export function ModuleSidebar({
               <div className={cn(
                 "relative z-10 w-8 h-8 rounded-[9px] flex items-center justify-center transition-all duration-200",
                 isActive
-                  ? "bg-primary text-white shadow-md shadow-orange-900/40"
-                  : "bg-transparent text-white/80 group-hover:text-white group-hover:bg-white/5"
+                  ? "bg-[var(--primary)] text-white shadow-md shadow-[var(--primary)]/40"
+                  : "bg-transparent text-[var(--header-icon-color,rgba(255,255,255,0.8))] group-hover:text-white group-hover:bg-white/5"
               )}>
                 {IconNode}
               </div>
 
-              <span className={cn(
-                "text-[10px] font-bold tracking-wide leading-none transition-colors",
-                isActive ? "text-white" : "text-white/80 group-hover:text-white"
-              )}>
+              <span
+                className={cn(
+                  "font-bold tracking-wide leading-none transition-colors",
+                  isActive ? "text-white" : "text-white/80 group-hover:text-white"
+                )}
+                style={{ fontSize: 'var(--fs-menu, 10px)' }}
+              >
                 {module.label}
               </span>
 

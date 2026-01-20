@@ -21,19 +21,25 @@ export function ColorPicker({ value, onChange, label }: ColorPickerProps) {
     const [isOpen, setIsOpen] = useState(false);
     const [mode, setMode] = useState<ColorMode>('HEX');
     const [copied, setCopied] = useState(false);
+    const [isDragging, setIsDragging] = useState(false);
 
     // Sync input value "H S% L%" -> Hex 
     useEffect(() => {
-        setHex(tailwindHslToHex(value));
-    }, [value]);
+        if (!isDragging) {
+            const newHex = tailwindHslToHex(value);
+            if (newHex !== hex) {
+                setHex(newHex);
+            }
+        }
+    }, [value, isDragging, hex]);
 
     const handleHexChange = (newHex: string) => {
         setHex(newHex);
-        // Only trigger onChange if it's a valid complete change to avoid spamming if typing
-        // But for picker drag, we need it. Debounce if needed? 
-        // For now direct is fine.
         const hsl = hexToTailwindHsl(newHex);
-        onChange(hsl);
+        // Só dispara o onChange se o HSL realmente mudou para evitar loops
+        if (hsl !== value) {
+            onChange(hsl);
+        }
     };
 
     const copyToClipboard = () => {
@@ -115,8 +121,13 @@ export function ColorPicker({ value, onChange, label }: ColorPickerProps) {
                             </Button>
                         </div>
 
-                        <div className="flex justify-center pb-2">
-                            {/* Force HexAlphaColorPicker class for styling if needed */}
+                        <div
+                            className="flex justify-center pb-2"
+                            onMouseDown={() => setIsDragging(true)}
+                            onMouseUp={() => setIsDragging(false)}
+                            onTouchStart={() => setIsDragging(true)}
+                            onTouchEnd={() => setIsDragging(false)}
+                        >
                             <HexAlphaColorPicker color={hex} onChange={handleHexChange} style={{ width: '100%', height: '160px' }} />
                         </div>
 

@@ -1153,7 +1153,7 @@ export default function SqlBank() {
             <div className="grid grid-cols-1 lg:grid-cols-12 gap-6">
                 {/* Editor Section */}
                 <div className="lg:col-span-8 space-y-6">
-                    <div className="card-industrial p-6 space-y-4">
+                    <div className="glass-dynamic p-6 space-y-4 rounded-[var(--radius)]">
                         <div className="flex items-center justify-between border-b border-white/5 pb-3">
                             <div className="flex items-center gap-2">
                                 <Code className="w-4 h-4 text-primary" />
@@ -1178,7 +1178,7 @@ export default function SqlBank() {
                                 value={query}
                                 onChange={(e) => setQuery(e.target.value)}
                                 placeholder="SELECT * FROM table..."
-                                className="min-h-[280px] font-mono text-sm bg-black/60 border-white/5 focus:border-primary/50 text-foreground/90 p-4 resize-none relative z-10"
+                                className="min-h-[280px] font-mono text-sm bg-black/40 border-white/5 focus:border-primary/50 text-foreground/90 p-4 resize-none relative z-10 rounded-[var(--radius)]"
                             />
                         </div>
 
@@ -1216,7 +1216,7 @@ export default function SqlBank() {
                                 initial={{ opacity: 0, y: 10 }}
                                 animate={{ opacity: 1, y: 0 }}
                                 exit={{ opacity: 0, y: -10 }}
-                                className="card-industrial overflow-hidden border-white/5"
+                                className="glass-dynamic overflow-hidden border-white/5 rounded-[var(--radius)]"
                             >
                                 <div className="p-4 bg-muted/30 border-b border-white/5 flex items-center justify-between">
                                     <span className="text-[10px] uppercase tracking-widest font-mono text-muted-foreground">
@@ -1230,7 +1230,7 @@ export default function SqlBank() {
                                 </div>
 
                                 {error ? (
-                                    <div className="p-6 bg-destructive/10 text-destructive font-mono text-sm border-l-2 border-destructive">
+                                    <div className="p-6 status-error font-mono text-xs border-l-4">
                                         <div className="flex gap-2 items-start">
                                             <AlertTriangle className="w-4 h-4 mt-1 flex-shrink-0" />
                                             <pre className="whitespace-pre-wrap">{error}</pre>
@@ -1275,7 +1275,7 @@ export default function SqlBank() {
 
                 {/* Lateral of Presets */}
                 <div className="lg:col-span-4 gap-6">
-                    <div className="card-industrial p-6 sticky top-8 max-h-[calc(100vh-100px)] flex flex-col">
+                    <div className="glass-dynamic p-6 sticky top-8 max-h-[calc(100vh-100px)] flex flex-col rounded-[var(--radius)]">
                         <div className="space-y-4 mb-4 flex-shrink-0">
                             <div className="flex items-center justify-between">
                                 <h3 className="text-xs font-bold uppercase tracking-widest text-primary flex items-center gap-2">
@@ -1287,7 +1287,7 @@ export default function SqlBank() {
                                         variant="ghost"
                                         size="sm"
                                         onClick={archiveSetupPresets}
-                                        className="h-6 px-2 text-[10px] text-orange-500 hover:text-orange-400 hover:bg-orange-500/10 border border-orange-500/20"
+                                        className="h-6 px-2 text-[10px] text-primary hover:text-primary hover:bg-primary/10 border border-primary/20"
                                         title="Auto-Ocultar todos os scripts de Setup/Migração já instalados"
                                     >
                                         <Archive className="w-3 h-3 mr-1" />
@@ -1417,10 +1417,10 @@ export default function SqlBank() {
                             ))}
                         </div>
 
-                        <div className="mt-4 p-4 rounded-lg bg-orange-500/10 border border-orange-500/20 flex-shrink-0">
-                            <div className="flex gap-2 text-orange-500">
+                        <div className="mt-4 p-4 rounded-[var(--radius)] status-warning flex-shrink-0">
+                            <div className="flex gap-2">
                                 <AlertTriangle className="w-4 h-4 flex-shrink-0 mt-0.5" />
-                                <p className="text-[11px] leading-relaxed uppercase font-bold tracking-tight">
+                                <p className="text-[11px] leading-relaxed uppercase font-black tracking-tight">
                                     Dica: Use o ícone de lixeira para limpar presets desnecessários da sua visualização.
                                 </p>
                             </div>

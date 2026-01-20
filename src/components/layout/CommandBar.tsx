@@ -26,7 +26,7 @@ export function CommandBar({ isContextOpen, onToggleContext }: CommandBarProps) 
             {/* Action Buttons */}
             <button className="p-2 text-zinc-400 hover:text-white hover:bg-white/5 rounded-full transition-colors relative group">
                 <Bell className="w-5 h-5 group-hover:text-primary transition-colors" />
-                <span className="absolute top-2 right-2 w-2 h-2 bg-primary rounded-full animate-pulse ring-2 ring-[#161616]" />
+                <span className="absolute top-2 right-2 w-2 h-2 bg-primary rounded-full animate-pulse ring-2 ring-[var(--bg-layout-menu)]" />
             </button>
             <button className="p-2 text-zinc-400 hover:text-white hover:bg-white/5 rounded-full transition-colors">
                 <HelpCircle className="w-5 h-5" />
@@ -44,7 +44,7 @@ export function CommandBar({ isContextOpen, onToggleContext }: CommandBarProps) 
                     </div>
                     <button
                         onClick={handleSignOut}
-                        className="w-9 h-9 rounded-full bg-zinc-800 border border-white/10 flex items-center justify-center shadow-sm text-zinc-400 font-bold text-sm hover:border-primary/50 hover:text-primary transition-all group-hover:ring-2 ring-primary/20"
+                        className="w-9 h-9 rounded-full bg-[var(--bg-layout-workspace)] border border-white/10 flex items-center justify-center shadow-sm text-zinc-400 font-bold text-sm hover:border-primary/50 hover:text-primary transition-all group-hover:ring-2 ring-primary/20"
                     >
                         {user.name.charAt(0).toUpperCase()}
                     </button>
