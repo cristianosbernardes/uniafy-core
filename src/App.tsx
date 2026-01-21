@@ -47,6 +47,17 @@ import CampaignBuilder from "./pages/traffic/CampaignBuilder";
 import OperationalSchedule from "./pages/traffic/OperationalSchedule";
 import DataAnalysis from "./pages/traffic/DataAnalysis";
 import Reminders from "./pages/traffic/Reminders";
+import CreativeHub from "./pages/traffic/CreativeHub";
+import TrackingManager from "./pages/traffic/TrackingManager";
+import TrafficGuard from "./pages/traffic/TrafficGuard";
+import MediaPlanner from "./pages/traffic/MediaPlanner";
+import AudienceVault from "./pages/traffic/AudienceVault";
+import LPSentinel from "./pages/traffic/LPSentinel";
+import AdSpy from "./pages/traffic/AdSpy";
+import BudgetPacing from "./pages/traffic/BudgetPacing";
+import OfflineConversions from "./pages/traffic/OfflineConversions";
+import NamingGovernor from "./pages/traffic/NamingGovernor";
+
 import { TrafficProvider } from "./contexts/TrafficContext";
 
 const queryClient = new QueryClient();
@@ -126,6 +137,17 @@ const AppRoutes = () => {
         <Route path="/traffic/scheduler" element={<OperationalSchedule />} />
         <Route path="/traffic/data-analysis" element={<DataAnalysis />} />
         <Route path="/traffic/reminders" element={<Reminders />} />
+        <Route path="/traffic/creatives" element={<CreativeHub />} />
+        <Route path="/traffic/tracking" element={<TrackingManager />} />
+        <Route path="/traffic/guard" element={<TrafficGuard />} />
+        <Route path="/traffic/planner" element={<MediaPlanner />} />
+        <Route path="/traffic/audiences" element={<AudienceVault />} />
+        <Route path="/traffic/lp-sentinel" element={<LPSentinel />} />
+        <Route path="/traffic/ad-spy" element={<AdSpy />} />
+        <Route path="/traffic/pacing" element={<BudgetPacing />} />
+        <Route path="/traffic/offline" element={<OfflineConversions />} />
+        <Route path="/traffic/naming" element={<NamingGovernor />} />
+        <Route path="/traffic/campaigns" element={<CampaignBuilder />} />
 
         {/* Client Success Routes */}
         <Route path="/success" element={<Navigate to="/success/portal" replace />} />

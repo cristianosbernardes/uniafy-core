@@ -49,7 +49,13 @@ import {
   Siren,
   Link as LinkIcon,
   FileSignature,
-  Key
+  Key,
+  ShieldCheck,
+  Image,
+  LineChart,
+  Gauge,
+  UploadCloud,
+  Type
 } from 'lucide-react';
 import { NAV_MODULES } from '@/config/navigation';
 import { NavItem, UserRole } from '@/types/uniafy';
@@ -111,6 +117,12 @@ const iconMap: Record<string, React.ReactNode> = {
   Link: <LinkIcon className="w-4 h-4" />, // Aliased to avoid conflict with react-router-dom Link
   FileSignature: <FileSignature className="w-4 h-4" />,
   Key: <Key className="w-4 h-4" />,
+  ShieldCheck: <ShieldCheck className="w-4 h-4" />,
+  Image: <Image className="w-4 h-4" />,
+  LineChart: <LineChart className="w-4 h-4" />,
+  Gauge: <Gauge className="w-4 h-4" />,
+  UploadCloud: <UploadCloud className="w-4 h-4" />,
+  Type: <Type className="w-4 h-4" />,
 };
 
 
