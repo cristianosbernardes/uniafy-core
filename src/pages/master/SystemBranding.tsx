@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Palette, LayoutDashboard, Save, Sliders, MousePointerClick, Globe, RotateCcw, LayoutTemplate, Smartphone, Monitor, Check, Users, Zap, LayoutGrid, Activity, Settings2, Image as ImageIcon, Type, Layout, Paintbrush, Fingerprint, ExternalLink, Moon, Sun } from 'lucide-react';
+import { Palette, LayoutDashboard, Save, Sliders, MousePointerClick, Globe, RotateCcw, LayoutTemplate, Smartphone, Monitor, Check, Users, Zap, LayoutGrid, Activity, Settings2, Image as ImageIcon, Type, Layout, Paintbrush, Fingerprint, ExternalLink, Moon, Sun, Search } from 'lucide-react';
 import { cn } from "@/lib/utils";
 import { useBranding } from "@/contexts/BrandingContext";
 import { ColorPicker } from "@/components/ui/color-picker";
@@ -421,42 +421,29 @@ export default function SystemBranding() {
 
 
     return (
-        <div className="flex flex-col h-[calc(100vh-80px)] -mt-4 overflow-hidden">
-            {/* TOP BAR / NAVIGATION INTEGRATED */}
-            <div className="flex items-center justify-between px-6 py-4 border-b border-white/5 bg-[#050505] shrink-0">
-                <div className="flex items-center gap-6">
-                    <div className="flex flex-col">
-                        <h1 className="text-xl font-bold text-white tracking-widest flex items-center gap-2">
-                            Branding Center
-                        </h1>
-                        <p className="text-[10px] text-zinc-500 font-mono tracking-tighter">ClickUp Standard Implementation</p>
-                    </div>
-                </div>
+        <div className="flex flex-col h-[calc(100vh-32px)] space-y-4">
+            <PageHeader
+                title="BRANDING"
+                titleAccent="CENTER"
+                subtitle="Master Suite • Personalização e Identidade Visual"
+                actions={[
+                    {
+                        label: 'Resetar',
+                        icon: RotateCcw,
+                        variant: 'outline',
+                        onClick: handleReset,
+                    },
+                    {
+                        label: 'Salvar Alterações',
+                        icon: Save,
+                        variant: 'primary',
+                        onClick: handleSave,
+                        isLoading: loading,
+                    }
+                ]}
+            />
 
-                <div className="flex items-center gap-3">
-                    <Button
-                        variant="ghost"
-                        size="sm"
-                        onClick={handleReset}
-                        className="text-zinc-500 hover:text-white text-xs font-bold tracking-widest gap-2"
-                    >
-                        <RotateCcw className="w-3.5 h-3.5" />
-                        Resetar
-                    </Button>
-                    <Button
-                        variant="default"
-                        size="sm"
-                        onClick={handleSave}
-                        disabled={loading}
-                        className="h-9 px-6 bg-primary hover:bg-primary/90 text-white font-bold text-xs tracking-widest gap-2 shadow-lg shadow-primary/20"
-                    >
-                        {loading ? <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" /> : <Save className="w-3.5 h-3.5" />}
-                        Salvar Alterações
-                    </Button>
-                </div>
-            </div>
-
-            <div className="flex flex-1 overflow-hidden">
+            <div className="flex flex-1 overflow-hidden rounded-xl border border-white/10 bg-[#09090b] shadow-2xl">
                 {/* SETTINGS SIDEBAR */}
                 <div className="w-64 bg-[#09090b] border-r border-white/5 flex flex-col pt-6 shrink-0 h-full">
                     <div className="px-6 mb-6">
@@ -790,59 +777,155 @@ export default function SystemBranding() {
                                         </div>
                                     </div>
                                 ) : (
-                                    <div className="flex-1 flex overflow-hidden animate-in fade-in duration-500">
-                                        {/* DASHBOARD MOCKUP */}
-                                        <div className="w-48 bg-[hsl(var(--sidebar))] border-r border-[var(--border-subtle)] p-4 flex flex-col gap-6 shrink-0">
-                                            <div className="h-6 w-24 bg-[var(--border-subtle)] rounded mb-4" />
-                                            <div className="space-y-3">
-                                                {[1, 2, 3, 4, 5].map(i => (
-                                                    <div key={i} className={cn("h-8 rounded-[var(--radius)] flex items-center px-3 gap-2", i === 1 ? "bg-[var(--primary)]/10 text-[var(--primary)]" : "text-[var(--text-secondary)]")}>
-                                                        <div className="w-3.5 h-3.5 rounded-sm bg-current opacity-20" />
-                                                        <div className="w-16 h-2 bg-current opacity-10 rounded-full" />
+                                    <div className="flex-1 flex overflow-hidden animate-in fade-in duration-500 font-sans">
+                                        {/* REALISTIC SIDEBAR MOCKUP */}
+                                        <div className="w-56 bg-[hsl(var(--sidebar))] border-r border-[var(--border-subtle)] flex flex-col pt-4 shrink-0">
+                                            <div className="px-4 mb-6">
+                                                <div className="h-4 w-24 bg-[var(--text-secondary)]/20 rounded" />
+                                            </div>
+                                            <div className="flex-1 space-y-1 px-2">
+                                                {[
+                                                    { icon: LayoutDashboard, label: 'Dashboard', active: true },
+                                                    { icon: Users, label: 'Clientes', active: false },
+                                                    { icon: Activity, label: 'Analytics', active: false },
+                                                    { icon: Settings2, label: 'Ajustes', active: false },
+                                                ].map((item, i) => (
+                                                    <div key={i} className={cn(
+                                                        "flex flex-col items-center justify-center p-2 rounded-[var(--radius)] transition-colors gap-1 group",
+                                                        item.active ? "" : "hover:bg-[var(--text-secondary)]/5"
+                                                    )}>
+                                                        <div className={cn(
+                                                            "w-8 h-8 rounded-lg flex items-center justify-center transition-all",
+                                                            item.active
+                                                                ? "bg-[var(--primary)] text-white shadow-lg shadow-[var(--primary)]/30"
+                                                                : "text-[var(--text-secondary)] bg-transparent"
+                                                        )}>
+                                                            <item.icon className="w-4 h-4" />
+                                                        </div>
+                                                        <span className={cn(
+                                                            "text-[9px] font-bold uppercase tracking-wider",
+                                                            item.active ? "text-white" : "text-[var(--text-secondary)]"
+                                                        )}>{item.label}</span>
                                                     </div>
                                                 ))}
+                                            </div>
+                                            <div className="p-4 border-t border-[var(--border-subtle)]">
+                                                <div className="flex items-center gap-3">
+                                                    <div className="w-8 h-8 rounded-full bg-[var(--text-secondary)]/20" />
+                                                    <div className="space-y-1">
+                                                        <div className="w-20 h-2 bg-[var(--text-secondary)]/30 rounded" />
+                                                        <div className="w-12 h-1.5 bg-[var(--text-secondary)]/20 rounded" />
+                                                    </div>
+                                                </div>
                                             </div>
                                         </div>
-                                        <div className="flex-1 bg-[hsl(var(--background))] p-8 space-y-8 overflow-y-auto custom-scrollbar">
-                                            <div className="flex items-center justify-between">
-                                                <div className="space-y-1">
-                                                    <h2 className="text-2xl font-bold text-[var(--text-primary)] tracking-tight uppercase" style={{ fontSize: `${fsTitle}px`, fontFamily: fontFamily }}>Dashboard Overview</h2>
-                                                    <p className="text-xs text-[var(--text-secondary)] uppercase tracking-widest">Growth Engine Active</p>
+
+                                        {/* REALISTIC CONTENT MOCKUP */}
+                                        <div className="flex-1 bg-[hsl(var(--background))] flex flex-col h-full overflow-hidden">
+                                            {/* Header Mock */}
+                                            <div className="h-14 border-b border-[var(--border-subtle)] bg-[hsl(var(--header))] flex items-center justify-between px-6 shrink-0">
+                                                <div className="flex items-center gap-2 text-[var(--text-secondary)]">
+                                                    <Search className="w-4 h-4" />
+                                                    <span className="text-xs">Pesquisar...</span>
                                                 </div>
-                                                <div className="flex gap-2">
-                                                    <div className="w-8 h-8 rounded-full bg-[var(--card)] border border-[var(--border-subtle)]" />
-                                                    <div className="h-8 px-4 bg-[var(--primary)] rounded-[var(--radius)] flex items-center"><span className="text-[10px] font-bold text-white uppercase tracking-tighter">Actions</span></div>
+                                                <div className="flex items-center gap-3">
+                                                    <div className="h-8 px-3 rounded-[var(--radius)] glass-panel border border-[var(--primary)]/30 text-[var(--primary)] text-xs font-bold flex items-center gap-2">
+                                                        <Zap className="w-3 h-3" />
+                                                        <span>Trial Ativo</span>
+                                                    </div>
                                                 </div>
                                             </div>
 
-                                            <div className="grid grid-cols-3 gap-6">
-                                                {[
-                                                    { label: 'Total MRR', val: '$42,500', color: successColor },
-                                                    { label: 'Active Trials', val: '128', color: primaryColor },
-                                                    { label: 'Churn Rate', val: '2.4%', color: errorColor },
-                                                ].map((s, idx) => (
-                                                    <div key={idx} className="p-6 bg-[var(--card)] border border-[var(--border-subtle)] rounded-[var(--radius)] space-y-3 relative overflow-hidden group hover:border-[var(--primary)]/30 transition-all">
-                                                        <p className="text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest">{s.label}</p>
-                                                        <h4 className="text-3xl font-bold text-[var(--text-primary)]" style={{ fontSize: `${fsStats}px` }}>{s.val}</h4>
-                                                        <div className="h-1 w-full bg-[var(--border-subtle)] rounded-full overflow-hidden mt-2">
-                                                            <div className="h-full bg-[var(--primary)] w-2/3" />
+                                            {/* Content Scroll */}
+                                            <div className="flex-1 overflow-y-auto custom-scrollbar p-8 space-y-8">
+                                                <div className="flex items-center justify-between">
+                                                    <div className="space-y-1">
+                                                        <h2 className="text-2xl font-bold text-[var(--text-primary)] tracking-tight uppercase" style={{ fontSize: `${fsTitle}px`, fontFamily: fontFamily }}>Visão Geral</h2>
+                                                        <p className="text-xs text-[var(--text-secondary)] uppercase tracking-widest">Performance da Agência</p>
+                                                    </div>
+                                                    <button className="h-9 px-4 bg-[var(--primary)] hover:bg-[var(--primary)]/90 text-white rounded-[var(--radius)] text-xs font-bold uppercase tracking-wider shadow-lg shadow-[var(--primary)]/20 transition-all">
+                                                        Nova Campanha
+                                                    </button>
+                                                </div>
+
+                                                {/* KPIs */}
+                                                <div className="grid grid-cols-3 gap-6">
+                                                    {[
+                                                        { label: 'Receita (MRR)', val: 'R$ 42.500', color: successColor, trend: '+12%' },
+                                                        { label: 'Clientes Ativos', val: '128', color: primaryColor, trend: '+4' },
+                                                        { label: 'Churn Rate', val: '2.4%', color: errorColor, trend: '-0.5%' },
+                                                    ].map((s, idx) => (
+                                                        <div key={idx} className="p-6 bg-[var(--card)] border border-[var(--border-subtle)] rounded-[var(--radius)] space-y-3 relative overflow-hidden group hover:border-[var(--primary)]/30 transition-all shadow-xl">
+                                                            <div className="flex justify-between items-start">
+                                                                <p className="text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest">{s.label}</p>
+                                                                <span className={cn("text-[9px] font-bold px-1.5 py-0.5 rounded border", idx === 2 ? "text-[var(--error)] border-[var(--error)]/20 bg-[var(--error)]/10" : "text-[var(--success)] border-[var(--success)]/20 bg-[var(--success)]/10")}>{s.trend}</span>
+                                                            </div>
+                                                            <h4 className="text-2xl font-bold text-[var(--text-primary)]" style={{ fontSize: `${fsStats}px` }}>{s.val}</h4>
+                                                        </div>
+                                                    ))}
+                                                </div>
+
+                                                {/* Data Table Mock */}
+                                                <div className="bg-[var(--card)] border border-[var(--border-subtle)] rounded-[var(--radius)] overflow-hidden shadow-xl">
+                                                    <div className="px-6 py-4 border-b border-[var(--border-subtle)] flex items-center justify-between bg-[var(--card)]/50">
+                                                        <h3 className="text-xs font-black text-[var(--text-primary)] uppercase tracking-wider">Últimas Transações</h3>
+                                                        <div className="flex gap-2">
+                                                            <div className="w-2 h-2 rounded-full bg-[var(--warning)] animate-pulse" />
+                                                            <span className="text-[9px] text-[var(--text-secondary)] uppercase font-bold">Ao Vivo</span>
                                                         </div>
                                                     </div>
-                                                ))}
-                                            </div>
-
-                                            <div className="p-6 bg-[var(--card)] border border-[var(--border-subtle)] rounded-[var(--radius)] space-y-6">
-                                                <div className="flex items-center justify-between">
-                                                    <h3 className="text-xs font-black text-[var(--text-primary)] uppercase">Performance Evolution</h3>
-                                                    <div className="flex gap-2">
-                                                        <div className="h-1.5 w-1.5 rounded-full bg-[var(--primary)]" />
-                                                        <div className="h-1.5 w-1.5 rounded-full bg-[var(--text-secondary)] opacity-20" />
+                                                    <div className="divide-y divide-[var(--border-subtle)]">
+                                                        {[1, 2, 3].map((row) => (
+                                                            <div key={row} className="px-6 py-3 flex items-center justify-between hover:bg-[var(--hover)] transition-colors group cursor-pointer">
+                                                                <div className="flex items-center gap-3">
+                                                                    <div className="w-8 h-8 rounded-lg bg-[var(--background)] border border-[var(--border-subtle)] flex items-center justify-center text-[var(--text-secondary)] group-hover:text-[var(--primary)] group-hover:border-[var(--primary)]/30 transition-colors">
+                                                                        <Users className="w-4 h-4" />
+                                                                    </div>
+                                                                    <div>
+                                                                        <p className="text-xs font-bold text-[var(--text-primary)]">Enterprise License</p>
+                                                                        <p className="text-[10px] text-[var(--text-secondary)] font-mono">ID: #8392{row}</p>
+                                                                    </div>
+                                                                </div>
+                                                                <div className="text-right">
+                                                                    <p className="text-xs font-bold text-[var(--text-primary)]">R$ 299,00</p>
+                                                                    <p className="text-[10px] text-[var(--success)]">Aprovado</p>
+                                                                </div>
+                                                            </div>
+                                                        ))}
                                                     </div>
                                                 </div>
-                                                <div className="h-48 w-full relative flex items-end gap-2">
-                                                    {[40, 60, 45, 80, 55, 70, 90, 65, 85, 100].map((h, i) => (
-                                                        <div key={i} className="flex-1 bg-gradient-to-t from-[var(--primary)]/5 to-[var(--primary)]/40 rounded-t-sm" style={{ height: `${h}%` }} />
-                                                    ))}
+
+                                                {/* UI Elements Check */}
+                                                <div className="grid grid-cols-2 gap-6">
+                                                    <div className="p-6 bg-[var(--card)] border border-[var(--border-subtle)] rounded-[var(--radius)] space-y-4">
+                                                        <h3 className="text-[10px] font-black text-[var(--text-secondary)] uppercase">Inputs & Forms</h3>
+                                                        <div className="space-y-3">
+                                                            <div className="flex flex-col gap-1">
+                                                                <label className="text-[10px] font-bold text-[var(--text-secondary)] uppercase">Nome do Projeto</label>
+                                                                <div className="h-9 px-3 rounded-[var(--radius)] bg-[var(--background)] border border-[var(--border-subtle)] flex items-center text-xs text-[var(--text-primary)]">
+                                                                    Marketing Q1
+                                                                </div>
+                                                            </div>
+                                                            <div className="flex items-center gap-2 p-2 rounded hover:bg-[var(--hover)] transition-colors">
+                                                                <div className="w-4 h-4 rounded border border-[var(--primary)] bg-[var(--primary)] flex items-center justify-center text-white">
+                                                                    <Check className="w-3 h-3" />
+                                                                </div>
+                                                                <span className="text-xs text-[var(--text-primary)]">Notificações Ativas</span>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+
+                                                    <div className="p-6 bg-[var(--card)] border border-[var(--border-subtle)] rounded-[var(--radius)] space-y-4">
+                                                        <h3 className="text-[10px] font-black text-[var(--text-secondary)] uppercase">Alertas & Status</h3>
+                                                        <div className="space-y-2">
+                                                            <div className="px-3 py-2 rounded-[var(--radius)] bg-[var(--success)]/10 border border-[var(--success)]/20 text-[var(--success)] text-[10px] font-bold uppercase flex items-center gap-2">
+                                                                <Check className="w-3 h-3" /> Sistema Operacional
+                                                            </div>
+                                                            <div className="px-3 py-2 rounded-[var(--radius)] bg-[var(--warning)]/10 border border-[var(--warning)]/20 text-[var(--warning)] text-[10px] font-bold uppercase flex items-center gap-2">
+                                                                <Zap className="w-3 h-3" /> Backup Pendente
+                                                            </div>
+                                                        </div>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>

@@ -8,6 +8,9 @@ import { masterService } from '@/services/masterService';
 import { supabase } from '@/integrations/supabase/client';
 import { useBranding } from '@/contexts/BrandingContext';
 
+import { ClientSwitcher } from '@/components/traffic/ClientSwitcher';
+import { useLocation } from 'react-router-dom';
+
 interface DashboardHeaderProps {
   user: User | null;
   isContextOpen: boolean;
@@ -16,6 +19,8 @@ interface DashboardHeaderProps {
 export function DashboardHeader({ user, isContextOpen }: DashboardHeaderProps) {
   const { branding } = useBranding();
   const [config, setConfig] = useState<MasterNotificationConfig | null>(null);
+  const location = useLocation();
+  const isTrafficModule = location.pathname.startsWith('/traffic');
 
   useEffect(() => {
     // 1. Carrega inicial
@@ -64,27 +69,29 @@ export function DashboardHeader({ user, isContextOpen }: DashboardHeaderProps) {
 
       {/* LEFT: LOGO */}
       <div className="flex items-center gap-3 px-1">
-        {branding?.logo_url ? (
-          <img
-            src={branding.logo_url}
-            alt="Logo"
-            className="h-8 w-auto object-contain transition-opacity duration-300"
-          />
-        ) : (
-          <div className="flex items-center gap-3 animate-in fade-in duration-500">
-            <div className="w-8 h-8 rounded-lg bg-[var(--primary)] flex items-center justify-center text-black font-extrabold shadow-lg shadow-[var(--primary)]/20">
-              U
-            </div>
-            <span className="font-bold text-lg text-white tracking-tight">
-              Uniafy
-            </span>
-          </div>
-        )}
+        <div className="flex items-center justify-center w-10 h-10 rounded-xl bg-primary text-primary-foreground shadow-lg shadow-primary/20 hover:scale-105 transition-transform duration-300">
+          {branding?.logo_url ? (
+            <img
+              src={branding.logo_url}
+              alt="Logo"
+              className="h-6 w-auto object-contain brightness-0 invert"
+            />
+          ) : (
+            <span className="font-black text-xl tracking-tighter">U</span>
+          )}
+        </div>
+        <span className="font-bold text-lg text-white tracking-tight hidden md:block">
+          {branding?.login?.title?.split(' ')[0] || 'Uniafy'}
+        </span>
       </div>
 
-      {/* CENTER: DYNAMIC CONTENT (Search OR Trial Timer) */}
+      {/* CENTER: DYNAMIC CONTENT (Search OR Trial Timer OR Client Switcher) */}
       <div className="flex-1 flex justify-center px-4">
-        {showTrialAlert && trialEndsAt ? (
+        {isTrafficModule ? (
+          <div className="animate-in fade-in slide-in-from-top-2 duration-300">
+            <ClientSwitcher />
+          </div>
+        ) : showTrialAlert && trialEndsAt ? (
           // TRIAL MODE: Digital Display Style
           <div className="flex items-center gap-6 animate-in fade-in slide-in-from-top-4 duration-700">
             {/* Container "Display Digital" */}

@@ -66,7 +66,10 @@ export function UserProfile({ showLabel = true }: UserProfileProps) {
                     Minha Conta ({user.email})
                 </div>
                 <DropdownMenuSeparator className="bg-white/10" />
-                <DropdownMenuItem className="focus:bg-white/10 focus:text-zinc-200 cursor-pointer">
+                <DropdownMenuItem
+                    className="focus:bg-white/10 focus:text-zinc-200 cursor-pointer"
+                    onClick={() => navigate('/sistema/perfil')}
+                >
                     <User className="w-4 h-4 mr-2" />
                     Perfil
                 </DropdownMenuItem>

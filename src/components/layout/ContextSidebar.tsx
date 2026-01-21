@@ -169,15 +169,16 @@ export function ContextSidebar({ activeModule, userRole, isOpen = true, onToggle
 
               <div className="relative flex items-center z-10 w-full px-2">
                 <div
-                  className={cn("transition-colors shrink-0 mr-3", isActive ? "text-[var(--primary)]" : "text-[var(--primary)]/60 group-hover:text-[var(--primary)]")}
-                  style={{ color: 'hsl(var(--primary))' }}
+                  className={cn("transition-colors shrink-0 mr-3",
+                    isActive ? "text-primary" : "text-zinc-500 group-hover:text-white"
+                  )}
                 >
                   {Icon}
                 </div>
                 <span
                   className={cn(
                     "font-medium transition-colors truncate leading-none pt-0.5 nav-item-submenu",
-                    isActive ? "text-white" : "text-zinc-400 group-hover:text-zinc-200"
+                    isActive ? "text-white" : "text-zinc-400 group-hover:text-white"
                   )}
                   style={{ fontSize: 'var(--fs-submenu, 14px)' }}
                 >

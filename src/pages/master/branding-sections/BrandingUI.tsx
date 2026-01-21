@@ -51,16 +51,16 @@ export function BrandingUI({
             </div>
 
             <div className="space-y-6">
-                <div className="space-y-4 p-4 rounded-xl bg-white/[0.02] border border-white/5">
-                    <h3 className="text-[10px] font-black text-zinc-500 mb-2">Tipografia (Padrão Sistema)</h3>
+                <div className="space-y-4 p-4 rounded-xl glass-panel border-white/5">
+                    <h3 className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-2">Tipografia (Padrão Sistema)</h3>
                     <div className="flex items-center justify-between h-10 px-4 bg-black/40 border border-white/10 rounded-lg">
-                        <span className="text-xs text-zinc-400">Família da Fonte</span>
+                        <span className="text-xs text-muted-foreground">Família da Fonte</span>
                         <span className="text-xs font-bold text-white uppercase tracking-widest">Inter</span>
                     </div>
                 </div>
 
-                <div className="space-y-4 p-4 rounded-xl bg-white/[0.02] border border-white/5">
-                    <h3 className="text-[10px] font-black text-zinc-500 mb-4">Hierarquia de Tamanhos (px)</h3>
+                <div className="space-y-4 p-4 rounded-xl glass-panel border-white/5">
+                    <h3 className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-4">Hierarquia de Tamanhos (px)</h3>
                     <div className="space-y-4">
                         {[
                             { label: 'Títulos (H1)', val: fsTitle, set: setFsTitle, min: 16, max: 48 },
@@ -81,8 +81,8 @@ export function BrandingUI({
                     </div>
                 </div>
 
-                <div className="space-y-4 p-4 rounded-xl bg-white/[0.02] border border-white/5">
-                    <h3 className="text-[10px] font-black text-zinc-500 mb-4">Arredondamento & Vidro</h3>
+                <div className="space-y-4 p-4 rounded-xl glass-panel border-white/5">
+                    <h3 className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-4">Arredondamento & Vidro</h3>
                     <div className="space-y-6">
                         <div className="space-y-2">
                             <div className="flex justify-between">

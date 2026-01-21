@@ -207,7 +207,7 @@ export function ClientOnboardingWizard({ onComplete, onCancel }: ClientOnboardin
                         {step === 3 && (
                             <div className="space-y-4">
                                 <div className="mb-6">
-                                    <h3 className="text-xl font-bold text-white mb-1">Conexões de Mídia</h3>
+                                    <h3 className="text-xl font-bold text-white mb-1">Conexões de Tráfego</h3>
                                     <p className="text-zinc-400 text-sm">Registre os IDs para organização e futuras automações.</p>
                                 </div>
                                 <div className="space-y-4">
@@ -399,7 +399,7 @@ export function ClientOnboardingWizard({ onComplete, onCancel }: ClientOnboardin
 
                                     <div className="space-y-2">
                                         <div className="flex justify-between items-center text-xs uppercase tracking-wider text-zinc-500 font-bold border-b border-white/5 pb-1 mb-2">
-                                            Mídia <span className="cursor-pointer hover:text-primary transition-colors" onClick={() => setStep(3)}>(Editar)</span>
+                                            Conexões <span className="cursor-pointer hover:text-primary transition-colors" onClick={() => setStep(3)}>(Editar)</span>
                                         </div>
                                         <div className="flex flex-col gap-1">
                                             {(formData.metaAdsId || formData.metaBusinessId) && (

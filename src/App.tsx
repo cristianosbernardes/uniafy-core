@@ -9,7 +9,9 @@ import { DomainProvider } from "./contexts/DomainContext";
 import { BrandingProvider } from "./contexts/BrandingContext";
 import Dashboard from "./pages/Dashboard";
 import GestaoClientes from "./pages/GestaoClientes";
-import MeuPerfil from "./pages/MeuPerfil";
+import UserProfilePage from "./pages/system/UserProfilePage"; // Updated import
+
+
 import NotFound from "./pages/NotFound";
 import Login from "@/pages/auth/Login";
 import Register from "@/pages/auth/Register";
@@ -37,6 +39,15 @@ import AgencyChurn from "./pages/agency/AgencyChurn";
 import PublicDashboardView from "@/pages/public/PublicDashboardView";
 import AgencyOnboarding from "./pages/agency/AgencyOnboarding";
 import AgencyIntegrations from "@/pages/agency/AgencyIntegrations";
+import TrafficDashboard from "./pages/traffic/TrafficDashboard";
+import GroupSentinel from "./pages/traffic/GroupSentinel";
+import DynamicReports from "./pages/traffic/DynamicReports";
+import AiAnalysis from "./pages/traffic/AiAnalysis";
+import CampaignBuilder from "./pages/traffic/CampaignBuilder";
+import OperationalSchedule from "./pages/traffic/OperationalSchedule";
+import DataAnalysis from "./pages/traffic/DataAnalysis";
+import Reminders from "./pages/traffic/Reminders";
+import { TrafficProvider } from "./contexts/TrafficContext";
 
 const queryClient = new QueryClient();
 
@@ -58,11 +69,17 @@ const AppRoutes = () => {
   return (
     <Routes>
       <Route path="/login" element={<Login />} />
-      {/* Rota Pública de Dashboard (Sem Auth) */}
+      {/* Public Dashboard Route (No Auth) */}
       <Route path="/shared/:token" element={<PublicDashboardView />} />
 
       {/* Main Layout Wrapping Private Routes */}
-      <Route element={<PrivateRoute><DashboardShell /></PrivateRoute>}>
+      <Route element={
+        <PrivateRoute>
+          <TrafficProvider>
+            <DashboardShell />
+          </TrafficProvider>
+        </PrivateRoute>
+      }>
         <Route path="/" element={<Navigate to="/growth/hunter" replace />} />
 
         {/* Mestre Routes */}
@@ -100,10 +117,15 @@ const AppRoutes = () => {
         <Route path="/agency/churn-alert" element={<AgencyChurn />} />
 
         {/* Traffic Commander Routes */}
-        <Route path="/traffic" element={<Navigate to="/traffic/analytics" replace />} />
-        <Route path="/traffic/analytics" element={<Dashboard />} />
-        <Route path="/traffic/auditor" element={<Dashboard />} />
-        <Route path="/traffic/otimizador" element={<Dashboard />} />
+        <Route path="/traffic" element={<Navigate to="/traffic/dashboard" replace />} />
+        <Route path="/traffic/dashboard" element={<TrafficDashboard />} />
+        <Route path="/traffic/sentinela" element={<GroupSentinel />} />
+        <Route path="/traffic/reports" element={<DynamicReports />} />
+        <Route path="/traffic/ai-analysis" element={<AiAnalysis />} />
+        <Route path="/traffic/campaigns" element={<CampaignBuilder />} />
+        <Route path="/traffic/scheduler" element={<OperationalSchedule />} />
+        <Route path="/traffic/data-analysis" element={<DataAnalysis />} />
+        <Route path="/traffic/reminders" element={<Reminders />} />
 
         {/* Client Success Routes */}
         <Route path="/success" element={<Navigate to="/success/portal" replace />} />
@@ -114,7 +136,7 @@ const AppRoutes = () => {
 
         {/* Sistema Routes */}
         <Route path="/sistema" element={<Navigate to="/sistema/perfil" replace />} />
-        <Route path="/sistema/perfil" element={<MeuPerfil />} />
+        <Route path="/sistema/perfil" element={<UserProfilePage />} />
       </Route>
 
       {/* Catch-all */}

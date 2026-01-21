@@ -100,7 +100,7 @@ export function ModuleSidebar({
               <div className={cn(
                 "relative z-10 w-8 h-8 rounded-[9px] flex items-center justify-center transition-all duration-200",
                 isActive
-                  ? "bg-[var(--primary)] text-white shadow-md shadow-[var(--primary)]/40"
+                  ? "bg-primary text-primary-foreground shadow-md shadow-primary/40"
                   : "bg-transparent text-[var(--header-icon-color,rgba(255,255,255,0.8))] group-hover:text-white group-hover:bg-white/5"
               )}>
                 {IconNode}

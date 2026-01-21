@@ -30,12 +30,12 @@ export function BrandingLogin({
         <div className="space-y-8 animate-in fade-in slide-in-from-left-4 duration-300">
             <div>
                 <h2 className="text-lg font-bold text-white mb-1 tracking-tight">Portal de Login</h2>
-                <p className="text-xs text-zinc-500">Personalize a primeira impressão do usuário.</p>
+                <p className="text-xs text-muted-foreground">Personalize a primeira impressão do usuário.</p>
             </div>
 
             <div className="space-y-6">
-                <div className="space-y-4 p-4 rounded-xl bg-white/[0.02] border border-white/5">
-                    <h3 className="text-[10px] font-black text-zinc-500 mb-2">Estrutura</h3>
+                <div className="space-y-4 p-4 rounded-xl glass-panel border-white/5">
+                    <h3 className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-2">Estrutura</h3>
                     <div className="grid grid-cols-2 gap-4">
                         <button onClick={() => setLoginLayout('center')} className={cn("p-2 rounded-lg border text-center transition-all", loginLayout === 'center' ? "border-primary bg-primary/10" : "border-white/5 hover:bg-white/5")}>
                             <span className="text-[10px] font-bold text-zinc-400">Card Central</span>
@@ -46,8 +46,8 @@ export function BrandingLogin({
                     </div>
                 </div>
 
-                <div className="space-y-4 p-4 rounded-xl bg-white/[0.02] border border-white/5">
-                    <h3 className="text-[10px] font-black text-zinc-500 mb-4">Textos & Mensagens</h3>
+                <div className="space-y-4 p-4 rounded-xl glass-panel border-white/5">
+                    <h3 className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-4">Textos & Mensagens</h3>
                     <div className="space-y-4">
                         <div className="space-y-2">
                             <Label className="text-[10px] text-zinc-600">Título</Label>
@@ -60,8 +60,8 @@ export function BrandingLogin({
                     </div>
                 </div>
 
-                <div className="space-y-4 p-4 rounded-xl bg-white/[0.02] border border-white/5">
-                    <h3 className="text-[10px] font-black text-zinc-500 mb-2">Wallpaper (Fundo)</h3>
+                <div className="space-y-4 p-4 rounded-xl glass-panel border-white/5">
+                    <h3 className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-2">Wallpaper (Fundo)</h3>
                     <div className="space-y-4">
                         <UiAssetUploader label="Imagem de Fundo" value={loginBgUrl} onChange={setLoginBgUrl} />
                         <div className="space-y-2">

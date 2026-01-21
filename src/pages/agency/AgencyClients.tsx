@@ -43,41 +43,32 @@ import {
     DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { ClientOnboardingWizard } from "@/components/agency/ClientOnboardingWizard";
+import { useTraffic } from "@/contexts/TrafficContext";
+import { useNavigate } from "react-router-dom";
 
 export default function AgencyClients() {
     const { user } = useAuth();
-    const [clients, setClients] = useState<any[]>([]);
-    const [loading, setLoading] = useState(true);
+    const { selectClient, clients, isLoading: loading, refreshClients } = useTraffic();
+    const navigate = useNavigate();
     const [inviteOpen, setInviteOpen] = useState(false);
     const [clientData, setClientData] = useState<any>({});
 
-    useEffect(() => {
-        if (user) loadClients();
-    }, [user]);
+    /* 
+    const loadClients = async () => { ... } 
+    Removed to use unified TrafficContext source
+    */
 
-    const loadClients = async () => {
-        if (!user) return;
-        setLoading(true);
-        try {
-            // Mock data for clients if service returns empty (since we don't have real clients yet)
-            const data = await agencyService.getClients(user.id);
-            if (!data || data.length === 0) {
-                // Temporary Mock for demonstration
-                setClients([
-                    { id: 1, full_name: "Loja de Móveis Silva", email: "contato@moveissilva.com.br", plan: "Enterprise", status: "active", ltv: "R$ 12.450" },
-                    { id: 2, full_name: "Dra. Ana Paula Dermato", email: "financeiro@anapaula.com", plan: "Pro", status: "trial", ltv: "R$ 0" },
-                    { id: 3, full_name: "Academia Fitness Plus", email: "gerencia@fitplus.com", plan: "Basic", status: "overdue", ltv: "R$ 3.200" },
-                ]);
-            } else {
-                setClients(data);
-            }
-        } catch (error) {
-            console.error(error);
-            toast.error("Erro ao carregar clientes.");
-        } finally {
-            setLoading(false);
-        }
+    const handleViewDashboard = (clientId: string) => {
+        // 1. Select the client globally
+        selectClient(clientId.toString());
+        // 2. Navigate to the Traffic Reports (Builder) page
+        navigate('/traffic/reports');
+        // 3. Optional: Toast
+        toast.info("Acessando painel do cliente...");
     };
+
+    // Unified data source via TrafficContext
+    // useEffect(() => { if (user) loadClients(); }, [user]);
 
     const handleCreateClient = async (data: any) => {
         if (!user) return;
@@ -86,15 +77,8 @@ export default function AgencyClients() {
             toast.success("Onboarding iniciado com sucesso! O acesso será enviado em breve.");
             setInviteOpen(false);
 
-            // Mock update
-            setClients([...clients, {
-                id: crypto.randomUUID(),
-                full_name: data.name,
-                email: data.email,
-                plan: data.monthlyBudget > 10000 ? 'Enterprise' : 'Pro',
-                status: 'trial',
-                ltv: 'R$ 0'
-            }]);
+            // Mock update: refresh clients from context (which will likely just reload mocks for now)
+            await refreshClients();
 
             // Trigger confetti or success animation here if possible
         } catch (error) {
@@ -127,7 +111,7 @@ export default function AgencyClients() {
                             Novo Cliente
                         </Button>
                     </DialogTrigger>
-                    <DialogContent className="bg-transparent border-none shadow-none max-w-4xl p-0 overflow-hidden">
+                    <DialogContent className="bg-transparent border-none shadow-none max-w-4xl max-h-[90vh] p-0 overflow-y-auto custom-scrollbar">
                         <ClientOnboardingWizard
                             onComplete={handleCreateClient}
                             onCancel={() => setInviteOpen(false)}
@@ -209,7 +193,10 @@ export default function AgencyClients() {
                                                 </DropdownMenuTrigger>
                                                 <DropdownMenuContent align="end" className="bg-zinc-950 border-white/10 text-zinc-200">
                                                     <DropdownMenuLabel>Ações do Cliente</DropdownMenuLabel>
-                                                    <DropdownMenuItem className="focus:bg-white/10 cursor-pointer">
+                                                    <DropdownMenuItem
+                                                        className="focus:bg-white/10 cursor-pointer"
+                                                        onClick={() => handleViewDashboard(client.id)}
+                                                    >
                                                         <ExternalLink className="w-4 h-4 mr-2" />
                                                         Ver Dashboard
                                                     </DropdownMenuItem>
