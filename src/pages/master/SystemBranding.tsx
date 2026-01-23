@@ -4,7 +4,7 @@ import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
 import { supabase } from "@/integrations/supabase/client";
 import { toast } from "sonner";
-import { Palette, LayoutDashboard, Save, Sliders, MousePointerClick, Globe, RotateCcw, LayoutTemplate, Smartphone, Monitor, Check, Users, Zap, LayoutGrid, Activity, Settings2, Image as ImageIcon, Type, Layout, Paintbrush, Fingerprint, ExternalLink, Moon, Sun, Search } from 'lucide-react';
+import { Palette, LayoutDashboard, Save, Sliders, MousePointerClick, Globe, RotateCcw, LayoutTemplate, Smartphone, Monitor, Check, Users, Zap, LayoutGrid, Activity, Settings2, Image as ImageIcon, Type, Layout, Paintbrush, Fingerprint, ExternalLink, Moon, Sun, Search, PanelLeft, Loader2, Layers, Ghost, Mail } from 'lucide-react';
 import { cn } from "@/lib/utils";
 import { useBranding } from "@/contexts/BrandingContext";
 import { ColorPicker } from "@/components/ui/color-picker";
@@ -20,6 +20,15 @@ import {
 } from "@/components/ui/select";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { ToggleGroup, ToggleGroupItem } from "@/components/ui/toggle-group";
+import {
+    DropdownMenu,
+    DropdownMenuContent,
+    DropdownMenuItem,
+    DropdownMenuLabel,
+    DropdownMenuSeparator,
+    DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
+import { ChevronDown, AlertTriangle } from "lucide-react";
 
 // New Modular Components
 import { BrandingLogos } from "./branding-sections/BrandingLogos";
@@ -27,15 +36,90 @@ import { BrandingColors } from "./branding-sections/BrandingColors";
 import { BrandingUI } from "./branding-sections/BrandingUI";
 import { BrandingLogin } from "./branding-sections/BrandingLogin";
 import { BrandingPresets } from "./branding-sections/BrandingPresets";
+import { BrandingTypography } from "./branding-sections/BrandingTypography";
+import { BrandingLoader } from "./branding-sections/BrandingLoader";
+import { BrandingEffects } from "./branding-sections/BrandingEffects";
+import { BrandingAppIcons } from "./branding-sections/BrandingAppIcons";
+import { BrandingSystemPages } from "./branding-sections/BrandingSystemPages";
+import { BrandingEmail } from "./branding-sections/BrandingEmail";
+import { BrandingSounds } from "./branding-sections/BrandingSounds";
+import { BrandingSEO } from "./branding-sections/BrandingSEO";
+import { BrandingFooter } from "./branding-sections/BrandingFooter";
+// Icons already imported or added here if missing
+// Volume2, Globe, Copyright are needed.
+// Checking line 7 for duplicates.
+// Line 7 has: ..., Globe, ... 
+// I need Volume2 and Copyright.
+import { Volume2, Copyright } from "lucide-react";
+
+const DEFAULT_BRANDING = {
+    colors: {
+        primary: "24 100% 52%",
+        background: "240 10% 2%",
+        sidebar: "0 0% 2%",
+        sidebar_menu: "0 0% 2%",
+        sidebar_submenu: "0 0% 5%",
+        sidebar_active: "24 100% 52%",
+        border: "0 0% 100% / 0.1",
+        card: "0 0% 100% / 0.05",
+        hover: "24 100% 52% / 0.1",
+        header_bg: "240 10% 2%",
+        header_icons: "0 0% 100%",
+        icons_global: "24 100% 52%",
+        success: "142 71% 45%",
+        warning: "48 96% 53%",
+        error: "0 84% 60%",
+        info: "217 91% 60%",
+        text_primary: "0 0% 100%",
+        text_secondary: "240 5% 65%",
+        border_strong: "240 5% 12%",
+        border_subtle: "0 0% 100% / 0.08",
+        scroll_thumb: "240 5% 34%"
+    },
+    logo_url: "",
+    favicon_url: "",
+    login: {
+        bg_url: "",
+        overlay_color: "#000000",
+        overlay_opacity: 0.8,
+        title: "",
+        message: "",
+        logo_url: "",
+        layout: "center" as const,
+        bg_type: "image" as const,
+        bg_color: "#000000",
+        gradient_start: "#1a1a1a",
+        gradient_end: "#000000",
+        gradient_direction: "to bottom right"
+    },
+    ui: {
+        radius: 0.5,
+        fontFamily: "Inter",
+        fontHeadings: "",
+        effects: { shadowStyle: 'soft' as const },
+        loader: { type: 'spinner' as const, customUrl: '', color: '', bgColor: '' },
+        glass: { blur: 12, opacity: 0.05 },
+        fontSizes: { base: 14, titles: 24, cardTitles: 18, menu: 13, submenu: 14, small: 12, stats: 32, subtitles: 14 }
+    },
+    pwa: { appleTouchIcon: "", androidIcon192: "", androidIcon512: "" },
+    systemPages: {
+        maintenance: { isActive: false, message: "", estimatedReturn: "" },
+        notFound: { imageUrl: "", title: "", description: "", backButtonText: "" }
+    },
+    email: { headerColor: "#FF6600", ctaColor: "#FF6600", footerText: "" },
+    sounds: { enabled: false, volume: 0.5 },
+    seo: { titleTemplate: "%s | Uniafy", description: "", ogImage: "" },
+    footer: { text: "© 2026 Uniafy Platform. Todos os direitos reservados.", showLinks: true, links: [] }
+};
 
 export default function SystemBranding() {
     const { branding, refreshBranding } = useBranding();
     const [loading, setLoading] = useState(false);
 
     // Color State
-    const [primaryColor, setPrimaryColor] = useState("24 100% 52%");
-    const [bgColor, setBgColor] = useState("240 10% 2%");
-    const [sidebarMenuColor, setSidebarMenuColor] = useState("0 0% 2%");
+    const [primaryColor, setPrimaryColor] = useState("#FF6600"); // Orange (Brand)
+    const [bgColor, setBgColor] = useState("#09090b"); // Dark Background
+    const [sidebarMenuColor, setSidebarMenuColor] = useState("#020202"); // Sidebar Dark
     const [sidebarSubmenuColor, setSidebarSubmenuColor] = useState("0 0% 5%");
 
     // Advanced UI Colors
@@ -76,7 +160,8 @@ export default function SystemBranding() {
     const [loginLogoUrl, setLoginLogoUrl] = useState("");
     const [loginLayout, setLoginLayout] = useState<'center' | 'split'>('center');
     const [previewMode, setPreviewMode] = useState<'desktop' | 'mobile'>('desktop');
-    const [activeSection, setActiveSection] = useState<'logos' | 'colors' | 'ui' | 'login' | 'presets'>('logos');
+    const [activeSection, setActiveSection] = useState<'logos' | 'colors' | 'ui' | 'typography' | 'loader' | 'effects' | 'pwa' | 'pages' | 'email' | 'login' | 'presets' | 'sounds' | 'seo' | 'footer'>('logos');
+    const [isSidebarCollapsed, setIsSidebarCollapsed] = useState(false);
 
     // Background Type State
     const [loginBgType, setLoginBgType] = useState<'image' | 'color' | 'gradient'>('image');
@@ -98,6 +183,47 @@ export default function SystemBranding() {
     const [fsSubtitle, setFsSubtitle] = useState(14); // Descriptions
     const [glassBlur, setGlassBlur] = useState(12);
     const [glassOpacity, setGlassOpacity] = useState(0.05);
+
+    // EXPANSION STATES
+    // Typography
+    const [fontHeadings, setFontHeadings] = useState("");
+
+    // Effects
+    const [shadowStyle, setShadowStyle] = useState<'flat' | 'soft' | 'hard'>('soft');
+
+    // Loader
+    const [loaderType, setLoaderType] = useState<'spinner' | 'pulse' | 'bar' | 'custom'>('spinner');
+    const [loaderCustomUrl, setLoaderCustomUrl] = useState("");
+
+    // PWA
+    const [appleTouchIcon, setAppleTouchIcon] = useState("");
+    const [androidIcon192, setAndroidIcon192] = useState("");
+    const [androidIcon512, setAndroidIcon512] = useState("");
+
+    // System Pages
+    const [maintenanceIsActive, setMaintenanceIsActive] = useState(false);
+    const [maintenanceMessage, setMaintenanceMessage] = useState("");
+    const [maintenanceReturn, setMaintenanceReturn] = useState("");
+    const [notFoundImageUrl, setNotFoundImageUrl] = useState("");
+    const [notFoundTitle, setNotFoundTitle] = useState("");
+
+    // Email
+    const [emailHeaderColor, setEmailHeaderColor] = useState("#FF6600");
+    const [emailCtaColor, setEmailCtaColor] = useState("#FF6600");
+    const [emailFooterText, setEmailFooterText] = useState("");
+
+    // Sounds
+    const [soundsEnabled, setSoundsEnabled] = useState(false);
+    const [soundsVolume, setSoundsVolume] = useState(0.5);
+
+    // SEO
+    const [seoTitle, setSeoTitle] = useState("%s | Uniafy");
+    const [seoDescription, setSeoDescription] = useState("");
+    const [seoOgImage, setSeoOgImage] = useState("");
+
+    // Footer
+    const [footerText, setFooterText] = useState("© 2026 Uniafy Platform. Todos os direitos reservados.");
+    const [footerShowLinks, setFooterShowLinks] = useState(true);
 
     useEffect(() => {
         setIconsGlobalColor(primaryColor);
@@ -160,10 +286,20 @@ export default function SystemBranding() {
                 setRadius(r * 16); // Convert REM to PX for UI
 
                 if (branding.ui.fontFamily) setFontFamily(branding.ui.fontFamily);
+                if (branding.ui.fontHeadings) setFontHeadings(branding.ui.fontHeadings);
+
                 if (branding.ui.glass) {
                     setGlassBlur(branding.ui.glass.blur ?? 12);
                     setGlassOpacity(branding.ui.glass.opacity ?? 0.05);
                 }
+
+                if (branding.ui.effects?.shadowStyle) setShadowStyle(branding.ui.effects.shadowStyle);
+
+                if (branding.ui.loader) {
+                    setLoaderType(branding.ui.loader.type);
+                    if (branding.ui.loader.customUrl) setLoaderCustomUrl(branding.ui.loader.customUrl);
+                }
+
                 if (branding.ui.fontSizes) {
                     setFsBase(branding.ui.fontSizes.base || 14);
                     setFsTitle(branding.ui.fontSizes.titles || 24);
@@ -174,6 +310,46 @@ export default function SystemBranding() {
                     setFsStats(branding.ui.fontSizes.stats || 32);
                     setFsSubtitle(branding.ui.fontSizes.subtitles || 14);
                 }
+            }
+
+            if (branding.pwa) {
+                if (branding.pwa.appleTouchIcon) setAppleTouchIcon(branding.pwa.appleTouchIcon);
+                if (branding.pwa.androidIcon192) setAndroidIcon192(branding.pwa.androidIcon192);
+                if (branding.pwa.androidIcon512) setAndroidIcon512(branding.pwa.androidIcon512);
+            }
+
+            if (branding.systemPages) {
+                if (branding.systemPages.maintenance) {
+                    setMaintenanceIsActive(branding.systemPages.maintenance.isActive);
+                    setMaintenanceMessage(branding.systemPages.maintenance.message || "");
+                    setMaintenanceReturn(branding.systemPages.maintenance.estimatedReturn || "");
+                }
+                if (branding.systemPages.notFound) {
+                    setNotFoundImageUrl(branding.systemPages.notFound.imageUrl || "");
+                    setNotFoundTitle(branding.systemPages.notFound.title || "");
+                }
+            }
+
+            if (branding.email) {
+                if (branding.email.headerColor) setEmailHeaderColor(branding.email.headerColor);
+                if (branding.email.ctaColor) setEmailCtaColor(branding.email.ctaColor);
+                if (branding.email.footerText) setEmailFooterText(branding.email.footerText);
+            }
+
+            if (branding.sounds) {
+                setSoundsEnabled(branding.sounds.enabled ?? false);
+                setSoundsVolume(branding.sounds.volume ?? 0.5);
+            }
+
+            if (branding.seo) {
+                setSeoTitle(branding.seo.titleTemplate || "%s | Uniafy");
+                setSeoDescription(branding.seo.description || "");
+                setSeoOgImage(branding.seo.ogImage || "");
+            }
+
+            if (branding.footer) {
+                setFooterText(branding.footer.text || "© 2026 Uniafy Platform. Todos os direitos reservados.");
+                setFooterShowLinks(branding.footer.showLinks ?? true);
             }
         }
     }, [branding]);
@@ -244,6 +420,16 @@ export default function SystemBranding() {
                 ui: {
                     radius: radius / 16,
                     fontFamily,
+                    fontHeadings: fontHeadings === 'default' ? '' : fontHeadings,
+                    effects: {
+                        shadowStyle
+                    },
+                    loader: {
+                        type: loaderType,
+                        customUrl: loaderCustomUrl,
+                        color: primaryColor,
+                        bgColor: bgColor
+                    },
                     glass: {
                         blur: glassBlur,
                         opacity: glassOpacity
@@ -258,6 +444,43 @@ export default function SystemBranding() {
                         stats: fsStats,
                         subtitles: fsSubtitle
                     }
+                },
+                pwa: {
+                    appleTouchIcon,
+                    androidIcon192,
+                    androidIcon512
+                },
+                systemPages: {
+                    maintenance: {
+                        isActive: maintenanceIsActive,
+                        message: maintenanceMessage,
+                        estimatedReturn: maintenanceReturn
+                    },
+                    notFound: {
+                        imageUrl: notFoundImageUrl,
+                        title: notFoundTitle,
+                        description: "",
+                        backButtonText: ""
+                    }
+                },
+                email: {
+                    headerColor: emailHeaderColor,
+                    footerText: emailFooterText,
+                    ctaColor: emailCtaColor
+                },
+                sounds: {
+                    enabled: soundsEnabled,
+                    volume: soundsVolume
+                },
+                seo: {
+                    titleTemplate: seoTitle,
+                    description: seoDescription,
+                    ogImage: seoOgImage
+                },
+                footer: {
+                    text: footerText,
+                    showLinks: footerShowLinks,
+                    links: []
                 }
             };
 
@@ -286,52 +509,87 @@ export default function SystemBranding() {
         }
     };
 
-    const handleReset = async () => {
-        if (!confirm('Tem certeza que deseja restaurar os padrões visuais do sistema?')) return;
+
+
+    const handleReset = async (scope: 'global' | 'section' = 'global') => {
+        const actionLabel = scope === 'global' ? 'RESTAURAR PADRÕES DE FÁBRICA' : `RESTAURAR PADRÕES DE ${activeSection.toUpperCase()}`;
+        if (!confirm(`ATENÇÃO: Você deseja ${actionLabel}?\n\nEssa ação não pode ser desfeita.`)) return;
 
         setLoading(true);
         try {
-            const defaultBranding = {
-                colors: {
-                    primary: "24 100% 52%",
-                    background: "240 10% 2%",
-                    sidebar: "0 0% 2%",
-                    sidebar_menu: "0 0% 2%",
-                    sidebar_submenu: "0 0% 5%",
-                    sidebar_active: "24 100% 52%",
-                    border: "0 0% 100% / 0.1",
-                    card: "0 0% 100% / 0.05",
-                    hover: "24 100% 52% / 0.1"
-                },
-                logo_url: "",
-                favicon_url: "",
-                login: {
-                    bg_url: "",
-                    overlay_color: "#000000",
-                    overlay_opacity: 0.8,
-                    title: "",
-                    message: "",
-                    logo_url: "",
-                    layout: "center" as const,
-                    bg_type: "image",
-                    bg_color: "#000000",
-                    gradient_start: "#1a1a1a",
-                    gradient_end: "#000000",
-                    gradient_direction: "to bottom right"
-                },
-                ui: { radius: 0.5, fontFamily: "Inter", fontSizes: { base: 14, titles: 24, cardTitles: 18, menu: 13, submenu: 14, small: 12, stats: 32, subtitles: 14 } }
-            };
+            let configToSave = { ...branding }; // Start with current branding
+
+            if (scope === 'global') {
+                configToSave = { ...DEFAULT_BRANDING };
+            } else {
+                // Section-based reset logic
+                switch (activeSection) {
+                    case 'logos':
+                        configToSave.logo_url = DEFAULT_BRANDING.logo_url;
+                        configToSave.favicon_url = DEFAULT_BRANDING.favicon_url;
+                        if (configToSave.login) configToSave.login.logo_url = DEFAULT_BRANDING.login.logo_url;
+                        break;
+                    case 'colors':
+                        configToSave.colors = { ...DEFAULT_BRANDING.colors };
+                        break;
+                    case 'ui':
+                        if (configToSave.ui) {
+                            configToSave.ui.radius = DEFAULT_BRANDING.ui.radius;
+                            configToSave.ui.glass = { ...DEFAULT_BRANDING.ui.glass };
+                            configToSave.ui.fontSizes = { ...DEFAULT_BRANDING.ui.fontSizes };
+                        }
+                        break;
+                    case 'typography':
+                        if (configToSave.ui) {
+                            configToSave.ui.fontFamily = DEFAULT_BRANDING.ui.fontFamily;
+                            configToSave.ui.fontHeadings = DEFAULT_BRANDING.ui.fontHeadings;
+                        }
+                        break;
+                    case 'loader':
+                        if (configToSave.ui) configToSave.ui.loader = { ...DEFAULT_BRANDING.ui.loader };
+                        break;
+                    case 'effects':
+                        if (configToSave.ui) configToSave.ui.effects = { ...DEFAULT_BRANDING.ui.effects };
+                        break;
+                    case 'login':
+                        configToSave.login = { ...DEFAULT_BRANDING.login };
+                        break;
+                    case 'pwa':
+                        configToSave.pwa = { ...DEFAULT_BRANDING.pwa };
+                        break;
+                    case 'pages':
+                        configToSave.systemPages = { ...DEFAULT_BRANDING.systemPages };
+                        break;
+                    case 'email':
+                        configToSave.email = { ...DEFAULT_BRANDING.email };
+                        break;
+                    case 'sounds':
+                        configToSave.sounds = { ...DEFAULT_BRANDING.sounds };
+                        break;
+                    case 'seo':
+                        configToSave.seo = { ...DEFAULT_BRANDING.seo };
+                        break;
+                    case 'footer':
+                        configToSave.footer = { ...DEFAULT_BRANDING.footer };
+                        break;
+                    case 'presets':
+                        toast.info("Para resetar presets, aplique um tema padrão manualmente.");
+                        setLoading(false);
+                        return; // No specific state to reset for presets logic as it applies colors
+                }
+            }
 
             const { error } = await supabase
                 .from('master_config')
-                .update({ branding: defaultBranding })
+                .update({ branding: configToSave })
                 .eq('id', 1);
 
             if (error) throw error;
             await refreshBranding();
-            toast.success('Padrões restaurados com sucesso!');
+            toast.success(scope === 'global' ? 'Sistema restaurado com sucesso!' : `Seção ${activeSection} restaurada!`);
         } catch (error: any) {
             toast.error('Erro ao restaurar padrões.');
+            console.error(error);
         } finally {
             setLoading(false);
         }
@@ -426,13 +684,31 @@ export default function SystemBranding() {
                 title="BRANDING"
                 titleAccent="CENTER"
                 subtitle="Master Suite • Personalização e Identidade Visual"
+                action={
+                    <DropdownMenu>
+                        <DropdownMenuTrigger asChild>
+                            <Button variant="outline" className="gap-2">
+                                <RotateCcw className="w-4 h-4" />
+                                Resetar
+                                <ChevronDown className="w-3 h-3 opacity-50" />
+                            </Button>
+                        </DropdownMenuTrigger>
+                        <DropdownMenuContent align="end" className="w-64 bg-[#09090b] border-white/10 text-zinc-300">
+                            <DropdownMenuLabel>Opções de Restauração</DropdownMenuLabel>
+                            <DropdownMenuSeparator className="bg-white/10" />
+                            <DropdownMenuItem onClick={() => handleReset('section')} className="gap-2 cursor-pointer focus:bg-primary/20 focus:text-primary">
+                                <RotateCcw className="w-4 h-4" />
+                                <span>Restaurar {activeSection.toUpperCase()}</span>
+                            </DropdownMenuItem>
+                            <DropdownMenuSeparator className="bg-white/10" />
+                            <DropdownMenuItem onClick={() => handleReset('global')} className="gap-2 text-red-400 hover:text-red-300 cursor-pointer focus:bg-red-500/10 focus:text-red-400">
+                                <AlertTriangle className="w-4 h-4" />
+                                <span>Restaurar Sistema (ALL)</span>
+                            </DropdownMenuItem>
+                        </DropdownMenuContent>
+                    </DropdownMenu>
+                }
                 actions={[
-                    {
-                        label: 'Resetar',
-                        icon: RotateCcw,
-                        variant: 'outline',
-                        onClick: handleReset,
-                    },
                     {
                         label: 'Salvar Alterações',
                         icon: Save,
@@ -445,42 +721,70 @@ export default function SystemBranding() {
 
             <div className="flex flex-1 overflow-hidden rounded-xl border border-white/10 bg-[#09090b] shadow-2xl">
                 {/* SETTINGS SIDEBAR */}
-                <div className="w-64 bg-[#09090b] border-r border-white/5 flex flex-col pt-6 shrink-0 h-full">
-                    <div className="px-6 mb-6">
-                        <h3 className="text-[10px] font-black text-zinc-600 tracking-[0.2em]">Configurações</h3>
+                <div className={cn(
+                    "bg-[#09090b] border-r border-white/5 flex flex-col pt-6 shrink-0 h-full transition-all duration-300",
+                    isSidebarCollapsed ? "w-20 items-center" : "w-64"
+                )}>
+                    <div className={cn("mb-6 flex items-center justify-between", isSidebarCollapsed ? "px-0 justify-center" : "px-6")}>
+                        {!isSidebarCollapsed && (
+                            <h3 className="text-xs font-bold text-zinc-400 uppercase tracking-normal">Configurações</h3>
+                        )}
+                        <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={() => setIsSidebarCollapsed(!isSidebarCollapsed)}
+                            className={cn("h-6 w-6 text-zinc-500 hover:text-white", isSidebarCollapsed && "h-8 w-8")}
+                        >
+                            <PanelLeft className="w-4 h-4" />
+                        </Button>
                     </div>
 
-                    <div className="flex-1 space-y-1">
+                    <div className="flex-1 space-y-1 w-full overflow-y-auto custom-scrollbar pr-1">
                         {[
                             { id: 'logos', label: 'Identidade & Logos', icon: ImageIcon },
                             { id: 'colors', label: 'Cores do Sistema', icon: Paintbrush },
+                            { id: 'typography', label: 'Tipografia', icon: Type },
                             { id: 'ui', label: 'Interface & Shape', icon: Layout },
+                            { id: 'effects', label: 'Efeitos & Sombras', icon: Layers },
+                            { id: 'loader', label: 'Carregamento', icon: Loader2 },
                             { id: 'login', label: 'Tela de Login', icon: Fingerprint },
+                            { id: 'pwa', label: 'App / PWA', icon: Smartphone },
+                            { id: 'pages', label: 'Páginas Sistema', icon: Ghost },
+                            { id: 'sounds', label: 'Sons & Feedback', icon: Volume2 },
+                            { id: 'seo', label: 'SEO & Social', icon: Globe },
+                            { id: 'footer', label: 'Rodapé & Legal', icon: Copyright },
+                            { id: 'email', label: 'E-mails', icon: Mail },
                             { id: 'presets', label: 'Temas & Presets', icon: Palette },
                         ].map((item) => (
                             <button
                                 key={item.id}
                                 onClick={() => setActiveSection(item.id as any)}
                                 className={cn(
-                                    "w-full flex items-center gap-3 px-6 py-3 transition-all relative group",
+                                    "flex items-center transition-all relative group",
+                                    isSidebarCollapsed
+                                        ? "w-10 h-10 mx-auto justify-center rounded-lg"
+                                        : "w-full gap-3 px-6 py-3",
                                     activeSection === item.id
-                                        ? "text-primary bg-primary/5 border-r-2 border-primary"
+                                        ? isSidebarCollapsed
+                                            ? "bg-primary/10 text-primary"
+                                            : "text-primary bg-primary/5 border-l-2 border-primary"
                                         : "text-zinc-500 hover:text-zinc-300 hover:bg-white/[0.02]"
                                 )}
+                                title={isSidebarCollapsed ? item.label : undefined}
                             >
                                 <item.icon className={cn("w-4 h-4", activeSection === item.id ? "text-primary" : "text-primary/60 group-hover:text-primary")} />
-                                <span className="text-xs font-medium tracking-wider">{item.label}</span>
+                                {!isSidebarCollapsed && <span className="text-xs font-medium tracking-wider">{item.label}</span>}
                             </button>
                         ))}
                     </div>
 
-                    <div className="p-6 border-t border-white/5 space-y-4">
-                        <div className="bg-zinc-900/50 rounded-lg p-4 border border-white/5">
-                            <p className="text-[10px] text-zinc-500 leading-relaxed">
-                                Alterações no preview são em tempo real. Pressione <b>Salvar</b> para aplicar globalmente.
+                    {!isSidebarCollapsed && (
+                        <div className="p-4 border-t border-white/5">
+                            <p className="text-[10px] text-zinc-500 text-center leading-relaxed">
+                                Alterações no preview são em tempo real. <br /> Pressione <span className="text-zinc-300 font-bold">Salvar</span> para aplicar.
                             </p>
                         </div>
-                    </div>
+                    )}
                 </div>
 
                 {/* MAIN CONTENT SPLIT */}
@@ -520,13 +824,15 @@ export default function SystemBranding() {
                                 setTextPrimaryColor={setTextPrimaryColor}
                                 textSecondaryColor={textSecondaryColor}
                                 setTextSecondaryColor={setTextSecondaryColor}
+                                headerBgColor={headerBgColor}
+                                setHeaderBgColor={setHeaderBgColor}
+                                headerIconsColor={headerIconsColor}
+                                setHeaderIconsColor={setHeaderIconsColor}
                             />
                         )}
 
                         {activeSection === 'ui' && (
                             <BrandingUI
-                                fontFamily={fontFamily}
-                                setFontFamily={setFontFamily}
                                 fsTitle={fsTitle}
                                 setFsTitle={setFsTitle}
                                 fsStats={fsStats}
@@ -571,6 +877,97 @@ export default function SystemBranding() {
                                 primaryColor={primaryColor}
                             />
                         )}
+
+                        {activeSection === 'typography' && (
+                            <BrandingTypography
+                                fontFamily={fontFamily}
+                                setFontFamily={setFontFamily}
+                                fontHeadings={fontHeadings}
+                                setFontHeadings={setFontHeadings}
+                            />
+                        )}
+
+                        {activeSection === 'loader' && (
+                            <BrandingLoader
+                                loaderType={loaderType}
+                                setLoaderType={setLoaderType}
+                                loaderCustomUrl={loaderCustomUrl}
+                                setLoaderCustomUrl={setLoaderCustomUrl}
+                            />
+                        )}
+
+                        {activeSection === 'effects' && (
+                            <BrandingEffects
+                                shadowStyle={shadowStyle}
+                                setShadowStyle={setShadowStyle}
+                            />
+                        )}
+
+                        {activeSection === 'pwa' && (
+                            <BrandingAppIcons
+                                appleTouchIcon={appleTouchIcon}
+                                setAppleTouchIcon={setAppleTouchIcon}
+                                androidIcon192={androidIcon192}
+                                setAndroidIcon192={setAndroidIcon192}
+                                androidIcon512={androidIcon512}
+                                setAndroidIcon512={setAndroidIcon512}
+                            />
+                        )}
+
+                        {activeSection === 'pages' && (
+                            <BrandingSystemPages
+                                maintenanceIsActive={maintenanceIsActive}
+                                setMaintenanceIsActive={setMaintenanceIsActive}
+                                maintenanceMessage={maintenanceMessage}
+                                setMaintenanceMessage={setMaintenanceMessage}
+                                maintenanceReturn={maintenanceReturn}
+                                setMaintenanceReturn={setMaintenanceReturn}
+                                notFoundImageUrl={notFoundImageUrl}
+                                setNotFoundImageUrl={setNotFoundImageUrl}
+                                notFoundTitle={notFoundTitle}
+                                setNotFoundTitle={setNotFoundTitle}
+                            />
+                        )}
+
+                        {activeSection === 'sounds' && (
+                            <BrandingSounds
+                                enabled={soundsEnabled}
+                                setEnabled={setSoundsEnabled}
+                                volume={soundsVolume}
+                                setVolume={setSoundsVolume}
+                            />
+                        )}
+
+                        {activeSection === 'seo' && (
+                            <BrandingSEO
+                                title={seoTitle}
+                                setTitle={setSeoTitle}
+                                description={seoDescription}
+                                setDescription={setSeoDescription}
+                                ogImage={seoOgImage}
+                                setOgImage={setSeoOgImage}
+                            />
+                        )}
+
+                        {activeSection === 'footer' && (
+                            <BrandingFooter
+                                text={footerText}
+                                setText={setFooterText}
+                                showLinks={footerShowLinks}
+                                setShowLinks={setFooterShowLinks}
+                            />
+                        )}
+
+                        {activeSection === 'email' && (
+                            <BrandingEmail
+                                emailHeaderColor={emailHeaderColor}
+                                setEmailHeaderColor={setEmailHeaderColor}
+                                emailCtaColor={emailCtaColor}
+                                setEmailCtaColor={setEmailCtaColor}
+                                emailFooterText={emailFooterText}
+                                setEmailFooterText={setEmailFooterText}
+                            />
+                        )}
                     </div>
 
                     {/* RIGHT: PREVIEW (FLEX-1) */}
@@ -613,194 +1010,248 @@ export default function SystemBranding() {
                                     "--font-family": fontFamily,
                                 } as any}
                             >
-                                {/* Browser Tab Mock */}
-                                <div className="bg-[#1e1e1e] px-4 py-2 flex items-center gap-2 border-b border-white/5 shrink-0">
-                                    <div className="flex gap-1.5 opacity-50 mr-4">
-                                        <div className="w-3 h-3 rounded-full bg-[#ff5f56]"></div>
-                                        <div className="w-3 h-3 rounded-full bg-[#ffbd2e]"></div>
-                                        <div className="w-3 h-3 rounded-full bg-[#27c93f]"></div>
-                                    </div>
-                                    <div className="bg-[#333] rounded-t w-48 py-1.5 px-3 flex items-center gap-2 text-[10px] text-zinc-300 relative top-1">
-                                        {faviconUrl ? (
-                                            <img src={faviconUrl} className="w-3 h-3 object-contain" />
-                                        ) : (
-                                            <div className="w-3 h-3 bg-white/10 rounded-sm" />
-                                        )}
-                                        <span className="truncate">Uniafy - Sistema</span>
-                                    </div>
-                                </div>
 
-                                {activeSection === 'login' ? (
-                                    <div className="flex-1 relative flex items-center justify-center p-12 bg-zinc-900/50 overflow-hidden">
-                                        <div className="absolute inset-0 bg-cover bg-center z-0 transition-all duration-500"
-                                            style={{
-                                                backgroundImage: loginBgType === 'image' && loginBgUrl ? `url(${loginBgUrl})` :
-                                                    loginBgType === 'gradient' ? `linear-gradient(${loginGradientDirection}, ${loginGradientStart}, ${loginGradientEnd})` : undefined,
-                                                backgroundColor: loginBgType === 'color' ? loginBgColor : undefined,
-                                                width: loginLayout === 'split' && previewMode === 'desktop' ? '50%' : '100%'
-                                            }}
-                                        >
-                                            {loginBgType === 'image' && (
-                                                <div className="absolute inset-0" style={{ backgroundColor: loginOverlayColor, opacity: loginOverlayOpacity }}></div>
-                                            )}
+                                {/* P R E V I E W   C O N T E N T   W R A P P E R */}
+                                <div className="flex flex-col flex-1 relative z-10 bg-black">
+
+                                    {/* Browser Tab Mock */}
+                                    <div className="bg-neutral-950 px-4 py-2 flex items-center gap-2 border-b border-white/5 shrink-0 relative z-20">
+                                        <div className="flex gap-1.5 opacity-50 mr-4">
+                                            <div className="w-3 h-3 rounded-full bg-[#ff5f56]"></div>
+                                            <div className="w-3 h-3 rounded-full bg-[#ffbd2e]"></div>
+                                            <div className="w-3 h-3 rounded-full bg-[#27c93f]"></div>
                                         </div>
+                                        <div className="bg-[#333] rounded-t w-48 py-1.5 px-3 flex items-center gap-2 text-[10px] text-zinc-300 relative top-1">
+                                            {faviconUrl ? (
+                                                <img src={faviconUrl} className="w-3 h-3 object-contain" />
+                                            ) : (
+                                                <div className="w-3 h-3 bg-white/10 rounded-sm" />
+                                            )}
+                                            <span className="truncate">Uniafy - Sistema</span>
+                                        </div>
+                                    </div>
 
-                                        {loginLayout === 'split' && (
-                                            <div className="absolute inset-y-0 right-0 w-1/2 bg-[#0a0a0a] z-0 hidden lg:block" />
-                                        )}
-
-                                        <div className={cn(
-                                            "relative z-10 w-full max-w-sm bg-black/40 backdrop-blur-xl border border-white/10 rounded-2xl p-8 shadow-2xl space-y-8 transition-all",
-                                            loginLayout === 'split' && previewMode === 'desktop' ? "translate-x-[50%] bg-[#111] border-none shadow-none" : ""
-                                        )}>
-                                            <div className="flex justify-center">
-                                                {loginLogoUrl || logoUrl ? (
-                                                    <img src={loginLogoUrl || logoUrl} alt="Logo" className="h-10 object-contain" />
-                                                ) : (
-                                                    <div className="h-10 w-32 bg-white/10 rounded animate-pulse" />
+                                    {activeSection === 'login' ? (
+                                        <div className="flex-1 relative flex items-center justify-center p-12 bg-zinc-900/50 overflow-hidden">
+                                            <div className="absolute inset-0 bg-cover bg-center z-0 transition-all duration-500"
+                                                style={{
+                                                    backgroundImage: loginBgType === 'image' && loginBgUrl ? `url(${loginBgUrl})` :
+                                                        loginBgType === 'gradient' ? `linear-gradient(${loginGradientDirection}, ${loginGradientStart}, ${loginGradientEnd})` : undefined,
+                                                    backgroundColor: loginBgType === 'color' ? loginBgColor : undefined,
+                                                    width: loginLayout === 'split' && previewMode === 'desktop' ? '50%' : '100%'
+                                                }}
+                                            >
+                                                {loginBgType === 'image' && (
+                                                    <div className="absolute inset-0" style={{ backgroundColor: loginOverlayColor, opacity: loginOverlayOpacity }}></div>
                                                 )}
                                             </div>
 
-                                            <div className="space-y-4">
-                                                <div className="space-y-1 text-center">
-                                                    <h1 className="text-2xl font-semibold text-white tracking-tight">
-                                                        {loginTitle || "Bem-vindo de volta"}
-                                                    </h1>
-                                                    <p className="text-sm text-zinc-400">
-                                                        {loginMessage || "Entre com suas credenciais para acessar."}
-                                                    </p>
+                                            {loginLayout === 'split' && (
+                                                <div className="absolute inset-y-0 right-0 w-1/2 bg-[#0a0a0a] z-0 hidden lg:block" />
+                                            )}
+
+                                            <div className={cn(
+                                                "relative z-10 w-full max-w-sm bg-black/40 backdrop-blur-xl border border-white/10 rounded-2xl p-8 shadow-2xl space-y-8 transition-all",
+                                                loginLayout === 'split' && previewMode === 'desktop' ? "translate-x-[50%] bg-[#111] border-none shadow-none" : ""
+                                            )}>
+                                                <div className="flex justify-center">
+                                                    {loginLogoUrl || logoUrl ? (
+                                                        <img src={loginLogoUrl || logoUrl} alt="Logo" className="h-10 object-contain" />
+                                                    ) : (
+                                                        <div className="h-10 w-32 bg-white/10 rounded animate-pulse" />
+                                                    )}
                                                 </div>
 
-                                                <div className="space-y-4 opacity-50 pointer-events-none select-none">
-                                                    <div className="space-y-2">
-                                                        <div className="h-9 w-full bg-white/5 rounded border border-white/10" />
+                                                <div className="space-y-4">
+                                                    <div className="space-y-1 text-center">
+                                                        <h1 className="text-2xl font-semibold text-white tracking-tight">
+                                                            {loginTitle || "Bem-vindo de volta"}
+                                                        </h1>
+                                                        <p className="text-sm text-zinc-400">
+                                                            {loginMessage || "Entre com suas credenciais para acessar."}
+                                                        </p>
                                                     </div>
-                                                    <div className="space-y-2">
-                                                        <div className="h-9 w-full bg-white/5 rounded border border-white/10" />
+
+                                                    <div className="space-y-4 opacity-50 pointer-events-none select-none">
+                                                        <div className="space-y-2">
+                                                            <div className="h-9 w-full bg-white/5 rounded border border-white/10" />
+                                                        </div>
+                                                        <div className="space-y-2">
+                                                            <div className="h-9 w-full bg-white/5 rounded border border-white/10" />
+                                                        </div>
+                                                        <div className="h-10 w-full bg-primary rounded" />
                                                     </div>
-                                                    <div className="h-10 w-full bg-primary rounded" />
                                                 </div>
                                             </div>
                                         </div>
-                                    </div>
-                                ) : (
-                                    <div className="flex-1 bg-[var(--background)] flex flex-col overflow-hidden font-sans">
-                                        {/* HEADER FULL WIDTH */}
-                                        <div className="h-14 px-6 border-b border-[var(--border)] bg-[var(--header)] flex items-center justify-between shrink-0 relative z-20">
-                                            <div className="flex items-center gap-4">
-                                                <div className="w-8 h-8 rounded-lg bg-[var(--primary)] flex items-center justify-center shrink-0">
-                                                    {logoUrl ? <img src={logoUrl} className="w-5 h-5 object-contain" /> : <Zap className="w-4 h-4 text-white" />}
-                                                </div>
-                                                <div className="h-4 w-px bg-[var(--border)]" />
-                                                <span className="text-[10px] font-black tracking-widest text-[var(--text-primary)] uppercase">Uniafy Platform</span>
-                                            </div>
-                                            <div className="flex items-center gap-3">
-                                                <div className="flex -space-x-2">
-                                                    <div className="w-6 h-6 rounded-full border border-[var(--border)] bg-[var(--card)]" />
-                                                    <div className="w-6 h-6 rounded-full border border-[var(--border)] bg-[var(--primary)]" />
-                                                </div>
-                                                <div className="w-8 h-8 rounded-full bg-[var(--card)] border border-[var(--border)] overflow-hidden">
-                                                    <div className="w-full h-full bg-gradient-to-br from-[var(--primary)] to-transparent opacity-20" />
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div className="flex-1 flex overflow-hidden">
-                                            {/* REALISTIC SIDEBAR MOCKUP */}
-                                            <div className="w-16 bg-[var(--sidebar)] border-r border-[var(--border)] flex flex-col items-center py-4 gap-2 shrink-0">
-                                                {[
-                                                    { icon: LayoutGrid, label: 'Master' },
-                                                    { icon: Zap, label: 'Growth' },
-                                                    { icon: Users, label: 'Agência' },
-                                                    { icon: Activity, label: 'Tráfego' }
-                                                ].map((item, i) => (
-                                                    <div key={i} className={cn(
-                                                        "w-14 h-14 rounded-xl flex flex-col items-center justify-center transition-all cursor-pointer gap-1",
-                                                        i === 1 ? "bg-[var(--primary)] text-white shadow-lg shadow-[var(--primary)]/20" : "text-[var(--text-secondary)] hover:bg-[var(--hover)] hover:text-[var(--text-primary)]"
-                                                    )}>
-                                                        <item.icon className="w-5 h-5" />
-                                                        <span className="text-[9px] font-medium tracking-tight">{item.label}</span>
+                                    ) : (
+                                        <div className="flex-1 bg-[var(--background)] flex flex-col overflow-hidden font-sans">
+                                            {/* HEADER FULL WIDTH */}
+                                            <div className="h-14 px-6 border-b border-[var(--border)] bg-[var(--header)] flex items-center justify-between shrink-0 relative z-20">
+                                                <div className="flex items-center gap-4">
+                                                    <div className="w-8 h-8 rounded-lg bg-[var(--primary)] flex items-center justify-center shrink-0">
+                                                        {logoUrl ? <img src={logoUrl} className="w-5 h-5 object-contain" /> : <Zap className="w-4 h-4 text-white" />}
                                                     </div>
-                                                ))}
+                                                    <div className="h-4 w-px bg-[var(--border)]" />
+                                                    <span className="text-[10px] font-black tracking-widest text-[var(--text-primary)] uppercase">Uniafy Platform</span>
+                                                </div>
+                                                <div className="flex items-center gap-3">
+                                                    <div className="flex -space-x-2">
+                                                        <div className="w-6 h-6 rounded-full border border-[var(--border)] bg-[var(--card)]" />
+                                                        <div className="w-6 h-6 rounded-full border border-[var(--border)] bg-[var(--primary)]" />
+                                                    </div>
+                                                    <div className="w-8 h-8 rounded-full bg-[var(--card)] border border-[var(--border)] overflow-hidden">
+                                                        <div className="w-full h-full bg-gradient-to-br from-[var(--primary)] to-transparent opacity-20" />
+                                                    </div>
+                                                </div>
                                             </div>
 
-                                            {/* SUBMENU RETRATIL MOCKUP */}
-                                            <div className="w-44 bg-[var(--sidebar-submenu)] border-r border-[var(--border)] flex flex-col pt-6 shrink-0">
-                                                <div className="px-4 mb-8">
-                                                    <h4 className="text-[9px] font-black text-[var(--text-secondary)] uppercase tracking-[0.2em] mb-4">Módulo Growth</h4>
-                                                    <div className="space-y-1">
+                                            <div className="flex-1 flex overflow-hidden">
+                                                {/* REALISTIC SIDEBAR MOCKUP */}
+                                                <div className="w-16 bg-[var(--sidebar)] border-r border-[var(--border)] flex flex-col items-center py-4 gap-2 shrink-0">
+                                                    {[
+                                                        { icon: LayoutGrid, label: 'Master' },
+                                                        { icon: Zap, label: 'Growth' },
+                                                        { icon: Users, label: 'Agência' },
+                                                        { icon: Activity, label: 'Tráfego' }
+                                                    ].map((item, i) => (
+                                                        <div key={i} className={cn(
+                                                            "w-14 h-14 transition-all cursor-pointer gap-1 flex flex-col items-center justify-center rounded-r-xl rounded-l-none",
+                                                            i === 1 ? "" : "hover:bg-[var(--hover)] rounded-xl"
+                                                        )}
+                                                            style={i === 1 ? { borderLeft: '3px solid var(--primary)' } : {}}
+                                                        >
+                                                            {/* Active Gradient Background Layer */}
+                                                            {i === 1 && (
+                                                                <div
+                                                                    className="absolute inset-0 opacity-25 pointer-events-none"
+                                                                    style={{ background: 'linear-gradient(to right, var(--primary), transparent)' }}
+                                                                />
+                                                            )}
+
+                                                            {/* Icon Glow Layer */}
+                                                            {i === 1 && (
+                                                                <div
+                                                                    className="absolute inset-0 blur-xl opacity-20 pointer-events-none"
+                                                                    style={{ background: 'var(--primary)' }}
+                                                                />
+                                                            )}
+
+                                                            {/* Icon Wrapper Tech Style */}
+                                                            <div className={cn(
+                                                                "w-8 h-8 flex items-center justify-center transition-all",
+                                                                i === 1
+                                                                    ? "text-[var(--primary)] scale-110 drop-shadow-[0_0_8px_rgba(255,102,0,0.5)]" // Assuming orange/primary glow, inline style won't take var in rgba easily for shadow so simulating or using text-shadow if needed. Tailwind arb value works.
+                                                                    : ""
+                                                            )}
+                                                                style={i === 1 ? { filter: `drop-shadow(0 0 8px var(--primary))` } : {}}
+                                                            >
+                                                                <item.icon className="w-5 h-5" />
+                                                            </div>
+
+
+
+                                                            <span className={cn(
+                                                                "text-[9px] font-medium tracking-tight",
+                                                                i === 1 ? "text-[var(--primary)]" : "text-current"
+                                                            )}>{item.label}</span>
+                                                        </div>
+                                                    ))}
+                                                </div>
+
+                                                {/* SUBMENU RETRATIL MOCKUP */}
+                                                <div className="w-44 bg-[#121214] border-r border-[var(--border)] flex flex-col pt-6 shrink-0">
+                                                    <div className="px-4 mb-8">
+                                                        <h4 className="text-[9px] font-black text-[var(--text-secondary)] uppercase tracking-[0.2em] mb-4">Módulo Growth</h4>
+                                                        <div className="space-y-1">
+                                                            {[
+                                                                { text: 'Dashboard', icon: LayoutDashboard },
+                                                                { text: 'Scraper', icon: Search },
+                                                                { text: 'Sniper', icon: Fingerprint },
+                                                                { text: 'Máquina', icon: Zap }
+                                                            ].map((item, i) => (
+                                                                <div key={i} className={cn(
+                                                                    "h-8 flex items-center px-3 gap-2 text-[10px] font-bold transition-all cursor-pointer relative group",
+                                                                    i === 1 ? "rounded-r-[var(--radius)] rounded-l-none" : "hover:bg-[var(--hover)] rounded-[var(--radius)]"
+                                                                )}
+                                                                    style={i === 1 ? { borderLeft: '2px solid var(--primary)' } : {}}
+                                                                >
+                                                                    {/* Active BG Layer */}
+                                                                    {i === 1 && (
+                                                                        <div
+                                                                            className="absolute inset-0 opacity-20 pointer-events-none rounded-r-[var(--radius)]"
+                                                                            style={{ background: 'linear-gradient(to right, var(--primary), transparent)' }}
+                                                                        />
+                                                                    )}
+                                                                    <item.icon className={cn(
+                                                                        "w-3.5 h-3.5 transition-all",
+                                                                        i === 1 ? "text-[var(--primary)] scale-110" : "text-current opacity-70"
+                                                                    )}
+                                                                        style={i === 1 ? { filter: `drop-shadow(0 0 5px var(--primary))` } : {}}
+                                                                    />
+                                                                    <span className={i === 1 ? "text-white" : ""}>{item.text}</span>
+                                                                </div>
+                                                            ))}
+                                                        </div>
+                                                    </div>
+                                                </div>
+
+                                                {/* WORKSPACE CONTENT */}
+                                                <div className="flex-1 p-8 overflow-y-auto space-y-6 bg-[#09090b]">
+                                                    <div className="flex items-end justify-between mb-8">
+                                                        <div className="space-y-1">
+                                                            <h3 className="text-[var(--text-secondary)] font-black text-[8px] uppercase tracking-[0.3em]">Visão Geral</h3>
+                                                            <h1 className="text-2xl font-black text-[var(--text-primary)] tracking-tight" style={{ fontSize: `${fsTitle}px` }}>Resultados do Dia</h1>
+                                                        </div>
+                                                        <button className="px-4 py-2 bg-[var(--primary)] text-white text-[10px] font-black uppercase tracking-widest rounded-[var(--radius)] shadow-xl shadow-[var(--primary)]/20 animate-pulse">Novo Scan</button>
+                                                    </div>
+
+                                                    <div className="grid grid-cols-3 gap-4">
                                                         {[
-                                                            { text: 'Dashboard', icon: LayoutDashboard },
-                                                            { text: 'Scraper', icon: Search },
-                                                            { text: 'Sniper', icon: Fingerprint },
-                                                            { text: 'Máquina', icon: Zap }
-                                                        ].map((item, i) => (
-                                                            <div key={i} className={cn(
-                                                                "h-8 rounded-[var(--radius)] flex items-center px-3 gap-2 text-[10px] font-bold transition-all cursor-pointer",
-                                                                i === 1 ? "bg-[var(--hover)] text-[var(--primary)] border-r-2 border-[var(--primary)]" : "text-[var(--text-secondary)] hover:bg-[var(--hover)] hover:text-[var(--text-primary)]"
-                                                            )}>
-                                                                <item.icon className={cn("w-3.5 h-3.5", i === 1 ? "text-[var(--primary)]" : "text-current opacity-70")} />
-                                                                {item.text}
+                                                            { label: 'Leads Hoje', val: '1,284', grow: '+12%' },
+                                                            { label: 'Conversão', val: '4.2%', grow: '+0.5%' },
+                                                            { label: 'ROI Ativo', val: '12.4x', grow: '+2.1%' }
+                                                        ].map((kpi, i) => (
+                                                            <div key={i} className="p-5 rounded-[var(--radius)] bg-[var(--card)] border border-[var(--border)] group hover:border-[var(--primary)]/30 transition-all">
+                                                                <p className="text-[8px] font-black text-[var(--text-secondary)] uppercase tracking-[0.1em] mb-1">{kpi.label}</p>
+                                                                <div className="flex items-baseline gap-2">
+                                                                    <span className="text-xl font-black text-[var(--text-primary)]" style={{ fontSize: `${fsCardTitle}px` }}>{kpi.val}</span>
+                                                                    <span className="text-[8px] font-bold text-emerald-500">{kpi.grow}</span>
+                                                                </div>
+                                                            </div>
+                                                        ))}
+                                                    </div>
+
+                                                    {/* DATA TABLE MOCKUP */}
+                                                    <div className="rounded-[var(--radius)] border border-[var(--border)] overflow-hidden bg-[var(--card)]">
+                                                        <div className="h-10 bg-[var(--hover)] border-b border-[var(--border)] flex items-center px-4 justify-between">
+                                                            <div className="flex gap-4">
+                                                                <div className="w-24 h-2 bg-[var(--text-secondary)]/10 rounded" />
+                                                                <div className="w-16 h-2 bg-[var(--text-secondary)]/10 rounded" />
+                                                            </div>
+                                                            <Search className="w-3 h-3 text-[var(--text-secondary)]" />
+                                                        </div>
+                                                        {[1, 2, 3].map(row => (
+                                                            <div key={row} className="h-12 border-b border-[var(--border-subtle)] last:border-0 flex items-center px-4 justify-between hover:bg-[var(--hover)] transition-colors">
+                                                                <div className="flex items-center gap-3">
+                                                                    <div className="w-6 h-6 rounded-full bg-[var(--border-subtle)]" />
+                                                                    <div className="w-32 h-2 bg-[var(--text-primary)]/5 rounded" />
+                                                                </div>
+                                                                <div className="w-12 h-4 rounded-full bg-[var(--primary)]/10 border border-[var(--primary)]/20" />
                                                             </div>
                                                         ))}
                                                     </div>
                                                 </div>
                                             </div>
-
-                                            {/* WORKSPACE CONTENT */}
-                                            <div className="flex-1 p-8 overflow-y-auto space-y-6 bg-[var(--background)]">
-                                                <div className="flex items-end justify-between mb-8">
-                                                    <div className="space-y-1">
-                                                        <h3 className="text-[var(--text-secondary)] font-black text-[8px] uppercase tracking-[0.3em]">Visão Geral</h3>
-                                                        <h1 className="text-2xl font-black text-[var(--text-primary)] tracking-tight" style={{ fontSize: `${fsTitle}px` }}>Resultados do Dia</h1>
-                                                    </div>
-                                                    <button className="px-4 py-2 bg-[var(--primary)] text-white text-[10px] font-black uppercase tracking-widest rounded-[var(--radius)] shadow-xl shadow-[var(--primary)]/20 animate-pulse">Novo Scan</button>
-                                                </div>
-
-                                                <div className="grid grid-cols-3 gap-4">
-                                                    {[
-                                                        { label: 'Leads Hoje', val: '1,284', grow: '+12%' },
-                                                        { label: 'Conversão', val: '4.2%', grow: '+0.5%' },
-                                                        { label: 'ROI Ativo', val: '12.4x', grow: '+2.1%' }
-                                                    ].map((kpi, i) => (
-                                                        <div key={i} className="p-5 rounded-[var(--radius)] bg-[var(--card)] border border-[var(--border)] group hover:border-[var(--primary)]/30 transition-all">
-                                                            <p className="text-[8px] font-black text-[var(--text-secondary)] uppercase tracking-[0.1em] mb-1">{kpi.label}</p>
-                                                            <div className="flex items-baseline gap-2">
-                                                                <span className="text-xl font-black text-[var(--text-primary)]" style={{ fontSize: `${fsCardTitle}px` }}>{kpi.val}</span>
-                                                                <span className="text-[8px] font-bold text-emerald-500">{kpi.grow}</span>
-                                                            </div>
-                                                        </div>
-                                                    ))}
-                                                </div>
-
-                                                {/* DATA TABLE MOCKUP */}
-                                                <div className="rounded-[var(--radius)] border border-[var(--border)] overflow-hidden bg-[var(--card)]">
-                                                    <div className="h-10 bg-[var(--hover)] border-b border-[var(--border)] flex items-center px-4 justify-between">
-                                                        <div className="flex gap-4">
-                                                            <div className="w-24 h-2 bg-[var(--text-secondary)]/10 rounded" />
-                                                            <div className="w-16 h-2 bg-[var(--text-secondary)]/10 rounded" />
-                                                        </div>
-                                                        <Search className="w-3 h-3 text-[var(--text-secondary)]" />
-                                                    </div>
-                                                    {[1, 2, 3].map(row => (
-                                                        <div key={row} className="h-12 border-b border-[var(--border-subtle)] last:border-0 flex items-center px-4 justify-between hover:bg-[var(--hover)] transition-colors">
-                                                            <div className="flex items-center gap-3">
-                                                                <div className="w-6 h-6 rounded-full bg-[var(--border-subtle)]" />
-                                                                <div className="w-32 h-2 bg-[var(--text-primary)]/5 rounded" />
-                                                            </div>
-                                                            <div className="w-12 h-4 rounded-full bg-[var(--primary)]/10 border border-[var(--primary)]/20" />
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            </div>
                                         </div>
-                                    </div>
-                                )}
+                                    )}
+                                </div>
                             </div>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
+
     );
 }

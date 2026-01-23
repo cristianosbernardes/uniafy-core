@@ -51,6 +51,19 @@ interface BrandingConfig {
     ui?: {
         radius?: number;
         fontFamily?: string;
+        fontHeadings?: string; // New: Headings font
+
+        effects?: {
+            shadowStyle?: 'flat' | 'soft' | 'hard';
+        };
+
+        loader?: {
+            type: 'spinner' | 'pulse' | 'bar' | 'custom';
+            customUrl?: string;
+            color?: string;
+            bgColor?: string;
+        };
+
         glass?: {
             blur?: number;
             opacity?: number;
@@ -65,6 +78,43 @@ interface BrandingConfig {
             stats?: number; // KPI Numbers
             subtitles?: number; // Descriptions
         };
+    };
+    pwa?: {
+        appleTouchIcon?: string;
+        androidIcon192?: string;
+        androidIcon512?: string;
+    };
+    systemPages?: {
+        notFound?: {
+            imageUrl?: string;
+            title?: string;
+            description?: string;
+            backButtonText?: string;
+        };
+        maintenance?: {
+            isActive: boolean;
+            message?: string;
+            estimatedReturn?: string;
+        };
+    };
+    email?: {
+        headerColor?: string;
+        footerText?: string;
+        ctaColor?: string;
+    };
+    sounds?: {
+        enabled: boolean;
+        volume: number; // 0-1
+    };
+    seo?: {
+        titleTemplate?: string;
+        description?: string;
+        ogImage?: string;
+    };
+    footer?: {
+        text?: string;
+        showLinks?: boolean;
+        links?: { label: string; url: string; }[];
     };
 }
 
@@ -287,7 +337,49 @@ export const BrandingProvider: React.FC<{ children: React.ReactNode }> = ({ chil
             if (config.ui.fontSizes.stats) root.style.setProperty('--fs-stats', `${config.ui.fontSizes.stats}px`); // KPI Numbers
             if (config.ui.fontSizes.subtitles) root.style.setProperty('--fs-subtitle', `${config.ui.fontSizes.subtitles}px`); // Descriptions
         }
+
+        // 5. EFFECTS (Shadows)
+        if (config.ui?.effects?.shadowStyle) {
+            const style = config.ui.effects.shadowStyle;
+            if (style === 'flat') {
+                root.style.setProperty('--shadow-sm', 'none');
+                root.style.setProperty('--shadow-md', 'none');
+                root.style.setProperty('--shadow-lg', 'none');
+                root.style.setProperty('--shadow-xl', 'none');
+            } else if (style === 'hard') {
+                root.style.setProperty('--shadow-sm', '2px 2px 0px 0px rgba(0,0,0,1)');
+                root.style.setProperty('--shadow-md', '4px 4px 0px 0px rgba(0,0,0,1)');
+                root.style.setProperty('--shadow-lg', '6px 6px 0px 0px rgba(0,0,0,1)');
+                root.style.setProperty('--shadow-xl', '8px 8px 0px 0px rgba(0,0,0,1)');
+            } else {
+                // Soft (Default) - Revert to Tailwind defaults (or close approximations)
+                root.style.setProperty('--shadow-sm', '0 1px 2px 0 rgb(0 0 0 / 0.05)');
+                root.style.setProperty('--shadow-md', '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)');
+                root.style.setProperty('--shadow-lg', '0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1)');
+                root.style.setProperty('--shadow-xl', '0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1)');
+            }
+        }
     };
+
+    // PWA Injection Effect
+    useEffect(() => {
+        if (!branding?.pwa) return;
+
+        const updateMeta = (rel: string, href: string) => {
+            if (!href) return;
+            let link = document.querySelector(`link[rel="${rel}"]`) as HTMLLinkElement;
+            if (!link) {
+                link = document.createElement('link');
+                link.rel = rel;
+                document.head.appendChild(link);
+            }
+            link.href = href;
+        };
+
+        if (branding.pwa.appleTouchIcon) updateMeta('apple-touch-icon', branding.pwa.appleTouchIcon);
+        // Standard icons often use rel="icon" but with sizes. Handling basic injection here.
+        // For Android/Chrome strictness we might need manifest manipulation, but <link> works for simple cases.
+    }, [branding?.pwa]);
 
     const refreshBranding = async () => {
         try {

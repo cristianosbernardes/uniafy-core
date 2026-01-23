@@ -402,12 +402,13 @@ export const NAV_MODULES: NavModule[] = [
       },
       {
         id: 'conexoes-nuvem',
-        title: 'Conexões & APIs',
-        description: 'Hub de integrações e webhooks (n8n)',
-        icon: 'Share2',
-        path: '/sistema/conexoes',
-        roles: [UserRole.MASTER, UserRole.AGENCY],
+        title: 'Armazenamento & Cache',
+        description: 'Gerenciar dados locais e limpeza',
+        icon: 'Database',
+        path: '/sistema/cache',
+        roles: [UserRole.MASTER, UserRole.AGENCY, UserRole.CLIENT],
       }
+
     ],
   },
 ];

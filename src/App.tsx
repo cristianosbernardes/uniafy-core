@@ -28,6 +28,7 @@ import SaasMetrics from "./pages/master/SaasMetrics";
 import SystemBranding from "./pages/master/SystemBranding";
 import WhiteLabelFactory from "./pages/master/WhiteLabelFactory";
 import PlanManager from "./pages/master/PlanManager";
+import SystemCache from "./pages/system/SystemCache";
 import Vault from "./pages/master/Vault";
 import AgencyUsers from "./pages/agency/AgencyUsers";
 import AgencyWhiteLabel from "./pages/agency/AgencyWhiteLabel";
@@ -159,6 +160,7 @@ const AppRoutes = () => {
         {/* Sistema Routes */}
         <Route path="/sistema" element={<Navigate to="/sistema/perfil" replace />} />
         <Route path="/sistema/perfil" element={<UserProfilePage />} />
+        <Route path="/sistema/cache" element={<SystemCache />} />
       </Route>
 
       {/* Catch-all */}

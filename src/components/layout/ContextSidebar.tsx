@@ -172,17 +172,22 @@ export function ContextSidebar({ activeModule, userRole, isOpen = true, onToggle
               className="group relative flex items-center w-full px-3 py-1.5 mb-0.5"
             >
               {/* Active State: Rounded Background */}
+              {/* Active State: Tech Style (Gradient + Neon Border) */}
               <div
                 className={cn(
-                  "absolute inset-0 mx-2 rounded-[var(--radius)] transition-all duration-200",
-                  isActive ? "bg-white/10" : "bg-transparent group-hover:bg-white/5"
+                  "absolute inset-0 mx-2 transition-all duration-300",
+                  isActive
+                    ? "bg-gradient-to-r from-primary/20 via-primary/5 to-transparent border-l-2 border-primary rounded-r-[var(--radius)] rounded-l-none"
+                    : "bg-transparent group-hover:bg-white/5 rounded-[var(--radius)]"
                 )}
               />
 
               <div className="relative flex items-center z-10 w-full px-2">
                 <div
-                  className={cn("transition-colors shrink-0 mr-3",
-                    isActive ? "text-primary" : "text-zinc-500 group-hover:text-white"
+                  className={cn("transition-all duration-300 shrink-0 mr-3",
+                    isActive
+                      ? "text-primary drop-shadow-[0_0_5px_rgba(var(--primary),0.6)] scale-110"
+                      : "text-zinc-500 group-hover:text-white"
                   )}
                 >
                   {Icon}

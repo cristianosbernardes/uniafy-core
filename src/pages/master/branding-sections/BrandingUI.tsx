@@ -9,8 +9,7 @@ import {
 } from "@/components/ui/select";
 
 interface BrandingUIProps {
-    fontFamily: string;
-    setFontFamily: (font: string) => void;
+
     fsTitle: number;
     setFsTitle: (val: number) => void;
     fsStats: number;
@@ -32,7 +31,7 @@ interface BrandingUIProps {
 }
 
 export function BrandingUI({
-    fontFamily, setFontFamily,
+
     fsTitle, setFsTitle,
     fsStats, setFsStats,
     fsCardTitle, setFsCardTitle,
@@ -51,14 +50,6 @@ export function BrandingUI({
             </div>
 
             <div className="space-y-6">
-                <div className="space-y-4 p-4 rounded-xl glass-panel border-white/5">
-                    <h3 className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-2">Tipografia (Padrão Sistema)</h3>
-                    <div className="flex items-center justify-between h-10 px-4 bg-black/40 border border-white/10 rounded-lg">
-                        <span className="text-xs text-muted-foreground">Família da Fonte</span>
-                        <span className="text-xs font-bold text-white uppercase tracking-widest">Inter</span>
-                    </div>
-                </div>
-
                 <div className="space-y-4 p-4 rounded-xl glass-panel border-white/5">
                     <h3 className="text-[10px] font-black text-muted-foreground uppercase tracking-widest mb-4">Hierarquia de Tamanhos (px)</h3>
                     <div className="space-y-4">

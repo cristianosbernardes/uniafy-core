@@ -26,6 +26,12 @@ interface BrandingColorsProps {
     setTextPrimaryColor: (color: string) => void;
     textSecondaryColor: string;
     setTextSecondaryColor: (color: string) => void;
+
+    // Header
+    headerBgColor: string;
+    setHeaderBgColor: (color: string) => void;
+    headerIconsColor: string;
+    setHeaderIconsColor: (color: string) => void;
 }
 
 export function BrandingColors({
@@ -37,7 +43,9 @@ export function BrandingColors({
     cardColor, setCardColor,
     hoverColor, setHoverColor,
     textPrimaryColor, setTextPrimaryColor,
-    textSecondaryColor, setTextSecondaryColor
+    textSecondaryColor, setTextSecondaryColor,
+    headerBgColor, setHeaderBgColor,
+    headerIconsColor, setHeaderIconsColor
 }: BrandingColorsProps) {
     return (
         <div className="space-y-8 animate-in fade-in slide-in-from-left-4 duration-300 pb-12">
@@ -60,6 +68,15 @@ export function BrandingColors({
                     <div className="grid grid-cols-1 gap-4">
                         <ColorPicker label="Fundo Menu (Esquerda)" value={sidebarMenuColor} onChange={setSidebarMenuColor} />
                         <ColorPicker label="Fundo Submenu (Retrátil)" value={sidebarSubmenuColor} onChange={setSidebarSubmenuColor} />
+                    </div>
+                </div>
+
+                {/* Header & Topbar */}
+                <div className="space-y-4 p-4 rounded-xl glass-panel border-white/5">
+                    <h3 className="text-[10px] font-black text-zinc-500 uppercase tracking-[0.2em] mb-2">Cabeçalho (Header)</h3>
+                    <div className="grid grid-cols-1 gap-4">
+                        <ColorPicker label="Fundo do Cabeçalho" value={headerBgColor} onChange={setHeaderBgColor} />
+                        <ColorPicker label="Cor dos Ícones" value={headerIconsColor} onChange={setHeaderIconsColor} />
                     </div>
                 </div>
 

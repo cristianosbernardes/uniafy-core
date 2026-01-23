@@ -90,18 +90,28 @@ export function ModuleSidebar({
             <button
               key={module.id}
               onClick={() => onModuleChange(module.id)}
-              className="group relative flex flex-col items-center justify-center w-14 h-14 rounded-xl transition-all duration-200 gap-1"
+              className={cn(
+                "group relative flex flex-col items-center justify-center w-14 h-14 transition-all duration-300 gap-1 rounded-r-xl rounded-l-none",
+                isActive
+                  ? "bg-gradient-to-r from-primary/25 via-primary/5 to-transparent border-l-[3px] border-primary"
+                  : "bg-transparent hover:bg-white/5 border-l-[3px] border-transparent"
+              )}
               title={module.label}
             >
+              {/* Active Glow Effect Background */}
+              {isActive && (
+                <div className="absolute inset-0 bg-primary/10 blur-xl pointer-events-none" />
+              )}
+
               {/* 
-                Icon Wrapper: 32x32 (w-8 h-8) 
-                Holds the background color when active 
+                Icon Wrapper: 
+                Tech Style: Icon takes color + Glow
               */}
               <div className={cn(
-                "relative z-10 w-8 h-8 rounded-[9px] flex items-center justify-center transition-all duration-200",
+                "relative z-10 w-8 h-8 flex items-center justify-center transition-all duration-300",
                 isActive
-                  ? "bg-primary text-primary-foreground shadow-md shadow-primary/40"
-                  : "bg-transparent text-[var(--header-icon-color,rgba(255,255,255,0.8))] group-hover:text-white group-hover:bg-white/5"
+                  ? "text-primary scale-110 drop-shadow-[0_0_8px_rgba(var(--primary),0.5)]"
+                  : "text-[var(--header-icon-color,rgba(255,255,255,0.7))] group-hover:text-white"
               )}>
                 {IconNode}
               </div>
