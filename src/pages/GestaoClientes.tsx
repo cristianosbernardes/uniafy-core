@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { PageHeader } from '@/components/ui/PageHeader';
 import { Card } from '@/components/ui/card';
 import { Badge } from '@/components/ui/badge';
@@ -133,26 +133,32 @@ export default function GestaoClientes() {
   };
 
   // KPIs Calculations
-  const totalMRR = subscriptions.reduce((acc, sub) => sub.status === 'active' ? acc + sub.amount : acc, 0);
-  const activeClients = subscriptions.filter(s => s.status === 'active').length;
+  const metrics = useMemo(() => {
+    const totalMRR = subscriptions.reduce((acc, sub) => sub.status === 'active' ? acc + sub.amount : acc, 0);
+    const activeClients = subscriptions.filter(s => s.status === 'active').length;
+    const canceledClients = subscriptions.filter(s => s.status === 'canceled').length;
+    const totalClients = subscriptions.length;
+    const churnRate = totalClients > 0 ? (canceledClients / totalClients) * 100 : 0;
+    const arpu = activeClients > 0 ? totalMRR / activeClients : 0;
 
-  // Real Churn Calculation (Approximation: Canceled / Total ever)
-  const canceledClients = subscriptions.filter(s => s.status === 'canceled').length;
-  const totalClients = subscriptions.length;
-  // If no clients, churn is 0. If clients exist, calculate percentage.
-  const churnRate = totalClients > 0 ? (canceledClients / totalClients) * 100 : 0;
+    let ltv = 0;
+    if (churnRate > 0) {
+      ltv = arpu / (churnRate / 100);
+    } else {
+      ltv = arpu * 12; // Fallback: 1 year LTV if 0 churn
+    }
 
-  // ARPU
-  const arpu = activeClients > 0 ? totalMRR / activeClients : 0;
+    return { totalMRR, activeClients, churnRate, arpu, ltv };
+  }, [subscriptions]);
 
-  // LTV (Lifetime Value) = ARPU / Churn Rate (decimal). 
-  // If Churn is 0, LTV is theoretically infinite, let's cap or use ARPU * 12 (1 year)
-  let ltv = 0;
-  if (churnRate > 0) {
-    ltv = arpu / (churnRate / 100);
-  } else {
-    ltv = arpu * 12; // Fallback: 1 year LTV if 0 churn
-  }
+  const { totalMRR, activeClients, churnRate, arpu, ltv } = metrics;
+
+  const filteredSubscriptions = useMemo(() => {
+    return subscriptions.filter(s =>
+      s.tenant_name.toLowerCase().includes(searchTerm.toLowerCase()) ||
+      s.tenant_id.toLowerCase().includes(searchTerm.toLowerCase())
+    );
+  }, [subscriptions, searchTerm]);
 
   // We can use the plan_name from the subscription directly if available, or fallback
   const getSubPlanName = (sub: AgencySubscription) => sub.plan_name || 'Plano Desconhecido';
@@ -522,12 +528,12 @@ export default function GestaoClientes() {
               <div className="w-6 h-6 border-2 border-white/10 border-t-primary rounded-full animate-spin"></div>
               <span className="text-xs uppercase tracking-widest font-medium">Carregando assinaturas...</span>
             </div>
-          ) : subscriptions.length === 0 ? (
+          ) : filteredSubscriptions.length === 0 ? (
             <div className="p-12 text-center text-zinc-500">
               <span className="text-xs uppercase tracking-widest font-medium">Nenhuma assinatura encontrada.</span>
             </div>
           ) : (
-            subscriptions.filter(s => s.tenant_name.toLowerCase().includes(searchTerm.toLowerCase())).map((sub) => {
+            filteredSubscriptions.map((sub) => {
               const daysToDue = getDaysUntilDue(sub.next_billing_date);
               const isNearDue = daysToDue >= 0 && daysToDue <= 3;
               const isLate = daysToDue < 0;

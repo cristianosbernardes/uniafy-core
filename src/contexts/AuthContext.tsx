@@ -52,11 +52,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
                 };
 
                 setUser((prev) => {
-                    if (JSON.stringify(prev) === JSON.stringify(newUser)) {
-                        return prev;
-                    }
-                    console.log('[AuthContext] User Start/Update:', newUser.email);
-                    return newUser;
+                    const hasChanged = !prev ||
+                        prev.id !== newUser.id ||
+                        prev.email !== newUser.email ||
+                        prev.role !== newUser.role ||
+                        JSON.stringify(prev.subscription) !== JSON.stringify(newUser.subscription);
+
+                    return hasChanged ? newUser : prev;
                 });
             } else {
                 setUser(null);

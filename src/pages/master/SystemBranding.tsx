@@ -504,6 +504,22 @@ export default function SystemBranding() {
                             <BrandingColors
                                 primaryColor={primaryColor}
                                 setPrimaryColor={setPrimaryColor}
+                                bgColor={bgColor}
+                                setBgColor={setBgColor}
+                                sidebarMenuColor={sidebarMenuColor}
+                                setSidebarMenuColor={setSidebarMenuColor}
+                                sidebarSubmenuColor={sidebarSubmenuColor}
+                                setSidebarSubmenuColor={setSidebarSubmenuColor}
+                                borderColor={borderColor}
+                                setBorderColor={setBorderColor}
+                                cardColor={cardColor}
+                                setCardColor={setCardColor}
+                                hoverColor={hoverColor}
+                                setHoverColor={setHoverColor}
+                                textPrimaryColor={textPrimaryColor}
+                                setTextPrimaryColor={setTextPrimaryColor}
+                                textSecondaryColor={textSecondaryColor}
+                                setTextSecondaryColor={setTextSecondaryColor}
                             />
                         )}
 
@@ -579,20 +595,20 @@ export default function SystemBranding() {
                                 previewMode === 'mobile' ? "w-[375px] h-[667px]" : "w-full"
                             )}
                                 style={{
-                                    "--primary": primaryColor,
-                                    "--background": bgColor,
-                                    "--sidebar": sidebarMenuColor,
-                                    "--sidebar-submenu": sidebarSubmenuColor,
-                                    "--border": borderColor,
-                                    "--card": cardColor,
-                                    "--hover": hoverColor,
-                                    "--header": headerBgColor,
-                                    "--header-icons": headerIconsColor,
-                                    "--text-primary": textPrimaryColor,
-                                    "--text-secondary": textSecondaryColor,
-                                    "--border-strong": borderStrongColor,
-                                    "--border-subtle": borderSubtleColor,
-                                    "--scroll-thumb": scrollThumbColor,
+                                    "--primary": primaryColor.includes(' ') ? `hsl(${primaryColor})` : primaryColor,
+                                    "--background": bgColor.includes(' ') ? `hsl(${bgColor})` : bgColor,
+                                    "--sidebar": sidebarMenuColor.includes(' ') ? `hsl(${sidebarMenuColor})` : sidebarMenuColor,
+                                    "--sidebar-submenu": sidebarSubmenuColor.includes(' ') ? `hsl(${sidebarSubmenuColor})` : sidebarSubmenuColor,
+                                    "--border": borderColor.includes(' ') ? `hsl(${borderColor})` : borderColor,
+                                    "--card": cardColor.includes(' ') ? `hsl(${cardColor})` : cardColor,
+                                    "--hover": hoverColor.includes(' ') ? `hsl(${hoverColor})` : hoverColor,
+                                    "--header": headerBgColor.includes(' ') ? `hsl(${headerBgColor})` : headerBgColor,
+                                    "--header-icons": headerIconsColor.includes(' ') ? `hsl(${headerIconsColor})` : headerIconsColor,
+                                    "--text-primary": textPrimaryColor.includes(' ') ? `hsl(${textPrimaryColor})` : textPrimaryColor,
+                                    "--text-secondary": textSecondaryColor.includes(' ') ? `hsl(${textSecondaryColor})` : textSecondaryColor,
+                                    "--border-strong": borderStrongColor.includes(' ') ? `hsl(${borderStrongColor})` : borderStrongColor,
+                                    "--border-subtle": borderSubtleColor.includes(' ') ? `hsl(${borderSubtleColor})` : borderSubtleColor,
+                                    "--scroll-thumb": scrollThumbColor.includes(' ') ? `hsl(${scrollThumbColor})` : scrollThumbColor,
                                     "--radius": `${radius}px`,
                                     "--font-family": fontFamily,
                                 } as any}
@@ -667,265 +683,114 @@ export default function SystemBranding() {
                                             </div>
                                         </div>
                                     </div>
-                                ) : activeSection === 'logos' ? (
-                                    <div className="flex-1 bg-[hsl(var(--background))] flex flex-col animate-in fade-in duration-500">
-                                        <div className="h-16 px-8 border-b border-[hsl(var(--border))] bg-[hsl(var(--header))] flex items-center justify-between shrink-0">
-                                            <div className="flex items-center gap-6">
-                                                {logoUrl ? (
-                                                    <img src={logoUrl} alt="Logo" className="h-8 object-contain" />
-                                                ) : (
-                                                    <div className="h-8 w-24 bg-white/5 rounded flex items-center justify-center border border-white/10 text-[8px] uppercase font-black text-zinc-500">Logo Header</div>
-                                                )}
-                                                <div className="h-4 w-px bg-white/10 mx-2" />
-                                                <div className="flex gap-4">
-                                                    <div className="h-2 w-12 bg-white/5 rounded" />
-                                                    <div className="h-2 w-16 bg-white/5 rounded" />
-                                                </div>
-                                            </div>
-                                            <div className="flex items-center gap-4">
-                                                <div className="w-8 h-8 rounded-full bg-white/5 border border-white/10" />
-                                            </div>
-                                        </div>
-                                        <div className="flex-1 flex overflow-hidden">
-                                            <div className="w-64 bg-[hsl(var(--sidebar))] border-r border border-[var(--border-subtle)] p-6 flex flex-col gap-8 shrink-0">
-                                                <div className="space-y-4">
-                                                    <p className="text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest">Main Application</p>
-                                                    {[1, 2, 3].map(i => (
-                                                        <div key={i} className="h-10 rounded-[var(--radius)] bg-[var(--card)] flex items-center px-4 gap-3 opacity-40">
-                                                            <div className="w-4 h-4 rounded bg-[var(--border-subtle)]" />
-                                                            <div className="w-20 h-2 bg-[var(--border-subtle)] rounded" />
-                                                        </div>
-                                                    ))}
-                                                </div>
-                                            </div>
-                                            <div className="flex-1 p-12 flex items-center justify-center">
-                                                <div className="max-w-md w-full space-y-12 text-center">
-                                                    <div className="space-y-4">
-                                                        <h3 className="text-[10px] font-black text-[var(--primary)] uppercase tracking-[0.3em]">Brand Identity Preview</h3>
-                                                        <div className="p-12 rounded-3xl bg-[var(--card)] border border-[var(--border-subtle)] shadow-2xl inline-block relative overflow-hidden group">
-                                                            <div className="absolute inset-0 bg-gradient-to-br from-[var(--primary)]/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                                                            {loginLogoUrl || logoUrl ? (
-                                                                <img src={loginLogoUrl || logoUrl} alt="Main Logo" className="h-24 object-contain relative z-10 transition-transform group-hover:scale-110" />
-                                                            ) : (
-                                                                <div className="h-24 w-48 bg-[var(--card)] rounded-xl border border-[var(--border-subtle)] flex items-center justify-center relative z-10">
-                                                                    <ImageIcon className="w-12 h-12 text-[var(--text-secondary)]" />
-                                                                </div>
-                                                            )}
-                                                        </div>
-                                                    </div>
-                                                    <div className="grid grid-cols-2 gap-8 max-w-sm mx-auto">
-                                                        <div className="space-y-3">
-                                                            <p className="text-[9px] font-bold text-[var(--text-secondary)] uppercase">Favicon</p>
-                                                            <div className="w-12 h-12 bg-[hsl(var(--background))] rounded-lg border border-[var(--border-subtle)] flex items-center justify-center mx-auto shadow-xl">
-                                                                {faviconUrl ? <img src={faviconUrl} className="w-8 h-8 object-contain" /> : <Globe className="w-6 h-6 text-[var(--text-secondary)]" />}
-                                                            </div>
-                                                        </div>
-                                                        <div className="space-y-3">
-                                                            <p className="text-[9px] font-bold text-[var(--text-secondary)] uppercase">Primary Mark</p>
-                                                            <div className="w-12 h-12 bg-[var(--primary)] rounded-lg flex items-center justify-center mx-auto shadow-xl shadow-[var(--primary)]/30">
-                                                                <div className="w-6 h-6 bg-white/20 rounded-sm" />
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                ) : activeSection === 'ui' ? (
-                                    <div className="flex-1 bg-[hsl(var(--background))] p-8 overflow-y-auto custom-scrollbar space-y-8 animate-in fade-in duration-500">
-                                        <div className="space-y-2">
-                                            <h2 className="text-2xl font-bold text-[var(--text-primary)] uppercase tracking-tight" style={{ fontSize: `${fsTitle}px`, fontFamily: fontFamily }}>Interface & Library</h2>
-                                            <div className="h-1 w-12 bg-[var(--primary)] rounded-full" />
-                                        </div>
-
-                                        <div className="grid grid-cols-2 gap-6">
-                                            <div className="p-6 bg-[var(--card)] border border-[var(--border-subtle)] rounded-[var(--radius)] space-y-4">
-                                                <h3 className="text-xs font-black text-[var(--text-secondary)] uppercase">Buttons & States</h3>
-                                                <div className="flex flex-wrap gap-3">
-                                                    <button className="px-4 py-2 bg-[var(--primary)] text-white text-xs font-bold rounded-[var(--radius)] shadow-lg shadow-[var(--primary)]/20">Primary</button>
-                                                    <button className="px-4 py-2 bg-[var(--hover)] text-[var(--text-primary)] text-xs font-bold rounded-[var(--radius)] border border-[var(--border-subtle)] transition-colors">Secondary</button>
-                                                    <button className="px-4 py-2 bg-transparent text-[var(--primary)] text-xs font-bold rounded-[var(--radius)] border border-[var(--primary)]/30">Outline</button>
-                                                </div>
-                                            </div>
-
-                                            <div className="p-6 bg-[var(--card)] border border-[var(--border-subtle)] rounded-[var(--radius)] space-y-4">
-                                                <h3 className="text-xs font-black text-[var(--text-secondary)] uppercase">Form Elements</h3>
-                                                <div className="space-y-3">
-                                                    <div className="h-9 bg-[hsl(var(--background))] border border-[var(--border-subtle)] rounded-[var(--radius)] w-full" />
-                                                    <div className="flex items-center gap-2">
-                                                        <div className="w-4 h-4 rounded-sm border border-[var(--primary)] bg-[var(--primary)]/10 flex items-center justify-center"><Check className="w-3 h-3 text-[var(--primary)]" /></div>
-                                                        <span className="text-[10px] text-[var(--text-secondary)]">Checkbox Active</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div className="p-8 bg-[var(--card)] border border-[var(--border-subtle)] rounded-[var(--radius)] relative overflow-hidden group">
-                                            <div className="absolute inset-0 bg-gradient-to-br from-[var(--primary)]/5 to-transparent opacity-50" />
-                                            <div className="relative z-10 space-y-4">
-                                                <h3 className="text-[10px] font-black text-[var(--primary)] uppercase tracking-[0.2em]">Glassmorphism Effect</h3>
-                                                <div
-                                                    className="p-6 rounded-2xl border border-[var(--border-subtle)] shadow-2xl"
-                                                    style={{
-                                                        backgroundColor: `rgba(255, 255, 255, ${glassOpacity})`,
-                                                        backdropFilter: `blur(${glassBlur}px)`
-                                                    }}
-                                                >
-                                                    <p className="text-xs text-[var(--text-primary)] leading-relaxed font-medium">Este elemento demonstra o efeito de desfoque e opacidade configurado em tempo real.</p>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
                                 ) : (
-                                    <div className="flex-1 flex overflow-hidden animate-in fade-in duration-500 font-sans">
-                                        {/* REALISTIC SIDEBAR MOCKUP */}
-                                        <div className="w-56 bg-[hsl(var(--sidebar))] border-r border-[var(--border-subtle)] flex flex-col pt-4 shrink-0">
-                                            <div className="px-4 mb-6">
-                                                <div className="h-4 w-24 bg-[var(--text-secondary)]/20 rounded" />
+                                    <div className="flex-1 bg-[var(--background)] flex flex-col overflow-hidden font-sans">
+                                        {/* HEADER FULL WIDTH */}
+                                        <div className="h-14 px-6 border-b border-[var(--border)] bg-[var(--header)] flex items-center justify-between shrink-0 relative z-20">
+                                            <div className="flex items-center gap-4">
+                                                <div className="w-8 h-8 rounded-lg bg-[var(--primary)] flex items-center justify-center shrink-0">
+                                                    {logoUrl ? <img src={logoUrl} className="w-5 h-5 object-contain" /> : <Zap className="w-4 h-4 text-white" />}
+                                                </div>
+                                                <div className="h-4 w-px bg-[var(--border)]" />
+                                                <span className="text-[10px] font-black tracking-widest text-[var(--text-primary)] uppercase">Uniafy Platform</span>
                                             </div>
-                                            <div className="flex-1 space-y-1 px-2">
+                                            <div className="flex items-center gap-3">
+                                                <div className="flex -space-x-2">
+                                                    <div className="w-6 h-6 rounded-full border border-[var(--border)] bg-[var(--card)]" />
+                                                    <div className="w-6 h-6 rounded-full border border-[var(--border)] bg-[var(--primary)]" />
+                                                </div>
+                                                <div className="w-8 h-8 rounded-full bg-[var(--card)] border border-[var(--border)] overflow-hidden">
+                                                    <div className="w-full h-full bg-gradient-to-br from-[var(--primary)] to-transparent opacity-20" />
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <div className="flex-1 flex overflow-hidden">
+                                            {/* REALISTIC SIDEBAR MOCKUP */}
+                                            <div className="w-16 bg-[var(--sidebar)] border-r border-[var(--border)] flex flex-col items-center py-4 gap-2 shrink-0">
                                                 {[
-                                                    { icon: LayoutDashboard, label: 'Dashboard', active: true },
-                                                    { icon: Users, label: 'Clientes', active: false },
-                                                    { icon: Activity, label: 'Analytics', active: false },
-                                                    { icon: Settings2, label: 'Ajustes', active: false },
+                                                    { icon: LayoutGrid, label: 'Master' },
+                                                    { icon: Zap, label: 'Growth' },
+                                                    { icon: Users, label: 'Agência' },
+                                                    { icon: Activity, label: 'Tráfego' }
                                                 ].map((item, i) => (
                                                     <div key={i} className={cn(
-                                                        "flex flex-col items-center justify-center p-2 rounded-[var(--radius)] transition-colors gap-1 group",
-                                                        item.active ? "" : "hover:bg-[var(--text-secondary)]/5"
+                                                        "w-14 h-14 rounded-xl flex flex-col items-center justify-center transition-all cursor-pointer gap-1",
+                                                        i === 1 ? "bg-[var(--primary)] text-white shadow-lg shadow-[var(--primary)]/20" : "text-[var(--text-secondary)] hover:bg-[var(--hover)] hover:text-[var(--text-primary)]"
                                                     )}>
-                                                        <div className={cn(
-                                                            "w-8 h-8 rounded-lg flex items-center justify-center transition-all",
-                                                            item.active
-                                                                ? "bg-[var(--primary)] text-white shadow-lg shadow-[var(--primary)]/30"
-                                                                : "text-[var(--text-secondary)] bg-transparent"
-                                                        )}>
-                                                            <item.icon className="w-4 h-4" />
-                                                        </div>
-                                                        <span className={cn(
-                                                            "text-[9px] font-bold uppercase tracking-wider",
-                                                            item.active ? "text-white" : "text-[var(--text-secondary)]"
-                                                        )}>{item.label}</span>
+                                                        <item.icon className="w-5 h-5" />
+                                                        <span className="text-[9px] font-medium tracking-tight">{item.label}</span>
                                                     </div>
                                                 ))}
                                             </div>
-                                            <div className="p-4 border-t border-[var(--border-subtle)]">
-                                                <div className="flex items-center gap-3">
-                                                    <div className="w-8 h-8 rounded-full bg-[var(--text-secondary)]/20" />
+
+                                            {/* SUBMENU RETRATIL MOCKUP */}
+                                            <div className="w-44 bg-[var(--sidebar-submenu)] border-r border-[var(--border)] flex flex-col pt-6 shrink-0">
+                                                <div className="px-4 mb-8">
+                                                    <h4 className="text-[9px] font-black text-[var(--text-secondary)] uppercase tracking-[0.2em] mb-4">Módulo Growth</h4>
                                                     <div className="space-y-1">
-                                                        <div className="w-20 h-2 bg-[var(--text-secondary)]/30 rounded" />
-                                                        <div className="w-12 h-1.5 bg-[var(--text-secondary)]/20 rounded" />
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        {/* REALISTIC CONTENT MOCKUP */}
-                                        <div className="flex-1 bg-[hsl(var(--background))] flex flex-col h-full overflow-hidden">
-                                            {/* Header Mock */}
-                                            <div className="h-14 border-b border-[var(--border-subtle)] bg-[hsl(var(--header))] flex items-center justify-between px-6 shrink-0">
-                                                <div className="flex items-center gap-2 text-[var(--text-secondary)]">
-                                                    <Search className="w-4 h-4" />
-                                                    <span className="text-xs">Pesquisar...</span>
-                                                </div>
-                                                <div className="flex items-center gap-3">
-                                                    <div className="h-8 px-3 rounded-[var(--radius)] glass-panel border border-[var(--primary)]/30 text-[var(--primary)] text-xs font-bold flex items-center gap-2">
-                                                        <Zap className="w-3 h-3" />
-                                                        <span>Trial Ativo</span>
-                                                    </div>
-                                                </div>
-                                            </div>
-
-                                            {/* Content Scroll */}
-                                            <div className="flex-1 overflow-y-auto custom-scrollbar p-8 space-y-8">
-                                                <div className="flex items-center justify-between">
-                                                    <div className="space-y-1">
-                                                        <h2 className="text-2xl font-bold text-[var(--text-primary)] tracking-tight uppercase" style={{ fontSize: `${fsTitle}px`, fontFamily: fontFamily }}>Visão Geral</h2>
-                                                        <p className="text-xs text-[var(--text-secondary)] uppercase tracking-widest">Performance da Agência</p>
-                                                    </div>
-                                                    <button className="h-9 px-4 bg-[var(--primary)] hover:bg-[var(--primary)]/90 text-white rounded-[var(--radius)] text-xs font-bold uppercase tracking-wider shadow-lg shadow-[var(--primary)]/20 transition-all">
-                                                        Nova Campanha
-                                                    </button>
-                                                </div>
-
-                                                {/* KPIs */}
-                                                <div className="grid grid-cols-3 gap-6">
-                                                    {[
-                                                        { label: 'Receita (MRR)', val: 'R$ 42.500', color: successColor, trend: '+12%' },
-                                                        { label: 'Clientes Ativos', val: '128', color: primaryColor, trend: '+4' },
-                                                        { label: 'Churn Rate', val: '2.4%', color: errorColor, trend: '-0.5%' },
-                                                    ].map((s, idx) => (
-                                                        <div key={idx} className="p-6 bg-[var(--card)] border border-[var(--border-subtle)] rounded-[var(--radius)] space-y-3 relative overflow-hidden group hover:border-[var(--primary)]/30 transition-all shadow-xl">
-                                                            <div className="flex justify-between items-start">
-                                                                <p className="text-[10px] font-black text-[var(--text-secondary)] uppercase tracking-widest">{s.label}</p>
-                                                                <span className={cn("text-[9px] font-bold px-1.5 py-0.5 rounded border", idx === 2 ? "text-[var(--error)] border-[var(--error)]/20 bg-[var(--error)]/10" : "text-[var(--success)] border-[var(--success)]/20 bg-[var(--success)]/10")}>{s.trend}</span>
-                                                            </div>
-                                                            <h4 className="text-2xl font-bold text-[var(--text-primary)]" style={{ fontSize: `${fsStats}px` }}>{s.val}</h4>
-                                                        </div>
-                                                    ))}
-                                                </div>
-
-                                                {/* Data Table Mock */}
-                                                <div className="bg-[var(--card)] border border-[var(--border-subtle)] rounded-[var(--radius)] overflow-hidden shadow-xl">
-                                                    <div className="px-6 py-4 border-b border-[var(--border-subtle)] flex items-center justify-between bg-[var(--card)]/50">
-                                                        <h3 className="text-xs font-black text-[var(--text-primary)] uppercase tracking-wider">Últimas Transações</h3>
-                                                        <div className="flex gap-2">
-                                                            <div className="w-2 h-2 rounded-full bg-[var(--warning)] animate-pulse" />
-                                                            <span className="text-[9px] text-[var(--text-secondary)] uppercase font-bold">Ao Vivo</span>
-                                                        </div>
-                                                    </div>
-                                                    <div className="divide-y divide-[var(--border-subtle)]">
-                                                        {[1, 2, 3].map((row) => (
-                                                            <div key={row} className="px-6 py-3 flex items-center justify-between hover:bg-[var(--hover)] transition-colors group cursor-pointer">
-                                                                <div className="flex items-center gap-3">
-                                                                    <div className="w-8 h-8 rounded-lg bg-[var(--background)] border border-[var(--border-subtle)] flex items-center justify-center text-[var(--text-secondary)] group-hover:text-[var(--primary)] group-hover:border-[var(--primary)]/30 transition-colors">
-                                                                        <Users className="w-4 h-4" />
-                                                                    </div>
-                                                                    <div>
-                                                                        <p className="text-xs font-bold text-[var(--text-primary)]">Enterprise License</p>
-                                                                        <p className="text-[10px] text-[var(--text-secondary)] font-mono">ID: #8392{row}</p>
-                                                                    </div>
-                                                                </div>
-                                                                <div className="text-right">
-                                                                    <p className="text-xs font-bold text-[var(--text-primary)]">R$ 299,00</p>
-                                                                    <p className="text-[10px] text-[var(--success)]">Aprovado</p>
-                                                                </div>
+                                                        {[
+                                                            { text: 'Dashboard', icon: LayoutDashboard },
+                                                            { text: 'Scraper', icon: Search },
+                                                            { text: 'Sniper', icon: Fingerprint },
+                                                            { text: 'Máquina', icon: Zap }
+                                                        ].map((item, i) => (
+                                                            <div key={i} className={cn(
+                                                                "h-8 rounded-[var(--radius)] flex items-center px-3 gap-2 text-[10px] font-bold transition-all cursor-pointer",
+                                                                i === 1 ? "bg-[var(--hover)] text-[var(--primary)] border-r-2 border-[var(--primary)]" : "text-[var(--text-secondary)] hover:bg-[var(--hover)] hover:text-[var(--text-primary)]"
+                                                            )}>
+                                                                <item.icon className={cn("w-3.5 h-3.5", i === 1 ? "text-[var(--primary)]" : "text-current opacity-70")} />
+                                                                {item.text}
                                                             </div>
                                                         ))}
                                                     </div>
                                                 </div>
+                                            </div>
 
-                                                {/* UI Elements Check */}
-                                                <div className="grid grid-cols-2 gap-6">
-                                                    <div className="p-6 bg-[var(--card)] border border-[var(--border-subtle)] rounded-[var(--radius)] space-y-4">
-                                                        <h3 className="text-[10px] font-black text-[var(--text-secondary)] uppercase">Inputs & Forms</h3>
-                                                        <div className="space-y-3">
-                                                            <div className="flex flex-col gap-1">
-                                                                <label className="text-[10px] font-bold text-[var(--text-secondary)] uppercase">Nome do Projeto</label>
-                                                                <div className="h-9 px-3 rounded-[var(--radius)] bg-[var(--background)] border border-[var(--border-subtle)] flex items-center text-xs text-[var(--text-primary)]">
-                                                                    Marketing Q1
-                                                                </div>
-                                                            </div>
-                                                            <div className="flex items-center gap-2 p-2 rounded hover:bg-[var(--hover)] transition-colors">
-                                                                <div className="w-4 h-4 rounded border border-[var(--primary)] bg-[var(--primary)] flex items-center justify-center text-white">
-                                                                    <Check className="w-3 h-3" />
-                                                                </div>
-                                                                <span className="text-xs text-[var(--text-primary)]">Notificações Ativas</span>
+                                            {/* WORKSPACE CONTENT */}
+                                            <div className="flex-1 p-8 overflow-y-auto space-y-6 bg-[var(--background)]">
+                                                <div className="flex items-end justify-between mb-8">
+                                                    <div className="space-y-1">
+                                                        <h3 className="text-[var(--text-secondary)] font-black text-[8px] uppercase tracking-[0.3em]">Visão Geral</h3>
+                                                        <h1 className="text-2xl font-black text-[var(--text-primary)] tracking-tight" style={{ fontSize: `${fsTitle}px` }}>Resultados do Dia</h1>
+                                                    </div>
+                                                    <button className="px-4 py-2 bg-[var(--primary)] text-white text-[10px] font-black uppercase tracking-widest rounded-[var(--radius)] shadow-xl shadow-[var(--primary)]/20 animate-pulse">Novo Scan</button>
+                                                </div>
+
+                                                <div className="grid grid-cols-3 gap-4">
+                                                    {[
+                                                        { label: 'Leads Hoje', val: '1,284', grow: '+12%' },
+                                                        { label: 'Conversão', val: '4.2%', grow: '+0.5%' },
+                                                        { label: 'ROI Ativo', val: '12.4x', grow: '+2.1%' }
+                                                    ].map((kpi, i) => (
+                                                        <div key={i} className="p-5 rounded-[var(--radius)] bg-[var(--card)] border border-[var(--border)] group hover:border-[var(--primary)]/30 transition-all">
+                                                            <p className="text-[8px] font-black text-[var(--text-secondary)] uppercase tracking-[0.1em] mb-1">{kpi.label}</p>
+                                                            <div className="flex items-baseline gap-2">
+                                                                <span className="text-xl font-black text-[var(--text-primary)]" style={{ fontSize: `${fsCardTitle}px` }}>{kpi.val}</span>
+                                                                <span className="text-[8px] font-bold text-emerald-500">{kpi.grow}</span>
                                                             </div>
                                                         </div>
-                                                    </div>
+                                                    ))}
+                                                </div>
 
-                                                    <div className="p-6 bg-[var(--card)] border border-[var(--border-subtle)] rounded-[var(--radius)] space-y-4">
-                                                        <h3 className="text-[10px] font-black text-[var(--text-secondary)] uppercase">Alertas & Status</h3>
-                                                        <div className="space-y-2">
-                                                            <div className="px-3 py-2 rounded-[var(--radius)] bg-[var(--success)]/10 border border-[var(--success)]/20 text-[var(--success)] text-[10px] font-bold uppercase flex items-center gap-2">
-                                                                <Check className="w-3 h-3" /> Sistema Operacional
-                                                            </div>
-                                                            <div className="px-3 py-2 rounded-[var(--radius)] bg-[var(--warning)]/10 border border-[var(--warning)]/20 text-[var(--warning)] text-[10px] font-bold uppercase flex items-center gap-2">
-                                                                <Zap className="w-3 h-3" /> Backup Pendente
-                                                            </div>
+                                                {/* DATA TABLE MOCKUP */}
+                                                <div className="rounded-[var(--radius)] border border-[var(--border)] overflow-hidden bg-[var(--card)]">
+                                                    <div className="h-10 bg-[var(--hover)] border-b border-[var(--border)] flex items-center px-4 justify-between">
+                                                        <div className="flex gap-4">
+                                                            <div className="w-24 h-2 bg-[var(--text-secondary)]/10 rounded" />
+                                                            <div className="w-16 h-2 bg-[var(--text-secondary)]/10 rounded" />
                                                         </div>
+                                                        <Search className="w-3 h-3 text-[var(--text-secondary)]" />
                                                     </div>
+                                                    {[1, 2, 3].map(row => (
+                                                        <div key={row} className="h-12 border-b border-[var(--border-subtle)] last:border-0 flex items-center px-4 justify-between hover:bg-[var(--hover)] transition-colors">
+                                                            <div className="flex items-center gap-3">
+                                                                <div className="w-6 h-6 rounded-full bg-[var(--border-subtle)]" />
+                                                                <div className="w-32 h-2 bg-[var(--text-primary)]/5 rounded" />
+                                                            </div>
+                                                            <div className="w-12 h-4 rounded-full bg-[var(--primary)]/10 border border-[var(--primary)]/20" />
+                                                        </div>
+                                                    ))}
                                                 </div>
                                             </div>
                                         </div>
